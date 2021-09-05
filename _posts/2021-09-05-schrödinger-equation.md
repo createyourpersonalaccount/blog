@@ -49,7 +49,7 @@ $$
 \end{align}
 $$
 
-If we define $H(t) := A'(t)$, which is again a Hermitian operator (since the Lie algebra is a vector space and thus closed under derivatives unlike curved spaces), we get \eqref{eq:main}.
+If we define $H(t) := A'(t)$, which is again a Hermitian operator, (since the Lie algebra is a vector space and thus closed under derivatives unlike curved spaces), we get \eqref{eq:main}.
 
 # Conclusion
 
