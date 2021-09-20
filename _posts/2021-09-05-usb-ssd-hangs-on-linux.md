@@ -53,8 +53,12 @@ The part we are interested in is given above by `0411:02d0`. Set a temporary she
 If you are trying to fix this issue on a permanent environment, use
 
 ```sh
-    echo usb_storage quirks=$ID:u | sudo tee -a /etc/modprobe.d/usb_storage.conf
+    echo options usb_storage quirks=$ID:u | sudo tee -a /etc/modprobe.d/usb_storage.conf
 ```
+
+Then, the instructions to initrd need to be updated, so that it loads the module with the quirk. This depends on the distribution; on Debian-based distributions you would use `sudo update-initramfs -u` and on Fedora you would use `sudo dracut -v -f`. Do not blindly use these commands, it won't work; read the manual to see exactly what it is you need to do.
+
+In theory, initrd only needs to load the modules required to access the root filesystem. Some distributions put all common kernel modules to be loaded in initrd; there's also udev involved which may load additional modules. As a consequence the modules are loaded before the quirk, and that's why a new initramfs has to be generated. 
 
 ## On a live environment
 
