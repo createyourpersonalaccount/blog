@@ -21,15 +21,7 @@ We will boot on a virtual machine with two hard drives, setting the first to the
 qemu-kvm -m 2G -drive file=/dev/sdb,format=raw,snapshot=on -drive file=vm.img,format=raw
 ```
 
-This command may produce the error: `Could not open '/dev/sdb': Permission denied`. There are several methods to deal with this, we detail two:
-
-- Run the command as `sudo`, accepting the danger of running QEMU as root.
-- Add your user to the group permissions for `/dev/sdb`:
-  - First, find the group by using `ls -l /dev/sdb | cut -d " " -f 4`, which for me is `disk`.
-  - Then add the user to the listed group above (the method varies depending on the distribution).
-  - Log in again using `su -l <user>` to refresh the groups the user is in.
-  - Execute QEMU and finish the installation.
-  - Remove the user from the `disk` group (the method varies depending on the distribution).
+This command may produce the error: `Could not open '/dev/sdb': Permission denied`. There are several methods to deal with this, the simplst is to run the command as `sudo`, accepting the danger of running QEMU as root. Others are detailed in the blog post [Accessing a restricted file on Linux and BSD](https://createyourpersonalaccount.github.io/blog/2022/01/23/accessing-a-restricted-file.html).
 
 Complete installation, shut down and then simply exit out of QEMU.
 
