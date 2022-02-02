@@ -5,10 +5,10 @@ title: How to use QEMU with a live USB
 
 # Create a disk image for storage
 
-We create a virtual hard drive named `vm.img` of size 10G.
+We create a virtual hard drive named `vm.img` of size 20G.
 
 ```bash
-qemu-img create -f raw vm.img 10G
+qemu-img create -f raw vm.img 20G
 ```
 
 The file format is `raw`, which has few features but offers performance.
