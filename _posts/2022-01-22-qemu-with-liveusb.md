@@ -32,3 +32,5 @@ Now you can boot from your disk file.
 ```bash
 qemu-kvm -m 2G -drive file=vm.img,format=raw
 ```
+
+If available, it is advisable to enable kvm by passing `-enable-kvm` to `qemu-kvm`. This will speed up emulation significantly.
