@@ -37,8 +37,9 @@ fact, this equation exactly states the relationship between these two
 quantities, and captures the intuition that current density must be
 derivable from charge density.
 
-The equation is $\partial_t \rho = -\div\vec{F}$. The left hand side
-is the rate of change of charge, while divergence is a measure of
+The equation is $\partial_t \rho = -\operatorname{div}\vec{F}$. The
+left hand side is the rate of change of charge, while
+[divergence](https://en.wikipedia.org/wiki/Divergence) is a measure of
 outgoingness of the field $\vec{F}$. For example, if charge is
 lessening at $x$, and so $\partial_t\rho$ is negative, we expect the
 current density to be outgoing. The current density $\vec{j}$
