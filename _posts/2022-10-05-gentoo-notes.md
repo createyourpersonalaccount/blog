@@ -127,3 +127,5 @@ Continue reading from <https://wiki.gentoo.org/wiki/Handbook:AMD64/Working/Porta
 - [X] What does `grub-mkconfig -o /boot/grub/grub.cfg` do? Does it look under `/boot` to generate the GRUB entries?
   
   The command generates a configuration file using scripts from `/etc/grub.d` and information from `/etc/default/grub`.
+
+- [ ] Read https://wiki.gentoo.org/wiki/SSD and enable trimming.
