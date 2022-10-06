@@ -129,3 +129,5 @@ Continue reading from <https://wiki.gentoo.org/wiki/Handbook:AMD64/Working/Porta
   The command generates a configuration file using scripts from `/etc/grub.d` and information from `/etc/default/grub`.
 
 - [ ] Read https://wiki.gentoo.org/wiki/SSD and enable trimming.
+
+- [ ] What is the difference between profiles? Can it be pointed out? The difference between stable, desktop and hardened.
