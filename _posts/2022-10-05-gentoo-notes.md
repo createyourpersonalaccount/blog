@@ -164,6 +164,6 @@ Continue reading from <https://wiki.gentoo.org/wiki/Handbook:AMD64/Working/Porta
 
 - [ ] Get rid of multilib.
 
-- [ ] Fix brightness buttons. Do they show up under `xev`? Does adjustment via `/sys/class/backlight` work?
+- [X] Fix brightness buttons. Do they show up under `xev`? Does adjustment via `/sys/class/backlight` work?
 
     The buttons show up under `xev`. For now, I simply edit it to contain a fixed value. The `xbacklight` program might help.
