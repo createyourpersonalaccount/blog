@@ -128,9 +128,13 @@ Continue reading from <https://wiki.gentoo.org/wiki/Handbook:AMD64/Working/Porta
 
     The command generates a configuration file using scripts from `/etc/grub.d` and information from `/etc/default/grub`.
 
-- [ ] Set up log rotation with anachron.
+- [X] Set up log rotation with anacron.
 
-- [ ] Read https://wiki.gentoo.org/wiki/SSD and enable trimming.
+    This was possible with a custom monthly script that moves logs to `.old` logs under `/var/log`.
+
+- [X] Read https://wiki.gentoo.org/wiki/SSD and enable trimming.
+
+    This was possible by setting a weekly anacron job with `fstrim --fstab`.
 
 - [X] What is the difference between profiles? Can it be pointed out? The difference between stable, desktop and hardened.
 
