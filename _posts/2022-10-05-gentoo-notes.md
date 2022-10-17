@@ -124,22 +124,6 @@ Continue reading from <https://wiki.gentoo.org/wiki/Handbook:AMD64/Working/Porta
 
 # Questions
 
-- [X] What does `grub-mkconfig -o /boot/grub/grub.cfg` do? Does it look under `/boot` to generate the GRUB entries?
-
-    The command generates a configuration file using scripts from `/etc/grub.d` and information from `/etc/default/grub`.
-
-- [X] Set up log rotation with anacron.
-
-    This was possible with a custom monthly script that moves logs to `.old` logs under `/var/log`.
-
-- [X] Read https://wiki.gentoo.org/wiki/SSD and enable trimming.
-
-    This was possible by setting a weekly anacron job with `fstrim --fstab`.
-
-- [X] What is the difference between profiles? Can it be pointed out? The difference between stable, desktop and hardened.
-
-    Profiles defined in the Gentoo ebuild repo can be found under `/var/db/repos/gentoo/profiles/`. The profiles are directories; they form a [directed acyclic graph](https://en.wikipedia.org/wiki/Directed_acyclic_graph) (DAG), with the parent nodes defined in the `parent` file of the child node directory. As a DAG, there is a [well-defined linear order](https://en.wikipedia.org/wiki/Topological_sorting) that defines the order of the inheritance operation of parent profiles.
-
 - [ ] How should the kernel be configured?
 
     Use the article on [Hardware detection](https://wiki.gentoo.org/wiki/Hardware_detection) to find the right kernel drivers.
@@ -167,6 +151,22 @@ Continue reading from <https://wiki.gentoo.org/wiki/Handbook:AMD64/Working/Porta
 - [ ] What is bpftrace useful for? Should collectd be installed?
 
 - [ ] Get rid of multilib.
+
+- [X] What does `grub-mkconfig -o /boot/grub/grub.cfg` do? Does it look under `/boot` to generate the GRUB entries?
+
+    The command generates a configuration file using scripts from `/etc/grub.d` and information from `/etc/default/grub`.
+
+- [X] Set up log rotation with anacron.
+
+    This was possible with a custom monthly script that moves logs to `.old` logs under `/var/log`.
+
+- [X] Read https://wiki.gentoo.org/wiki/SSD and enable trimming.
+
+    This was possible by setting a weekly anacron job with `fstrim --fstab`.
+
+- [X] What is the difference between profiles? Can it be pointed out? The difference between stable, desktop and hardened.
+
+    Profiles defined in the Gentoo ebuild repo can be found under `/var/db/repos/gentoo/profiles/`. The profiles are directories; they form a [directed acyclic graph](https://en.wikipedia.org/wiki/Directed_acyclic_graph) (DAG), with the parent nodes defined in the `parent` file of the child node directory. As a DAG, there is a [well-defined linear order](https://en.wikipedia.org/wiki/Topological_sorting) that defines the order of the inheritance operation of parent profiles.
 
 - [X] Fix brightness buttons. Do they show up under `xev`? Does adjustment via `/sys/class/backlight` work?
 
