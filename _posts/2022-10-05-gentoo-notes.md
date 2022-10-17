@@ -7,10 +7,361 @@ title: Gentoo notes
 
 Here I keep track of my own personal notes on installing and maintaining [Gentoo Linux](https://www.gentoo.org/). It is not yet in a state where it will be much useful to others.
 
+## Install Gentoo on amd64 with OpenRC
+
+### Obtaining the files
+
+1. Download the installation media and burn to a USB.
+2. Download the stage3 file and store in another USB.
+
+### Booting the USB
+
+1. Connect the Ethernet cable to the computer.
+2. Boot the USB.
+
+### Preparing the disk
+
+We will use ext4 as the filesystem. We assume the disk is /dev/sda with 16G of RAM. (same as swap space.)
+
+1. fdisk /dev/sda
+2. Use the following key sequence, each time pressing enter in between:
+
+       g n 1 +256M t 1 n 2 +16G t 2 19 n 3 RET RET w
+
+3. mkfs.vfat -F 32 /dev/sda1
+4. mkfs.ext4 /dev/sda3
+5. mkswap /dev/sda2
+6. swapon /dev/sda2
+7. mount /dev/sda3 /mnt/gentoo
+
+### Installing stage3
+
+1. Verify the date with the `date` command. It should be accurate to within a second in UTC time. The time may be obtained from the internet using `ntpd -q -g`.
+2. cd /mnt/gentoo
+3. Copy the stage3 tarball to current directory.
+4. tar xpvf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner
+
+#### Compile options
+
+1. nano -w /mnt/gentoo/etc/portage/make.conf
+2. Example contents may be
+
+       COMMON_FLAGS="-march=native -O2 -pipe"
+       MAKEOPTS="-j8"
+
+The `MAKEOPTS` flag decides on the number of parallel
+
+#### Select mirrors
+
+1. mirrorselect -i -o >> /mnt/gentoo/etc/portage/make.conf
+2. mkdir --parents /mnt/gentoo/etc/portage/repos.conf
+3. cp /mnt/gentoo/usr/share/portage/config/repos.conf /mnt/gentoo/etc/portage/repos.conf/gentoo.conf
+4. cp --dereference /etc/resolv.conf /mnt/gentoo/etc/
+
+#### Mount the filesystems
+
+1. mount --types proc /proc /mnt/gentoo/proc
+2. mount --rbind /sys /mnt/gentoo/sys
+3. mount --make-rslave /mnt/gentoo/sys
+4. mount --rbind /dev /mnt/gentoo/dev
+5. mount --make-rslave /mnt/gentoo/dev
+6. mount --bind /run /mnt/gentoo/run
+7. mount --make-slave /mnt/gentoo/run
+
+#### Enter the new environment
+
+1. chroot /mnt/gentoo /bin/bash
+2. source /etc/profile
+3. export PS1="(chroot) ${PS1}"
+4. mount /dev/sda1 /boot
+
+#### Update ebuilds
+
+1. emerge --sync --quiet
+2. eselect news read
+3. eselect profile list
+4. eselect profile set <number>
+5. emerge --ask --verbose --update --deep --newuse @world
+
+#### Configuring the USE variable
+
+View it with `emerge --info | grep ^USE`. A full description is found in `/var/db/repos/gentoo/profiles/use.desc`. Edit `/etc/portage/make.conf`, for example:
+
+    USE="doc examples -bluetooth -cdr -dvd -dvdr -intel"
+
+If `X` is desired, add it and add also `xft` for modern fonts.
+
+#### Configuring the ACCEPT_LICENSE variable
+
+View it with `portageq envvar ACCEPT_LICENSE`. Edit `/etc/portage/make.conf`, for example:
+
+    ACCEPT_LICENSE="-* @FREE @BINARY_REDISTRIBUTABLE"
+
+#### Timezone
+
+1. Find the timezone under `ls /usr/share/timezone`
+2. Write in `/etc/timezone`, e.g.:
+
+       echo "Europe/Brussels" > /etc/timezone
+
+3. emerge --config sys-libs/timezone-data
+
+#### Locale generation & selection
+
+1. nano -w /etc/locale.gen
+2. Add
+
+       en_US ISO-8859-1
+       en_US.UTF-8 UTF-8
+
+3. locale-gen
+4. eselect locale list
+5. eselect locale set <number>
+6. env-update && source /etc/profile && export PS1="(chroot) ${PS1}"
+
+### Configuring the kernel with genkernel
+
+1. emerge --ask sys-kernel/linux-firmware
+2. emerge --ask sys-kernel/gentoo-sources
+3. eselect kernel list
+4. eselect kernel set <number>
+5. emerge --ask sys-kernel/genkernel
+6. nano -w /etc/fstab
+
+       /dev/sda1	/boot	ext4	defaults	0 2
+
+7. genkernel all
+8. Write down the names of the kernel and initrd, displayed with
+
+       ls /boot/vmlinu* /boot/initramfs*
+
+### Configuring the system
+
+#### Edit fstab
+
+1. nano -w /etc/fstab
+
+       /dev/sda1   /boot        vfat    defaults,noatime     0 2
+       /dev/sda2   none         swap    sw                   0 0
+       /dev/sda3   /            ext4    noatime              0 1
+
+#### Network
+
+1. nano -w /etc/conf.d/hostname
+
+       hostname="tux"
+
+2. emerge --ask net-misc/dhcpcd
+3. rc-update add dhcpcd default
+4. rc-service dhcpcd start # may error if dhcpcd is already running
+
+#### Account management
+
+Set up root password with `passwd`.
+
+Set up a new account with `useradd -m -G audio,video,users,wheel -s /bin/bash <username>`. These are the right groups for that account to launch Xorg later with elogind and have access to `su -l root`.
+
+Accounts can be modified with `usermod`.
+
+#### System logger
+
+1. emerge --ask app-admin/sysklogd
+2. rc-update add sysklogd default
+
+#### Install a cron daemon
+
+1. emerge --ask sys-process/cronie
+2. rc-update add cronie default
+
+#### File indexing
+
+1. emerge --ask sys-apps/mlocate
+
+#### Time synchronization
+
+1. emerge --ask net-misc/chrony
+2. rc-update add chronyd default
+
+#### Wireless tools
+
+1. emerge --ask net-wireless/iw net-wireless/wpa_supplicant
+
+### Bootloader
+
+1. emerge --ask --verbose sys-boot/grub
+2. grub-install --target=x86_64-efi --efi-directory=/boot
+3. Check that the names of the kernel and initrd are mentioned under `ls /boot`
+4. grub-mkconfig -o /boot/grub/grub.cfg
+
+### Reboot
+
+1. exit
+2. cd
+3. umount -l /mnt/gentoo/dev{/shm,/pts,}
+4. umount -R /mnt/gentoo
+5. reboot
+
+## updating the kernel
+
+When updating the kernel, use
+
+    eselect kernel list
+    eselect kernel set <number>
+
+This switches the kernel symlink `/usr/src/linux` to the newest version.
+
+Then copy the configuration file from the old kernel, somewhere under `/usr/src/linux-*/.config`, to `/usr/src/linux`.
+
+Then run `make oldconfig` under `/usr/src/linux` to configure any options that are new.
+
+Finally run `make -j12` and then `make modules_install` and finally `make install`.
+
+Update initramfs with `genkernel --kernel-config=/usr/src/linux-target/.config initramfs` where `linux-target` is the kernel you're compiling. (Do not use `/usr/src/linux/.config` here; it can cause data loss).
+
+The last thing is to update GRUB, so run `grub-mkconfig -o /boot/grub/grub.cfg`.
+
+## OpenRC
+
+To show the OpenRC registered scripts, use
+
+    rc-update show
+
+With `-v`, all are shown. It is also possible to use `rc-status`.
+    
+To add `elogind` to `boot`, use
+
+    rc-update add elogind boot
+
+To restart a service such as cronie, use
+
+    rc-service cronie restart
+
+To stop and remove a service, use
+
+    rc-service my_service stop
+    rc-update delete my_service my_runlevel
+
+For more info, see https://wiki.gentoo.org/wiki/OpenRC_to_systemd_Cheatsheet
+
+## portage
+
+View the world contents with
+
+    cat /var/lib/portage/world
+
+View information about a package with
+
+    emerge -s package-name
+
+Find which package a file belongs to
+
+    portageq owners / /path/to/file
+
+Find reverse-dependencies with
+
+    emerge -cvp package
+
+Direct dependencies may be listed with
+
+    emerge -evp package
+
+List USE flags of a package with
+
+    emerge -vp package
+
+To update the system, use
+
+    emaint sync -a
+    emerge -auND @world
+
+The `-u` flag updates to recent version; the `-N` flag is to include packages whose USE flags have changed and `-D` makes a deep update of dependencies.
+
+To view the metadata of a Gentoo repo package, look at the file
+
+    /var/db/repos/gentoo/metadata/md5-cache/category/package_name
+
+## i3 configuration
+
+1. `cp /etc/i3/config ~/.config/i3/config`
+2. Delete the `bindsym` line relating to `exit` and replace with
+
+        mode "exit? [y/n]" {
+            bindsym y exec i3-msg exit
+            bindsym n mode "default"
+        }
+        bindsym Mod1+Shift+e mode "exit? [y/n]"
+3. Then reload the configuration with `Mod1+Shift+c`.
+
+
+## rxvt-unicode
+
+Make sure to install with the `xfg` USE flag; it allows for modern fonts as opposed to the old X core fonts.
+
+Find the system fonts with
+
+    fc-list | sort
+
+The final phrase is the name of the font, for example `Liberation Mono`. To use this font with `.Xresources`, use
+
+    URxvt.font: xft:Liberation Mono
+
+It is also possible to use `xft:monospace` and then the font selected by `fontconfig` and matching with `fc-match monospace` will be used.
+
+## Touchpad
+
+Sometimes enabling `libinput` and `synaptics` to `INPUT_DEVICES` is not enough; also follow https://wiki.gentoo.org/wiki/Synaptics which recommends some kernel parameters.
+
+## Working internet (WiFi and Ethernet)
+
+If `dhcpcd` is installed, Ethernet should work by plugging in the cable. It uses dhcpcd directly.
+
+WiFi has a lot of options. We will use the following combination: `dhcpcd`, `wpa_supplicant`, `netifrc`. Netifrc is a network manager, the default under Gentoo with OpenRC. `wpa_supplicant` contains the algorithms for WiFi data transfer.
+
+Edit `/etc/wpa_supplicant/wpa_supplicant.conf` to contain (whitespace-sensitive around assignment):
+
+    ctrl_interface=/var/run/wpa_supplicant
+    ctrl_interface_group=0
+    ap_scan=1
+
+Then run `wpa_passphrase "MyNetworkSSID" >> /etc/wpa_supplicant/wpa_supplicant.conf` and enter the WiFi passphrase. Edit `MyNetworkSSID` to your network SSID. This completes the `wpa_supplicant` configuration.
+
+Now to configure netifrc. First run `ip link` and grab the wireless interface, such as `wlan0`. Edit `/etc/conf.d/net` to contain:
+
+    modules_wlan0="wpa_supplicant"
+    config_wlan0="dhcp"
+
+Here, replace `wlan0` with your wireless interface.
+
+Then, create a soft link with `ln -s /etc/init.d/net.lo /etc/init.d/net.wlan0`, again changing `wlan0` to the wireless interface.
+
+Finally, start the service with
+
+    rc-update net.wlan0 start
+
+and add it to start at boot with
+
+    rc-update add net.wlan0 default
+
 ## sysklogd logger
 
-- supports RFC5424 and RFC3164 style log messages.
-- local and remote logging available.
+A program can generate a log message using `syslog(3)`. The utility `logger` can generate messages in the command line. System logs are found under `/var/log/`, as configured in `/etc/syslog.conf` and other configuration files.
+
+Note that not all programs use syslog; some user their own custom log files, and some of them are found under `/var/log/`. The file `/var/log/syslog` captures all sysklogd messages.
+
+By default `syslogd` reads messages from `/dev/log` and `/dev/kmsg`, as well as an Internet socket (if specified) in `/etc/services`. See `man 8 syslogd` and `man 5 syslog.conf`.
+
+The format of `syslog.conf` is somewhat simple: there are two parts separated by a dot, the facility and the severity. Facility examples are `kern, user, mail`, and there's 7 severities in decreasing order of importance: `emergency, alert, critical, error, warning, notice, info, debug`. 
+
+The filter rules use the symbol set `*,!=;`. For example:
+
+    *.warning              # Capture everything at least as important as a warning (inclusive)
+    mail.!=warning         # Capture every message from mail except warning
+    kern,mail.!alert       # Capture every message from kernel or mail less important than an alert (exclusive)
+    kern.=alert;mail.=info # Capture kernel alert and mail info messages
+
+The filepath that follows the rule is where the messages are written. If a file path is preceded by a `-`, the messages are not synced to the file.
+
+Optionally, there is the option of specifying the format after the filepath, such as `;RFC5424`, but by default it is `;RFC3164`. Finally there's a `secure_mode 0-2` line, that specifies whether syslog messages are remotely received or sent.
 
 ### Configuration
 
@@ -40,6 +391,29 @@ With cronie, the following commands can be used
 - `crontab -e`, edit a crontab
 - `crontab -d <user>`, remove crontab
 - `crontab <file>`, new crontab
+
+### cronie
+
+To have cronie run SSD-trim operations once a week under all drives mentioned in fstab, insert the following script, called `trim_drive.sh` under `/etc/cron.weekly/`:
+
+    #!/bin/sh
+    fstrim --fstab
+
+Finally set `chmod ug+x /etc/cron.weekly/trim_drive.sh` on the script, to give it owner & group execution permissions.
+
+This script is loaded by cronie, who runs anacron every minute, which checks `/etc/anacrontab` and confirms that the files listed under there have ran as they should. In particular, it contains pre-configured daily, weekly, and monthly directories for sh scripts.
+
+### logrotation
+
+To enable log rotation, use the script
+
+    #!/bin/sh
+    
+    for x in kern.log messages syslog auth.log
+        mv -f "/var/log/${x}" "/var/log/${x}.old"
+    done
+
+saved under `/etc/cron.monthly/logrotate.sh` and with the execution bit set via `chmod ug+x /etc/cron.monthly/logrotate.sh`.
 
 ## portage
 
@@ -120,7 +494,23 @@ For the purpose of this subsection, the hard drive is divided into logical block
 
 # TODO
 
-Continue reading from <https://wiki.gentoo.org/wiki/Handbook:AMD64/Working/Portage#When_Portage_is_complaining>
+- [ ] Reconfigure kernel. Find which drivers are needed, which kernel modules are loaded. Get more and more minimal and potentially get rid of initramfs if possible with dm-crypt.
+- [ ] Configure Wayland
+- [ ] Figure out selinux
+- [ ] Configure encrypted hard drives. See https://forums.gentoo.org/viewtopic-t-1110764-highlight-.html
+- [ ] Make a list of important Gentoo files and directories.
+- [ ] Use pipewire?
+- [ ] Get a firewall
+- [ ] Read the security handbook
+- [ ] See https://wiki.gentoo.org/wiki/Keyboard_layout_switching to switch `Menu` key to `Control_R`.
+- [ ] Proceed to install packages that make the system nice: gdb, emacs, firefox, etc...
+- [ ] To enable debugging with gdb of installed packages, see https://wiki.gentoo.org/wiki/Debugging
+- [ ] Write a Rust cron daemon? Or proof-check cronie.
+- [X] Enable log rotation.
+- [X] Learn more about cronie.
+- [X] Enable SSD trimming.
+- [X] Study Portage more. Figure out the `emerge` options for `-uND` for example.
+- [X] Maintanance: How to perform security updates only? It is not worth it. But `glsa-check --list` can be used to check for issues after a sync.
 
 # Questions
 
