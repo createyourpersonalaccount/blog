@@ -23,27 +23,27 @@ Here I keep track of my own personal notes on installing and maintaining [Gentoo
 
 We will use ext4 as the filesystem. We assume the disk is /dev/sda with 16G of RAM. (same as swap space.)
 
-1. fdisk /dev/sda
+1. `fdisk /dev/sda`
 2. Use the following key sequence, each time pressing enter in between:
 
        g n 1 +256M t 1 n 2 +16G t 2 19 n 3 RET RET w
 
-3. mkfs.vfat -F 32 /dev/sda1
-4. mkfs.ext4 /dev/sda3
-5. mkswap /dev/sda2
-6. swapon /dev/sda2
-7. mount /dev/sda3 /mnt/gentoo
+3. `mkfs.vfat -F 32 /dev/sda1`
+4. `mkfs.ext4 /dev/sda3`
+5. `mkswap /dev/sda2`
+6. `swapon /dev/sda2`
+7. `mount /dev/sda3 /mnt/gentoo`
 
 ### Installing stage3
 
 1. Verify the date with the `date` command. It should be accurate to within a second in UTC time. The time may be obtained from the internet using `ntpd -q -g`.
-2. cd /mnt/gentoo
+2. `cd /mnt/gentoo`
 3. Copy the stage3 tarball to current directory.
-4. tar xpvf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner
+4. `tar xpvf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner`
 
 #### Compile options
 
-1. nano -w /mnt/gentoo/etc/portage/make.conf
+1. `nano /mnt/gentoo/etc/portage/make.conf`
 2. Example contents may be
 
        COMMON_FLAGS="-march=native -O2 -pipe"
@@ -53,35 +53,35 @@ The `MAKEOPTS` flag decides on the number of parallel
 
 #### Select mirrors
 
-1. mirrorselect -i -o >> /mnt/gentoo/etc/portage/make.conf
-2. mkdir --parents /mnt/gentoo/etc/portage/repos.conf
-3. cp /mnt/gentoo/usr/share/portage/config/repos.conf /mnt/gentoo/etc/portage/repos.conf/gentoo.conf
-4. cp --dereference /etc/resolv.conf /mnt/gentoo/etc/
+1. `mirrorselect -i -o >> /mnt/gentoo/etc/portage/make.conf`
+2. `mkdir --parents /mnt/gentoo/etc/portage/repos.conf`
+3. `cp /mnt/gentoo/usr/share/portage/config/repos.conf /mnt/gentoo/etc/portage/repos.conf/gentoo.conf`
+4. `cp --dereference /etc/resolv.conf /mnt/gentoo/etc/`
 
 #### Mount the filesystems
 
-1. mount --types proc /proc /mnt/gentoo/proc
-2. mount --rbind /sys /mnt/gentoo/sys
-3. mount --make-rslave /mnt/gentoo/sys
-4. mount --rbind /dev /mnt/gentoo/dev
-5. mount --make-rslave /mnt/gentoo/dev
-6. mount --bind /run /mnt/gentoo/run
-7. mount --make-slave /mnt/gentoo/run
+1. `mount --types proc /proc /mnt/gentoo/proc`
+2. `mount --rbind /sys /mnt/gentoo/sys`
+3. `mount --make-rslave /mnt/gentoo/sys`
+4. `mount --rbind /dev /mnt/gentoo/dev`
+5. `mount --make-rslave /mnt/gentoo/dev`
+6. `mount --bind /run /mnt/gentoo/run`
+7. `mount --make-slave /mnt/gentoo/run`
 
 #### Enter the new environment
 
-1. chroot /mnt/gentoo /bin/bash
-2. source /etc/profile
-3. export PS1="(chroot) ${PS1}"
-4. mount /dev/sda1 /boot
+1. `chroot /mnt/gentoo /bin/bash`
+2. `source /etc/profile`
+3. `export PS1="(chroot) ${PS1}"`
+4. `mount /dev/sda1 /boot`
 
 #### Update ebuilds
 
-1. emerge --sync --quiet
-2. eselect news read
-3. eselect profile list
-4. eselect profile set <number>
-5. emerge --ask --verbose --update --deep --newuse @world
+1. `emerge --sync --quiet`
+2. `eselect news read`
+3. `eselect profile list`
+4. `eselect profile set <number>`
+5. `emerge --ask --verbose --update --deep --newuse @world`
 
 #### Configuring the USE variable
 
@@ -104,33 +104,33 @@ View it with `portageq envvar ACCEPT_LICENSE`. Edit `/etc/portage/make.conf`, fo
 
        echo "Europe/Brussels" > /etc/timezone
 
-3. emerge --config sys-libs/timezone-data
+3. `emerge --config sys-libs/timezone-data`
 
 #### Locale generation & selection
 
-1. nano -w /etc/locale.gen
+1. `nano /etc/locale.gen`
 2. Add
 
        en_US ISO-8859-1
        en_US.UTF-8 UTF-8
 
-3. locale-gen
-4. eselect locale list
-5. eselect locale set <number>
-6. env-update && source /etc/profile && export PS1="(chroot) ${PS1}"
+3. `locale-gen`
+4. `eselect locale list`
+5. `eselect locale set <number>`
+6. `env-update && source /etc/profile && export PS1="(chroot) ${PS1}"`
 
 ### Configuring the kernel with genkernel
 
-1. emerge --ask sys-kernel/linux-firmware
-2. emerge --ask sys-kernel/gentoo-sources
-3. eselect kernel list
-4. eselect kernel set <number>
-5. emerge --ask sys-kernel/genkernel
-6. nano -w /etc/fstab
+1. `emerge --ask sys-kernel/linux-firmware`
+2. `emerge --ask sys-kernel/gentoo-sources`
+3. `eselect kernel list`
+4. `eselect kernel set <number>`
+5. `emerge --ask sys-kernel/genkernel`
+6. `nano /etc/fstab`
 
        /dev/sda1	/boot	ext4	defaults	0 2
 
-7. genkernel all
+7. `genkernel all`
 8. Write down the names of the kernel and initrd, displayed with
 
        ls /boot/vmlinu* /boot/initramfs*
@@ -139,7 +139,7 @@ View it with `portageq envvar ACCEPT_LICENSE`. Edit `/etc/portage/make.conf`, fo
 
 #### Edit fstab
 
-1. nano -w /etc/fstab
+1. `nano /etc/fstab`
 
        /dev/sda1   /boot        vfat    defaults,noatime     0 2
        /dev/sda2   none         swap    sw                   0 0
@@ -147,13 +147,13 @@ View it with `portageq envvar ACCEPT_LICENSE`. Edit `/etc/portage/make.conf`, fo
 
 #### Network
 
-1. nano -w /etc/conf.d/hostname
+1. `nano /etc/conf.d/hostname`
 
        hostname="tux"
 
-2. emerge --ask net-misc/dhcpcd
-3. rc-update add dhcpcd default
-4. rc-service dhcpcd start # may error if dhcpcd is already running
+2. `emerge --ask net-misc/dhcpcd`
+3. `rc-update add dhcpcd default`
+4. `rc-service dhcpcd start # may error if dhcpcd is already running`
 
 #### Account management
 
@@ -165,41 +165,41 @@ Accounts can be modified with `usermod`.
 
 #### System logger
 
-1. emerge --ask app-admin/sysklogd
-2. rc-update add sysklogd default
+1. `emerge --ask app-admin/sysklogd`
+2. `rc-update add sysklogd default`
 
 #### Install a cron daemon
 
-1. emerge --ask sys-process/cronie
-2. rc-update add cronie default
+1. `emerge --ask sys-process/cronie`
+2. `rc-update add cronie default`
 
 #### File indexing
 
-1. emerge --ask sys-apps/mlocate
+1. `emerge --ask sys-apps/mlocate`
 
 #### Time synchronization
 
-1. emerge --ask net-misc/chrony
-2. rc-update add chronyd default
+1. `emerge --ask net-misc/chrony`
+2. `rc-update add chronyd default`
 
 #### Wireless tools
 
-1. emerge --ask net-wireless/iw net-wireless/wpa_supplicant
+1. `emerge --ask net-wireless/iw net-wireless/wpa_supplicant`
 
 ### Bootloader
 
-1. emerge --ask --verbose sys-boot/grub
-2. grub-install --target=x86_64-efi --efi-directory=/boot
+1. `emerge --ask --verbose sys-boot/grub`
+2. `grub-install --target=x86_64-efi --efi-directory=/boot`
 3. Check that the names of the kernel and initrd are mentioned under `ls /boot`
-4. grub-mkconfig -o /boot/grub/grub.cfg
+4. `grub-mkconfig -o /boot/grub/grub.cfg`
 
 ### Reboot
 
-1. exit
-2. cd
-3. umount -l /mnt/gentoo/dev{/shm,/pts,}
-4. umount -R /mnt/gentoo
-5. reboot
+1. `exit`
+2. `cd`
+3. `umount -l /mnt/gentoo/dev{/shm,/pts,}`
+4. `umount -R /mnt/gentoo`
+5. `reboot`
 
 ## updating the kernel
 
