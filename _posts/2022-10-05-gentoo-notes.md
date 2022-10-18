@@ -514,6 +514,12 @@ For the purpose of this subsection, the hard drive is divided into logical block
 
 # Questions
 
+- [ ] How to use `dracut` to generate an initramfs?
+
+    Before using `dracut`, maybe I can just use
+    
+        genkernel --luks --menuconfig all
+
 - [ ] How should the kernel be configured?
 
     Use the article on [Hardware detection](https://wiki.gentoo.org/wiki/Hardware_detection) to find the right kernel drivers.
