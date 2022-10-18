@@ -99,7 +99,7 @@ View it with `portageq envvar ACCEPT_LICENSE`. Edit `/etc/portage/make.conf`, fo
 
 #### Timezone
 
-1. Find the timezone under `ls /usr/share/timezone`
+1. Find the timezone under `ls /usr/share/zoneinfo`
 2. Write in `/etc/timezone`, e.g.:
 
        echo "Europe/Brussels" > /etc/timezone
