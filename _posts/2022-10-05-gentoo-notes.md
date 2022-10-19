@@ -522,6 +522,12 @@ For the purpose of this subsection, the hard drive is divided into logical block
     
         genkernel --luks --menuconfig all
 
+    Note that `dracut` is also a USE flag; and that the command to use should be
+
+        dracut --hostonly
+
+    One can also use `--kver 3.2.5-hardened` to give a special version string to the generated initramfs.
+
 - [ ] How should the kernel be configured?
 
     Use the article on [Hardware detection](https://wiki.gentoo.org/wiki/Hardware_detection) to find the right kernel drivers.
