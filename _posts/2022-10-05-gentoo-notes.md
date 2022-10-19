@@ -68,6 +68,8 @@ The `MAKEOPTS` flag decides on the number of parallel
 6. `mount --bind /run /mnt/gentoo/run`
 7. `mount --make-slave /mnt/gentoo/run`
 
+The `slave` commands are not required for OpenRC.
+
 #### Enter the new environment
 
 1. `chroot /mnt/gentoo /bin/bash`
@@ -550,7 +552,7 @@ For the purpose of this subsection, the hard drive is divided into logical block
 
 - [X] What does `grub-mkconfig -o /boot/grub/grub.cfg` do? Does it look under `/boot` to generate the GRUB entries?
 
-    The command generates a configuration file using scripts from `/etc/grub.d` and information from `/etc/default/grub`.
+    The command generates a configuration file using scripts from `/etc/grub.d` and information from `/etc/default/grub`. The scripts can search for kernels and other operating systems, initramfs, and do other things.
 
 - [X] Set up log rotation with anacron.
 
