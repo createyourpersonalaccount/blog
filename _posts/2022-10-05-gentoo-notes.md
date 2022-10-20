@@ -62,13 +62,8 @@ The `MAKEOPTS` flag decides on the number of parallel
 
 1. `mount --types proc /proc /mnt/gentoo/proc`
 2. `mount --rbind /sys /mnt/gentoo/sys`
-3. `mount --make-rslave /mnt/gentoo/sys`
-4. `mount --rbind /dev /mnt/gentoo/dev`
-5. `mount --make-rslave /mnt/gentoo/dev`
-6. `mount --bind /run /mnt/gentoo/run`
-7. `mount --make-slave /mnt/gentoo/run`
-
-The `slave` commands are not required for OpenRC.
+3. `mount --rbind /dev /mnt/gentoo/dev`
+4. `mount --bind /run /mnt/gentoo/run`
 
 #### Enter the new environment
 
