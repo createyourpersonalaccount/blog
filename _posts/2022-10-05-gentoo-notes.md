@@ -198,6 +198,38 @@ Accounts can be modified with `usermod`.
 4. `umount -R /mnt/gentoo`
 5. `reboot`
 
+## encrypted btrfs with hardened nomultilib selinux profile
+
+It is recommended to follow the ext4-unencrypted steps above at least once before attempting this. The steps below are simply adding to the instructions given above.
+
+### Preparing the disk (extended)
+
+At the _Preparing the disk_ step, use `gdisk` to create a `256M` EFI boot partition and make another partition, a linux filesystem, with the rest of the disk. Then use `cryptsetup luksFormat` to make the latter a luks-encrypted partition, and then `cryptsetup open` it. Then use `make.btrfs` in the mapper to create a btrfs filesystem, and use `btrfs` to create three subvolumes; `root, swap, home`. Follow the [Btrfs documentation for a swapfile](https://btrfs.readthedocs.io/en/latest/Swapfile.html). Finally, mount the three subvolumes using the `mount` option `-o subvol=...` where `...` is each of `root, swap, home`, and `swapon` the swapfile.
+
+### Configuring the kernel with genkernel (extended)
+
+Use genkernel with the `--luks` parameter when compiling the kernel and initramfs.
+
+### Edit fstab (extended)
+
+The `/etc/fstab` file should use the PARTUUID for `/boot` and the `UUID` corresponding to the mapper partitions for `/, /swap, /home`, obtained from the `blkid` command, for example:
+
+    UUID=...		/		btrfs	defaults,noatime,subvol=root	0 0
+    PARTUUID=...	/boot	vfat	defaults,noatime				0 2
+    UUID=...		/home	btrfs	defaults,noatime,subvol=home	0 0
+    UUID=...		/swap	btrfs	defaults,noatime,subvol=swap	0 0
+    /swap/swapfile	none	swap	defaults						0 0
+
+### Bootloader (extended)
+
+Install grub with the `device-mapper` USE flag enabled, e.g. add it in [`/etc/portage/package.use`](https://wiki.gentoo.org/wiki//etc/portage/package.use).
+
+After installing grub, edit `/etc/defaults/grub` to have the second partition UUID specified as
+
+    GRUB_CMDLINE_LINUX="crypt_root=UUID=<my-root-uuid-here>"
+
+At the end, if `/mnt/gentoo` can't be unmounted because it is busy, you might need to `swapoff` the swapfile.
+
 ## updating the kernel
 
 When updating the kernel, use
