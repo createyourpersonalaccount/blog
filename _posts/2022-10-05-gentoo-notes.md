@@ -581,7 +581,7 @@ For the purpose of this subsection, the hard drive is divided into logical block
 
 - [ ] What is bpftrace useful for? Should collectd be installed?
 
-- [ ] Get rid of multilib.
+- [X] Get rid of multilib.
 
 - [X] What does `grub-mkconfig -o /boot/grub/grub.cfg` do? Does it look under `/boot` to generate the GRUB entries?
 
