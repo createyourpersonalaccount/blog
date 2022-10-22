@@ -523,10 +523,9 @@ For the purpose of this subsection, the hard drive is divided into logical block
 
 # TODO
 
-- [ ] Reconfigure kernel. Find which drivers are needed, which kernel modules are loaded. Get more and more minimal and potentially get rid of initramfs if possible with dm-crypt.
+- [ ] Reconfigure kernel. Find which drivers are needed, which kernel modules are loaded.
 - [ ] Configure Wayland
 - [ ] Figure out selinux
-- [ ] Configure encrypted hard drives. See https://forums.gentoo.org/viewtopic-t-1110764-highlight-.html
 - [ ] Make a list of important Gentoo files and directories.
 - [ ] Use pipewire?
 - [ ] Get a firewall
@@ -535,6 +534,7 @@ For the purpose of this subsection, the hard drive is divided into logical block
 - [ ] Proceed to install packages that make the system nice: gdb, emacs, firefox, etc...
 - [ ] To enable debugging with gdb of installed packages, see https://wiki.gentoo.org/wiki/Debugging
 - [ ] Write a Rust cron daemon? Or proof-check cronie.
+- [X] Configure encrypted hard drives. See https://forums.gentoo.org/viewtopic-t-1110764-highlight-.html
 - [X] Enable log rotation.
 - [X] Learn more about cronie.
 - [X] Enable SSD trimming.
