@@ -9,8 +9,15 @@ title: Cube intersection algorithm
 In this article I outline the derivation of a simple algorithm that
 checks the intersection of two cubes of general position in
 space. Programmers who are interested only in the algorithm should
-read the definitions and the checks, marked with **bold**, skipping
+read the definitions and the **checks**, marked with bold, skipping
 the mathematical explanations.
+
+If you wish to adapt these definitions to your program, you must take
+care to correctly calculate the vectors involved. I use a certain
+representation of the edge and face; the numbers involved will depend
+on your representation of a cube. (For example, you may represent a
+cube by its 8 vertices, or choose to represent it with a basepoint and
+a diagonal.)
 
 I wrote this article for anyone who is interested in writing a cube
 intersection algorithm. I have not researched how it holds up in terms
@@ -134,8 +141,6 @@ calculation:
 $$0 \leq (Z\times (Y\times Z)) \cdot (U - X + \frac{(X - U)\cdot (Y\times Z)}{V\cdot (Y\times Z)}V) \leq \|Y \times Z\|^2,$$
 
 $$0 \leq ((Y\times Z)\times Y) \cdot (U - X + \frac{(X - U)\cdot (Y\times Z)}{V\cdot (Y\times Z)}V) \leq \|Y \times Z\|^2.$$
-
-
 
 #### The result of $I(E, F)$
 
