@@ -164,11 +164,9 @@ The [`attrs`](https://www.attrs.org/en/stable/) package is only used
 to make Python classes easier to work with.
 
 ```python
-import array
+from array import array
 from attrs import define
 from numpy import add, subtract, dot, cross
-
-__version__ = '0.1.0'
 
 @define
 class Edge:
@@ -176,8 +174,8 @@ class Edge:
     #
     # a -> b
     #
-    a: array.array('f')
-    b: array.array('f')
+    a: array('f')
+    b: array('f')
 
 @define
 class Face:
@@ -187,10 +185,10 @@ class Face:
     # |    |
     # a -- b
     #
-    a: array.array('f')
-    b: array.array('f')
-    c: array.array('f')
-    d: array.array('f')
+    a: array('f')
+    b: array('f')
+    c: array('f')
+    d: array('f')
 
 @define
 class Cube:
@@ -204,14 +202,14 @@ class Cube:
     # |    |    South face
     # a -- b
     #
-    a: array.array('f')
-    b: array.array('f')
-    c: array.array('f')
-    d: array.array('f')
-    e: array.array('f')
-    f: array.array('f')
-    g: array.array('f')
-    h: array.array('f')
+    a: array('f')
+    b: array('f')
+    c: array('f')
+    d: array('f')
+    e: array('f')
+    f: array('f')
+    g: array('f')
+    h: array('f')
 
 # Return the 6 faces of the cube
 def get_faces(r: Cube):
