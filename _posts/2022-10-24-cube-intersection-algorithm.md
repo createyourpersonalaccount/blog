@@ -19,11 +19,10 @@ on your representation of a cube. (For example, you may represent a
 cube by its 8 vertices, or choose to represent it with a basepoint and
 a diagonal.)
 
-I wrote this article for anyone who is interested in writing a cube
-intersection algorithm. I have not researched how it holds up in terms
-of performance when compared to other algorithms.
-
-I also have not researched its numerical stability properties.
+A word of warning: I wrote this article for anyone who is interested
+in writing a cube intersection algorithm. I have not researched how it
+holds up in terms of performance when compared to other algorithms. I
+also have not researched its numerical stability properties.
 
 ## Problem statement
 
