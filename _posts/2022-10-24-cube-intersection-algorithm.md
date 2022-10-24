@@ -6,6 +6,8 @@ title: Cube intersection algorithm
 
 # A simple algorithm
 
+Scroll to the end of the article for the Python code.
+
 In this article I outline the derivation of a simple algorithm that
 checks the intersection of two cubes of general position in
 space. Programmers who are interested only in the algorithm should
@@ -71,9 +73,10 @@ $$U\cdot N + \lambda V\cdot N = X\cdot N$$
 (where the eliminations happened because $N$ is perpendicular to $Y$
 and $Z$)
 
-Thus we can solve for $\lambda$, but first we must verify:
+Thus we can solve for $\lambda$, but first we must verify that the
+denominator is not zero:
 
-**(check 1)** We verify that $V\cdot N \not = 0$.
+**(check 1)** We verify that $V\cdot (Y\times Z) \not = 0$.
 
 Finally the solution for $\lambda$ is:
 
@@ -154,3 +157,122 @@ One minor optimization is by reducing the 72 $I(E, F)$ checks to a
 smaller number; this might be possible by first verifying that no
 vertex of the first cube lies inside the other cube, which implies
 that there will be at two faces intersecting the culprit edge.
+
+## The Python implementation
+
+The [`attrs`](https://www.attrs.org/en/stable/) package is only used
+to make Python classes easier to work with.
+
+```python
+import array
+from attrs import define
+from numpy import add, subtract, dot, cross
+
+__version__ = '0.1.0'
+
+@define
+class Edge:
+    # directed from a to b
+    #
+    # a -> b
+    #
+    a: array.array('f')
+    b: array.array('f')
+
+@define
+class Face:
+    # counter-clockwise
+    #
+    # d -- c
+    # |    |
+    # a -- b
+    #
+    a: array.array('f')
+    b: array.array('f')
+    c: array.array('f')
+    d: array.array('f')
+
+@define
+class Cube:
+    # A cube looks like this
+    #
+    # h -- g
+    # |    |    North face
+    # e -- f
+    #
+    # d -- c
+    # |    |    South face
+    # a -- b
+    #
+    a: array.array('f')
+    b: array.array('f')
+    c: array.array('f')
+    d: array.array('f')
+    e: array.array('f')
+    f: array.array('f')
+    g: array.array('f')
+    h: array.array('f')
+
+# Return the 6 faces of the cube
+def get_faces(r: Cube):
+    return [Face(r.a, r.b, r.c, r.d), # S
+            Face(r.a, r.e, r.h, r.d), # W
+            Face(r.b, r.c, r.g, r.f), # E 
+            Face(r.e, r.f, r.g, r.h), # N
+            Face(r.a, r.b, r.f, r.e), # front
+            Face(r.d, r.c, r.g, r.h)] # back
+
+# Return the 12 edges of the cube
+def get_edges(r: Cube):
+    return [Edge(r.a, r.b),
+            Edge(r.b, r.c),
+            Edge(r.c, r.d),
+            Edge(r.d, r.a),
+            Edge(r.e, r.f),
+            Edge(r.f, r.g),
+            Edge(r.g, r.h),
+            Edge(r.h, r.e),
+            Edge(r.a, r.e),
+            Edge(r.d, r.h),
+            Edge(r.b, r.f),
+            Edge(r.c, r.g)]
+
+def edge_face_intersect(edge: Edge, face: Face):
+    u = edge.a
+    v = edge.b
+    x = face.a
+    y = subtract(face.b, face.a)
+    z = subtract(face.d, face.a)
+    c = cross(x, y)
+
+    t1 =dot(v, c)
+    if t1 == 0:
+        return False
+
+    t2 = dot(subtract(x, u), c)
+
+    if t2 < 0 or t2 > t1:
+        return False
+    
+    i = add(u, multiply(t2 / t1, v))
+    ix = subtract(i, x)
+
+    norm_squared = dot(c, c)
+    t3 = dot(cross(z, c), ix)
+    if t3 < 0 or t3 > norm_squared:
+        return False
+    t4 = dot(cross(c, y), ix)
+    if t4 < 0 or t4 > norm_squared:
+        return False
+    
+    return True
+
+def intersect(r: Cube, s: Cube):
+    edges = get_edges(r)
+    faces = get_faces(s)
+    for edge in edges:
+        for face in faces:
+            if edge_face_intersect(edge, face):
+                return True
+    return False
+```
