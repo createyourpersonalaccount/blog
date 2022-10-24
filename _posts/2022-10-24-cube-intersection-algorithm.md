@@ -169,6 +169,8 @@ intersects the face $F$ is defined as follows:
 
 ## Further optimizations
 
+### Reducing the edge-face intersection calls
+
 We may reduce the 72 calls to $I(E, F)$ to only one:
 
 We first calculate the corner of $Q_1$ whose apex is the closest to
@@ -189,11 +191,13 @@ The calculation of the apex is a matter of three dot products and
 three inequality comparisons. To find the edge or face closest to the
 center, a few more dot products and inequalities must take place.
 
-Aside from this optimization, we may "pack" the representation of a
-cube to only $7$ real numbers instead of $24$ by using a side length,
-a base point and a 3-frame, also known as an element of $SO(3)$. See
-[Charts on $SO(3)$](https://en.wikipedia.org/wiki/Charts_on_SO(3)) for
-formulas and information.
+### Using less coordinates to represent the cubes
+
+We may "pack" the representation of a cube to only $7$ real numbers
+instead of $24$ by using a side length, a base point and a 3-frame,
+also known as an element of $SO(3)$. See [Charts on
+$SO(3)$](https://en.wikipedia.org/wiki/Charts_on_SO(3)) for formulas
+and information.
 
 ## The Python implementation
 
