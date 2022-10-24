@@ -43,6 +43,22 @@ there will be at most 72 such checks.
 Thus we need a function $I(E, F)$, that checks whether an edge $E$
 intersects with a face $F$.
 
+This operation is costly, but we can optimize by only checking when
+necessary: if $d$ is the distance of the centers of the cubes, and
+$s_1$ and $s_2$ their corresonding side lengths, then we have the
+following three cases:
+
+1) If $d > \sqrt 3 (s_1 + s_2) / 2$ then the cubes are too far to
+   intersect. (the [circumscribed
+   spheres](https://en.wikipedia.org/wiki/Circumscribed_sphere) do not
+   intersect.)
+2) Else, if $d \leq (s_1 + s_2) / 2$ then the cubes are too close;
+   they intersect. (the [inscribed
+   spheres](https://en.wikipedia.org/wiki/Inscribed_sphere)
+   intersect.)
+3) Otherwise perform the edge-face intersection checks described
+   below.
+
 ### Edge-Face intersection
 
 Suppose we're given an edge $V_U$ and a face $(Y, Z)_X$.
@@ -153,10 +169,25 @@ intersects the face $F$ is defined as follows:
 
 ## Further optimizations
 
-One minor optimization is by reducing the 72 $I(E, F)$ checks to a
-smaller number; this might be possible by first verifying that no
-vertex of the first cube lies inside the other cube, which implies
-that there will be at two faces intersecting the culprit edge.
+We may reduce the 72 calls to $I(E, F)$ to only one:
+
+We first calculate the corner of $Q_1$ whose apex is the closest to
+the center of $Q_2$, and vice versa, the corner of $Q_2$ whose apex is
+the closest to the center of $Q_1$.
+
+Then, we choose the edge $E$ of the first corner that is nearest to
+the apex of the second; and the face $F$ of the second that is nearest
+to the apex of the first.
+
+(Although these corners, edges, and faces are not unique, there is no
+issue picking one over the other.)
+
+Finally, we calculate the edge-face intersection, and this tells us
+whether the cubes intersect or not.
+
+The calculation of the apex is a matter of three dot products and
+three inequality comparisons. To find the edge or face closest to the
+center, a few more dot products and inequalities must take place.
 
 ## The Python implementation
 
@@ -166,7 +197,9 @@ to make Python classes easier to work with.
 ```python
 from array import array
 from attrs import define
-from numpy import add, subtract, dot, cross
+from math import sqrt
+from numpy import add, subtract, multiply, dot, cross
+from numpy.linalg import norm
 
 @define
 class Edge:
@@ -235,6 +268,12 @@ def get_edges(r: Cube):
             Edge(r.b, r.f),
             Edge(r.c, r.g)]
 
+def get_side(r: Cube):
+    return norm(sub(r.a, r.b))
+
+def get_center(r: Cube):
+    return add(r.a, multiply(.5, r.g))
+
 def edge_face_intersect(edge: Edge, face: Face):
     u = edge.a
     v = edge.b
@@ -266,11 +305,18 @@ def edge_face_intersect(edge: Edge, face: Face):
     return True
 
 def intersect(r: Cube, s: Cube):
-    edges = get_edges(r)
-    faces = get_faces(s)
-    for edge in edges:
-        for face in faces:
-            if edge_face_intersect(edge, face):
-                return True
-    return False
+    d = norm(sub(get_center(r), get_center(s))
+    t = (get_side(r) + get_side(s)) / 2
+    if d > sqrt(3) * t:
+        return False
+    elif d <= t:
+        return True
+    else:
+        edges = get_edges(r)
+        faces = get_faces(s)
+        for edge in edges:
+            for face in faces:
+                if edge_face_intersect(edge, face):
+                    return True
+         return False
 ```
