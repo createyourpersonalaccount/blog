@@ -32,8 +32,6 @@ Assume we're given two cubes $Q_1, Q_2$ of general position (i.e. not
 axis-aligned) in three-dimenisonal space. Write an algorithm that
 asserts whether they intersect or not.
 
-Assume that neither of the cubes contains the other fully.
-
 ## Solution
 
 One solution is to check that no edge of the first cube intersects
