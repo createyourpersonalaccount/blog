@@ -48,15 +48,15 @@ necessary: if $d$ is the distance of the centers of the cubes, and
 $s_1$ and $s_2$ their corresonding side lengths, then we have the
 following three cases:
 
-1) If $d > \sqrt 3 (s_1 + s_2) / 2$ then the cubes are too far to
+1. If $d > \sqrt 3 (s_1 + s_2) / 2$ then the cubes are too far to
    intersect. (the [circumscribed
    spheres](https://en.wikipedia.org/wiki/Circumscribed_sphere) do not
    intersect.)
-2) Else, if $d \leq (s_1 + s_2) / 2$ then the cubes are too close;
+2. Else, if $d \leq (s_1 + s_2) / 2$ then the cubes are too close;
    they intersect. (the [inscribed
    spheres](https://en.wikipedia.org/wiki/Inscribed_sphere)
    intersect.)
-3) Otherwise perform the edge-face intersection checks described
+3. Otherwise perform the edge-face intersection checks described
    below.
 
 ### Edge-Face intersection
