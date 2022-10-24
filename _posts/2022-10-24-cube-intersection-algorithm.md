@@ -174,8 +174,8 @@ class Edge:
     #
     # a -> b
     #
-    a: array('f')
-    b: array('f')
+    a: array('f') # float[3]
+    b: array('f') # float[3]
 
 @define
 class Face:
@@ -185,10 +185,10 @@ class Face:
     # |    |
     # a -- b
     #
-    a: array('f')
-    b: array('f')
-    c: array('f')
-    d: array('f')
+    a: array('f') # float[3]
+    b: array('f') # float[3]
+    c: array('f') # float[3]
+    d: array('f') # float[3]
 
 @define
 class Cube:
@@ -202,14 +202,14 @@ class Cube:
     # |    |    South face
     # a -- b
     #
-    a: array('f')
-    b: array('f')
-    c: array('f')
-    d: array('f')
-    e: array('f')
-    f: array('f')
-    g: array('f')
-    h: array('f')
+    a: array('f') # float[3]
+    b: array('f') # float[3]
+    c: array('f') # float[3]
+    d: array('f') # float[3]
+    e: array('f') # float[3]
+    f: array('f') # float[3]
+    g: array('f') # float[3]
+    h: array('f') # float[3]
 
 # Return the 6 faces of the cube
 def get_faces(r: Cube):
