@@ -243,7 +243,7 @@ def edge_face_intersect(edge: Edge, face: Face):
     z = subtract(face.d, face.a)
     c = cross(x, y)
 
-    t1 =dot(v, c)
+    t1 = dot(v, c)
     if t1 == 0:
         return False
 
