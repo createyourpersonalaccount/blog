@@ -19,7 +19,7 @@ care to correctly calculate the vectors involved. I use a certain
 representation of the edge and face; the numbers involved will depend
 on your representation of a cube. (For example, you may represent a
 cube by its 8 vertices, or choose to represent it with a basepoint and
-a diagonal.)
+a 3-frame, or some other representation.)
 
 A word of warning: I wrote this article for anyone who is interested
 in writing a cube intersection algorithm. I have not researched how it
