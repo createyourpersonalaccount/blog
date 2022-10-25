@@ -354,46 +354,6 @@ def neighbors(r: Cube, v: array('f')):
     elif array_equal(v, r.h):
         return [r.e, r.d, r.g]
 
-# return the edge of the cube `r` closest to `p`
-#
-# This is the edge formed by the closest vertex and the second closest
-# vertex to `p`.
-def closestEdge(r: Cube, p: array('f')):
-    a = apex(r, p)
-    frame = neighbors(r, a)
-    s = subtract(frame, p)
-    s = [dot(s[0], s[0]),
-         dot(s[1], s[1]),
-         dot(s[2], s[2])]
-    b = frame[argmax(s)]
-    return Edge(a, b)
-
-# return the face of the cube `r` closest to `p`
-#
-# This is the face formed by the closest, the second and third closest
-# vertices to `p`.
-def closestFace(r: Cube, p: array('f')):
-    a = apex(r, p)
-    frame = neighbors(r, a)
-    s = subtract(frame, p)
-    s = [dot(s[0], s[0]),
-         dot(s[1], s[1]),
-         dot(s[2], s[2])]
-    if s[0] > s[1]:
-        if s[1] > s[2]:
-            return Face(a, frame[0], subtract(add(frame[0], frame[1]),
-                                              a), frame[1])
-        else:
-            return Face(a, frame[0], subtract(add(frame[0], frame[2]),
-                                              a), frame[2])
-    else:
-        if s[0] > s[2]:
-            return Face(a, frame[0], subtract(add(frame[0], frame[1]),
-                                              a), frame[1])
-        else:
-            return Face(a, frame[1], subtract(add(frame[1], frame[2]),
-                                              a), frame[2])
-
 def get_edges(r: Cube, p: array('f')):
     a = apex(r, p)
     frame = neighbors(r, a)
