@@ -169,25 +169,12 @@ intersects the face $F$ is defined as follows:
 
 ### Reducing the edge-face intersection calls
 
-We may reduce the 72 calls to $I(E, F)$ to only one:
+We may reduce the 72 calls to $I(E, F)$ to at most 9, because we only
+have to check the edge-face intersection over the three edges of $Q_1$
+closest to the center of $Q_2$ and the three faces of $Q_2$ closest to
+the center of $Q_1$.
 
-We first calculate the corner of $Q_1$ whose apex is the closest to
-the center of $Q_2$, and vice versa, the corner of $Q_2$ whose apex is
-the closest to the center of $Q_1$.
-
-Then, we choose the edge $E$ of the first corner that is nearest to
-the apex of the second; and the face $F$ of the second that is nearest
-to the apex of the first.
-
-(Although these corners, edges, and faces are not unique, there is no
-issue picking one over the other.)
-
-Finally, we calculate the edge-face intersection, and this tells us
-whether the cubes intersect or not.
-
-The calculation of the apex is a matter of three dot products and
-three inequality comparisons. To find the edge or face closest to the
-center, a few more dot products and inequalities must take place.
+We actually implement this optimization in the Python code below.
 
 ### Using less coordinates to represent the cubes
 
@@ -196,6 +183,8 @@ instead of $24$ by using a side length, a base point and a 3-frame,
 also known as an element of $SO(3)$. See [Charts on
 $SO(3)$](https://en.wikipedia.org/wiki/Charts_on_SO(3)) for formulas
 and information.
+
+This is not implemented in the Python code below.
 
 ## The Python implementation
 
@@ -206,7 +195,7 @@ to make Python classes easier to work with.
 from array import array
 from attrs import define
 from math import sqrt
-from numpy import add, subtract, multiply, dot, cross
+from numpy import argmax, add, array_equal, subtract, multiply, dot, cross
 from numpy.linalg import norm
 
 @define
@@ -277,10 +266,10 @@ def get_edges(r: Cube):
             Edge(r.c, r.g)]
 
 def get_side(r: Cube):
-    return norm(sub(r.a, r.b))
+    return norm(subtract(r.a, r.b))
 
 def get_center(r: Cube):
-    return add(r.a, multiply(.5, r.g))
+    return add(r.a, multiply(.5, subtract(r.g, r.a)))
 
 def edge_face_intersect(edge: Edge, face: Face):
     u = edge.a
@@ -296,10 +285,12 @@ def edge_face_intersect(edge: Edge, face: Face):
 
     t2 = dot(subtract(x, u), c)
 
-    if t2 < 0 or t2 > t1:
+    r = t2 / t1
+
+    if r < 0 or r > 1:
         return False
     
-    i = add(u, multiply(t2 / t1, v))
+    i = add(u, multiply(r, v))
     ix = subtract(i, x)
 
     norm_squared = dot(c, c)
@@ -312,19 +303,141 @@ def edge_face_intersect(edge: Edge, face: Face):
     
     return True
 
+# return the vertex of the cube `r` closest to `p`
+def apex(r: Cube, p: array('f')):
+    x = subtract(p, get_center(r))
+    t1 = dot(subtract(r.b, r.a), x)
+    t2 = dot(subtract(r.d, r.a), x)
+    t3 = dot(subtract(r.e, r.a), x)
+    if t1 >= 0:
+        if t2 >= 0:
+            if t3 >= 0:
+                return r.g
+            else:
+                return r.c
+        else:
+            if t3 >= 0:
+                return r.f
+            else:
+                return r.b
+    else:
+        if t2 >= 0:
+            if t3 >= 0:
+                return r.h
+            else:
+                return r.d
+        else:
+            if t3 >= 0:
+                return r.e
+            else:
+                return r.a
+
+# return the 3 neighbors of the vertex `v` in the cube `r`
+#
+# The result frame is positively oriented, see the right-hand rule
+# <https://en.wikipedia.org/wiki/Right-hand_rule>.
+def neighbors(r: Cube, v: array('f')):
+    if array_equal(v, r.a):
+        return [r.b, r.d, r.e]
+    elif array_equal(v, r.b):
+        return [r.c, r.a, r.f]
+    elif array_equal(v, r.c):
+        return [r.g, r.d, r.b]
+    elif array_equal(v, r.d):
+        return [r.h, r.a, r.c]
+    elif array_equal(v, r.e):
+        return [r.f, r.a, r.h]
+    elif array_equal(v, r.f):
+        return [r.g, r.b, r.e]
+    elif array_equal(v, r.g):
+        return [r.h, r.c, r.f]
+    elif array_equal(v, r.h):
+        return [r.e, r.d, r.g]
+
+# return the edge of the cube `r` closest to `p`
+#
+# This is the edge formed by the closest vertex and the second closest
+# vertex to `p`.
+def closestEdge(r: Cube, p: array('f')):
+    a = apex(r, p)
+    frame = neighbors(r, a)
+    s = subtract(frame, p)
+    s = [dot(s[0], s[0]),
+         dot(s[1], s[1]),
+         dot(s[2], s[2])]
+    b = frame[argmax(s)]
+    return Edge(a, b)
+
+# return the face of the cube `r` closest to `p`
+#
+# This is the face formed by the closest, the second and third closest
+# vertices to `p`.
+def closestFace(r: Cube, p: array('f')):
+    a = apex(r, p)
+    frame = neighbors(r, a)
+    s = subtract(frame, p)
+    s = [dot(s[0], s[0]),
+         dot(s[1], s[1]),
+         dot(s[2], s[2])]
+    if s[0] > s[1]:
+        if s[1] > s[2]:
+            return Face(a, frame[0], subtract(add(frame[0], frame[1]),
+                                              a), frame[1])
+        else:
+            return Face(a, frame[0], subtract(add(frame[0], frame[2]),
+                                              a), frame[2])
+    else:
+        if s[0] > s[2]:
+            return Face(a, frame[0], subtract(add(frame[0], frame[1]),
+                                              a), frame[1])
+        else:
+            return Face(a, frame[1], subtract(add(frame[1], frame[2]),
+                                              a), frame[2])
+
+def get_edges(r: Cube, p: array('f')):
+    a = apex(r, p)
+    frame = neighbors(r, a)
+    return [Edge(a, frame[0]),
+            Edge(a, frame[1]),
+            Edge(a, frame[2])]
+
+def get_faces(r: Cube, p: array('f')):
+    a = apex(r, p)
+    frame = neighbors(r, a)
+    return [Face(a, frame[0], subtract(add(frame[0], frame[1]), a), frame[1]),
+            Face(a, frame[0], subtract(add(frame[0], frame[2]), a), frame[2]),
+            Face(a, frame[1], subtract(add(frame[1], frame[2]), a), frame[2])]
+
 def intersect(r: Cube, s: Cube):
-    d = norm(sub(get_center(r), get_center(s))
+    d = norm(subtract(get_center(r), get_center(s)))
     t = (get_side(r) + get_side(s)) / 2
     if d > sqrt(3) * t:
         return False
     elif d <= t:
         return True
     else:
-        edges = get_edges(r)
-        faces = get_faces(s)
+        c1 = get_center(r)
+        c2 = get_center(s)
+        edges = get_edges(r, c2)
+        faces = get_faces(s, c1)
         for edge in edges:
             for face in faces:
                 if edge_face_intersect(edge, face):
                     return True
-         return False
+        return False
+
+def start():
+    xs = [[0., 0., 0.],
+          [1., 0., 0.],
+          [1., 1., 0.],
+          [0., 1., 0.],
+          [0., 0., 1.],
+          [1., 0., 1.],
+          [1., 1., 1.],
+          [0., 1., 1.]]
+    r = Cube(*xs)
+    s1 = Cube(*subtract(xs, [0.9, .9, .9]))
+    s2 = Cube(*subtract(xs, [1.1, 1.1, 1.1]))
+    print("The cubes r and s1 intersect: ", intersect(r, s1))
+    print("The cubes r and s2 intersect: ", intersect(r, s2))
 ```
