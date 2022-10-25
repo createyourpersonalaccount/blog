@@ -283,11 +283,8 @@ def edge_face_intersect(edge: Edge, face: Face):
     if t1 == 0:
         return False
 
-    t2 = dot(subtract(x, u), c)
-
-    r = t2 / t1
-
-    if r < 0 or r > 1:
+    t2 = dot(subtract(x, u), c) / t1
+    if t2 < 0 or t2 > 1:
         return False
     
     i = add(u, multiply(r, v))
