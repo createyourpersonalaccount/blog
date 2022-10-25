@@ -109,7 +109,7 @@ and noticed that the denominators cancel out.
 
 We can now check that the intersection occurs inside the edge:
 
-**(check 2)** We verify that $0 \leq (X - U)\cdot (Y\times Z) \leq V\cdot (Y\times Z)$.
+**(check 2)** We verify that $0 \leq \frac{(X - U)\cdot (Y\times Z)}{V\cdot (Y\times Z)} \leq 1$.
 
 #### Verifying that the intersection occurs inside the plane
 
