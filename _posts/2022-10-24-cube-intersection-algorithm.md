@@ -351,14 +351,14 @@ def neighbors(r: Cube, v: array('f')):
     elif array_equal(v, r.h):
         return [r.e, r.d, r.g]
 
-def get_edges(r: Cube, p: array('f')):
+def get_apex_edges(r: Cube, p: array('f')):
     a = apex(r, p)
     frame = neighbors(r, a)
     return [Edge(a, frame[0]),
             Edge(a, frame[1]),
             Edge(a, frame[2])]
 
-def get_faces(r: Cube, p: array('f')):
+def get_apex_faces(r: Cube, p: array('f')):
     a = apex(r, p)
     frame = neighbors(r, a)
     return [Face(a, frame[0], subtract(add(frame[0], frame[1]), a), frame[1]),
@@ -375,8 +375,8 @@ def intersect(r: Cube, s: Cube):
     else:
         c1 = get_center(r)
         c2 = get_center(s)
-        edges = get_edges(r, c2)
-        faces = get_faces(s, c1)
+        edges = get_apex_edges(r, c2)
+        faces = get_apex_faces(s, c1)
         for edge in edges:
             for face in faces:
                 if edge_face_intersect(edge, face):
