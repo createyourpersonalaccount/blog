@@ -48,6 +48,6 @@ equations](https://en.wikipedia.org/wiki/Maxwell%27s_equations).)
 
 # Some more thoughts
 
-This is one of the few interesting differential equations, as I have
-now related it to my intuition and my mistaken naive attempts to
-calculate current from charge.
+For me, this is one of the few interesting differential equations that
+I have come across, as I have now related it to my intuition and my
+mistaken naive attempts to calculate current from charge.
