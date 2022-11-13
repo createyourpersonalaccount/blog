@@ -15,7 +15,7 @@ a structured region of memory.
 
 An imaginary `String` object may look as follows
 
-![a string object](/docs/assets/images/object.png)
+![a string object](/blog/docs/assets/images/object.png)
 
 A reader, more generally than just in lisp, may read a line from a
 stream such as
@@ -41,7 +41,7 @@ serially into the REPL, and the image updates itself with new
 definitions, and so on. When we type `"cat"` at the REPL, an object
 similar to the above is created in the lisp image:
 
-![the lisp image](/docs/assets/images/lisp-image.png)
+![the lisp image](/blog/docs/assets/images/lisp-image.png)
 
 Everything, or almost everything, is an object in Common Lisp.
 
@@ -66,7 +66,7 @@ and thus access the same object as many times as we'd like by typing
 convention for constants.) Remember how everything was an object? Now
 the situation in the lisp reader looks like this:
 
-![the lisp image](/docs/assets/images/lisp-image2.png)
+![the lisp image](/blog/docs/assets/images/lisp-image2.png)
 
 Since (almost) everything in Common Lisp is an object, the name (or
 variable) of the string is an object too. But... what kind of object
@@ -82,7 +82,7 @@ to Common Lisp symbols.
 Those so-called symbols are simply references to objects in the Lisp
 image. Fundamentally, they consist of two parts, a name and a value.
 
-![a symbol](/docs/assets/images/symbol.png)
+![a symbol](/blog/docs/assets/images/symbol.png)
 
 (We say "fundamentally" because Common Lisp symbols have more parts;
 and by the way, instead of "parts" they are called "slots".)
@@ -152,7 +152,7 @@ from the reader applying. The colon causes the symbol to be created in
 the special package `KEYWORD`. Symbols in this package are
 self-referential!
 
-![a symbol](/docs/assets/images/symbol2.png)
+![a symbol](/blog/docs/assets/images/symbol2.png)
 
 Thus their evaluation by the evaluator returns back their own
 self. This trick allows us to pass keywords as arguments to functions.
