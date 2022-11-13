@@ -1,8 +1,3 @@
----
-layout: post
-title: Common lisp: Symbols, Packages, Systems
----
-
 # Common lisp: Symbols, Packages, Systems
 
 The Common Lisp
