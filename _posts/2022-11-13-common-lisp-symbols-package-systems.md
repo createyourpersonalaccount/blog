@@ -196,19 +196,33 @@ graphs](https://en.wikipedia.org/wiki/Directed_acyclic_graph).
 
 ## Gotchas
 
-It's worthwhile to explain `#:my-function`, which we used when
-defining a package. When the reader encounters this syntax, it
-launches a _reader macro_ which transforms it to `(make-symbol
-"MY-FUNCTION")`. It would be erroneous to use `'my-function` in the
-export section of `defpackage`, since the reader would create a new
-symbol `my-function` in the current package (this might be harmless,
-but it's common practice in Common Lisp to use `#:symbols` for package
-definitions.) By the same logic we use `#:my-package`. Strings of
-course may be used too for package and symbol name designators, but
-they are less convenient to type out.  (Because they need to be
-uppercase, that's another quirk of the Lisp reader.)
-
-Packages can't track two symbols with the same name. That is a name
-clash. Name clashes can happen when importing symbols, and they can be
-resolved by shadowing symbols, which trump over others in name
-clashes.
+- It's worthwhile to explain `#:my-function`, which we used when
+  defining a package. When the reader encounters this syntax, it
+  launches a _reader macro_ which transforms it to `(make-symbol
+  "MY-FUNCTION")`. It would be erroneous to use `'my-function` in the
+  export section of `defpackage`, since the reader would create a new
+  symbol `my-function` in the current package (this might be harmless,
+  but it's common practice in Common Lisp to use `#:symbols` for
+  package definitions.) By the same logic we use
+  `#:my-package`. Strings of course may be used too for package and
+  symbol name designators, but they are less convenient to type out.
+  (Because they need to be uppercase, that's another quirk of the Lisp
+  reader.)
+- Packages can't track two symbols with the same name. That is a name
+  clash. Name clashes can happen when importing symbols, and they can
+  be resolved by shadowing symbols, which trump over others in name
+  clashes.
+- Does Common Lisp have a qualified import mechanism? It does not. It
+  is possible to have symbol clashes between dependencies when
+  dependending on too many ASDF systems. This can only happen however,
+  if the packages are used with `:use`, `:import` from `defpackage` or
+  `use-package` and so on. The user of these dependencies is supposed
+  to write shadow rules to resolve the conflicts. This solutions
+  scales to a certain extent. The alternative approach is to only
+  write qualified names, e.g. use `alexandria:emptyp` instead of
+  `emptyp`, but this is cumbersome. There is however a solution to
+  that! Newer releases of ASDF support `:local-nicknames`, which is a
+  way to rename `alexandria:` to a given string, e.g. `a:`, in a way
+  that is only visible when the current package is `:my-package`. If
+  your ASDF version is 3.3.5 or later, you should be good to
+  go. (check with `(asdf:asdf-version)`.)
