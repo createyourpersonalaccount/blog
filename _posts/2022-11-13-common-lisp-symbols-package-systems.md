@@ -215,14 +215,17 @@ graphs](https://en.wikipedia.org/wiki/Directed_acyclic_graph).
 - Does Common Lisp have a qualified import mechanism? It does not. It
   is possible to have symbol clashes between dependencies when
   dependending on too many ASDF systems. This can only happen however,
-  if the packages are used with `:use`, `:import` from `defpackage` or
-  `use-package` and so on. The user of these dependencies is supposed
-  to write shadow rules to resolve the conflicts. This solutions
-  scales to a certain extent. The alternative approach is to only
-  write qualified names, e.g. use `alexandria:emptyp` instead of
-  `emptyp`, but this is cumbersome. There is however a solution to
-  that! Newer releases of ASDF support `:local-nicknames`, which is a
-  way to rename `alexandria:` to a given string, e.g. `a:`, in a way
-  that is only visible when the current package is `:my-package`. If
-  your ASDF version is 3.3.5 or later, you should be good to
-  go. (check with `(asdf:asdf-version)`.)
+  if the packages are used with `:use`, `:import-from` from
+  `defpackage`. The user of these dependencies is supposed to write
+  shadow rules to resolve the conflicts. This solutions scales to a
+  certain extent, but `:use` can be dangerous as accidental clobbering
+  of symbols may occur, and `:import-from` at least names the symbols
+  so the programmer can be careful not to overwrite them. The
+  alternative approach is to only write qualified names, e.g. use
+  `alexandria:emptyp` instead of `emptyp`, but this is
+  cumbersome. There is however a solution to that! Newer releases of
+  ASDF support `:local-nicknames`, which is a way to rename
+  `alexandria:` to a given string, e.g. `a:`, in a way that is only
+  visible when the current package is `:my-package`. If your ASDF
+  version is 3.3.5 or later, you should be good to go. (check with
+  `(asdf:asdf-version)`.)
