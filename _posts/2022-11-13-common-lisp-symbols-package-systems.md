@@ -184,7 +184,7 @@ symbols, it's all or nothing. In fact, if we then type
 
 we obtain the following relationships
 
-![package use relationships](/blog/docs/assets/images/use-package.png]
+![package use relationships](/blog/docs/assets/images/use-package.png)
 
 Note that cyclic relationships are allowed.
 
