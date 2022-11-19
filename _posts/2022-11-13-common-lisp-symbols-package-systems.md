@@ -170,9 +170,23 @@ symbol. A typical use of packages is as follows
       42)
 
 Anyone who would like to use the above could `load` the file and start
-using `my-function`, but nowadays it is common to use
+using `my-package:my-function`, but nowadays it is common to use
 [ASDF](https://asdf.common-lisp.dev/) for the purpose of loading
 packages.
+
+There is one additional interesting detail here, which is `:use`. This
+is the same as calling the function `use-package` and it is a
+relationship of packages. It makes all the symbols of the package
+accessible by inheriting them. It is not possible to inherit only some
+symbols, it's all or nothing. In fact, if we then type
+
+    CL-USER> (use-package :my-package)
+
+we obtain the following relationships
+
+![package use relationships](/blog/docs/assets/images/use-packages.png]
+
+Note that cyclic relationships are allowed.
 
 ## ASDF and systems
 
