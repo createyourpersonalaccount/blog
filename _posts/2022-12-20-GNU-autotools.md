@@ -558,7 +558,7 @@ information, e.g.
 
     "Content-Type: text/plain; charset=UTF-8\n"
 
-Emacs' po-mode can help with the revision date; can be updated by
+Emacs' `po-mode` can help with the revision date; can be updated by
 hitting `V`, which will also save the file and run `msgfmt
 --statistics --check` that validates the po file.
 
@@ -575,7 +575,9 @@ Finally one can test it with
     LANG=fr_FR.utf8 ../src/hello
 
 For additional best practices and tips see
-<https://www.lrde.epita.fr/~adl/autotools.html>.
+<https://www.lrde.epita.fr/~adl/autotools.html>. If for some reason
+the translation does not appear, check the [gettext
+FAQ](https://www.gnu.org/software/gettext/FAQ.html#integrating_noop).
 
 ## Nested packages
 
