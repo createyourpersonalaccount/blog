@@ -602,3 +602,9 @@ For the purpose of this subsection, the hard drive is divided into logical block
 - [X] Fix brightness buttons. Do they show up under `xev`? Does adjustment via `/sys/class/backlight` work?
 
     The buttons show up under `xev`. For now, I simply edit it to contain a fixed value. The `xbacklight` program might help.
+
+- [ ] Security guide in
+      <https://wiki.gentoo.org/wiki/Project:Hardened_uClibc/Lilblue>
+      may be of interest, as well as
+      <https://kernsec.org/wiki/index.php/Kernel_Self_Protection_Project/Recommended_Settings>
+      in particular for kernel configuration.
