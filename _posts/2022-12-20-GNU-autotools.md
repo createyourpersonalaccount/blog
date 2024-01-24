@@ -382,7 +382,7 @@ To enable libtool, in `configure.ac`
 
 then in `Makefile.am`,
 
-    lib_LTLIBRARIES = libfoo.a         # declare a libtool archive
+    lib_LTLIBRARIES = libfoo.la        # declare a libtool archive
     libfoo_la_SOURCES = foo.c foo.h
     ...
     runme_LDADD = libfoo.la
@@ -401,7 +401,8 @@ one adds
 
 Then in the `Makefile.am`, one uses
 
-    ACLOCAL_AMFLAGS = -I m4 # options to pass to aclocal
+    # options to pass to aclocal
+    ACLOCAL_AMFLAGS = -I m4
 
 ### Wrapper scripts
 

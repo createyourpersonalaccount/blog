@@ -26,7 +26,7 @@ We will use ext4 as the filesystem. We assume the disk is /dev/sda with 16G of R
 1. `fdisk /dev/sda`
 2. Use the following key sequence, each time pressing enter in between:
 
-       g n 1 +256M t 1 n 2 +16G t 2 19 n 3 RET RET w
+       g n 1 RET +256M t 1 n 2 +16G t 2 19 n 3 RET RET w
 
 3. `mkfs.vfat -F 32 /dev/sda1`
 4. `mkfs.ext4 /dev/sda3`
