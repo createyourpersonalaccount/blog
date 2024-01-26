@@ -1,9 +1,17 @@
 ---
 layout: post
-title: GDB scripting
+title: LLDB and GDB scripting
 ---
 
-# GDB Scripting
+# LLDB and GDB Scripting
+
+This post is about scripting the [LLDB](https://lldb.llvm.org/) and [GDB](https://www.sourceware.org/gdb/) debuggers.
+
+The example code we will write scripts for is a simple recursive [depth-first](https://en.wikipedia.org/wiki/Depth-first_search) tree traversal function.
+
+For debugging C++ applications on x86_64, I recommend LLDB for scripting, because it has more features. One issue I had with GDB 13 is that it does not support calling method functions. On the other hand, GDB has wider coverage of architectures and is more ergonomic and productive to use (apart from scripting.)
+
+## GDB Scripting
 
 If you're thinking of using Guile instead of Python, *don't*. Guile is a great language, but don't use it for gdb scripting, the gdb community doesn't use it. If you're thinking of using gdbscript, *don't*. It's powerless. With that out of the way, let's begin:
 
@@ -150,12 +158,131 @@ Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
 
 We put a breakpoint just before `collect_leaves()` returns from a leaf, and using `commands` we entered a small script that calls our python function to unwind the stack and show the three paths taken, `[1, 2]`, `[1, 3, 5]`, and `[1, 4]`.
 
-## Some useful projects
+### Some useful projects
 
 There are quite a few projects that script and enhance gdb. You may enjoy:
 
 - [vdb](https://github.com/PlasmaHH/vdb)
 - [gef](https://github.com/hugsy/gef)
 - [pwndbg](https://github.com/pwndbg/pwndbg)
+- [gdb-dashboard](https://github.com/cyrus-and/gdb-dashboard)
 
-but I prefer for now to write my own scripts, as it facilitates learning. The simpler project [gdb-dashboard](https://github.com/cyrus-and/gdb-dashboard) just displays a lot of useful information (and can be customized.) I prefer that to gdb's tui or plain gdb.
+but I prefer for now to write my own scripts, as it facilitates learning.
+
+## LLDB Scripting
+
+The LLDB debugger API is a shared library that can be used by any application.
+
+We start a session and set a breakpoint on line 11 as before
+
+```
+lldb walk_tree
+(lldb) breakpoint set -l 11
+(lldb) process launch
+```
+
+Once we hit the breakpoint, we can enter the interactive python debugger with `script`
+
+```
+(lldb) script
+```
+
+From within `script`, there are some variables defined for us, such as `lldb.frame` (see more at [Embedded Python Interpreter](https://lldb.llvm.org/use/python-reference.html#embedded-python-interpreter) in lldb docs.) However, outside of `script`, in our python scripts, the API is different; we are passed the relevant information in arguments instead.
+
+Let's illustrate both, first assuming we've hit the breakpoint on `collect_leaves()` and we are inside `script`:
+
+```
+>>> lldb.frame.name
+'Node<int>::collect_leaves() const'
+>>> this = lldb.frame.FindVariable("this").
+>>> print(this.deref)
+(const Node<int>) *this = {
+  children = size=0 {
+    std::_Vector_base<Node<int>, std::allocator<Node<int> > > = {
+      _M_impl = {
+        std::_Vector_base<Node<int>, std::allocator<Node<int> > >::_Vector_impl_data = {
+          _M_start = nullptr
+          _M_finish = nullptr
+          _M_end_of_storage = nullptr
+        }
+      }
+    }
+  }
+  value = 2
+}
+>>> print(next(var for var in this.children if var.name == "value"))
+(int) value = 2
+```
+
+in the last invocation, we print `this->value`.
+
+However, we can now go *one step further* than GDB, and print `this->children.size()` thanks to `EvaluateExpression()`:
+
+```
+>>> print(lldb.frame.EvaluateExpression("this->children.size()"))
+(size_type) $6 = 0
+```
+
+Finally, we define our own LLDB command using Python:
+
+```
+#!/usr/bin/env python
+
+import lldb
+
+def recursive_parameters(debugger, command, exe_ctx, result, internal_dict):
+    """Walk the Node tree backwards and collect values"""
+    del debugger, command, internal_dict
+    parameters = []
+    frame = exe_ctx.frame
+    try:
+        while(frame):
+            this = frame.FindVariable("this")
+            value = next(var for var in this.children if var.name == "value")
+            parameters = [value.value] + parameters
+            frame = frame.parent
+    except:
+        pass
+    result.AppendMessage(f"{parameters}")
+```
+
+We load and run this command as follows:
+
+```
+$ lldb walk_tree
+(lldb) target create "walk_tree"
+Current executable set to 'walk_tree' (x86_64).
+(lldb) command script import my_command.py
+(lldb) command script add -f my_command.recursive_parameters recursive_parameters
+(lldb) breakpoint set -l 11
+Breakpoint 1: where = walk_tree`Node<int>::collect_leaves() const + 72 at walk_tree.cpp:11:29, address = 0x0000000000001678
+(lldb) breakpoint command add 1
+Enter your debugger command(s).  Type 'DONE' to end.
+> recursive_parameters
+> process continue
+(lldb) r
+Process 16028 launched: 'walk_tree' (x86_64)
+(lldb)  recursive_parameters
+['1', '2']
+(lldb)  process continue
+Process 16028 resuming
+Command #2 'process continue' continued the target.
+(lldb)  recursive_parameters
+['1', '3', '5']
+(lldb)  process continue
+Process 16028 resuming
+Command #2 'process continue' continued the target.
+(lldb)  recursive_parameters
+['1', '4']
+(lldb)  process continue
+Process 16028 resuming
+Command #2 'process continue' continued the target.
+2
+5
+4
+Process 16028 exited with status = 0 (0x00000000)
+```
+
+In fact LLDB has more specific Python abilities for just running Python commands on breakpoints (which is a bit simpler than defining a command); see [Running a python script when a breakpoint gets hit](https://lldb.llvm.org/use/python-reference.html#running-a-python-script-when-a-breakpoint-gets-hit), but here we explore the general case of defining an LLDB command, not just scripting a breakpoint.
+
+We can add an `.lldbinit` in the project directory that has the above `command script ...` commands and invoke `lldb` with `lldb --local-lldbinit` to load it and make our function available project-wide.
