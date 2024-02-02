@@ -225,7 +225,7 @@ However, we can now go *one step further* than GDB, and print `this->children.si
 
 Finally, we define our own LLDB command using Python:
 
-```
+```python
 #!/usr/bin/env python
 
 import lldb
