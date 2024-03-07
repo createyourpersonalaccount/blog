@@ -167,7 +167,13 @@ There are quite a few projects that script and enhance gdb. You may enjoy:
 - [pwndbg](https://github.com/pwndbg/pwndbg)
 - [gdb-dashboard](https://github.com/cyrus-and/gdb-dashboard)
 
-but I prefer for now to write my own scripts, as it facilitates learning.
+For example, you can git-clone gef and then write a bash alias:
+
+```bash
+alias gef="gdb --nh -q -iex 'source /path/to/gef/gef.py'"
+```
+
+so that `gef hello` will launch the gef-enabled version of gdb on the `hello` binary.
 
 ## LLDB Scripting
 
