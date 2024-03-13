@@ -6,7 +6,7 @@ title: OpenLDAP from a Mathematician's perspective
 
 # OpenLDAP from a Mathematician's perspective
 
-[OpenLDAP](https://www.openldap.org/) is notorious for being a hard technology. There's an excellent [book by Zytrax on OpenLDAP](https://www.zytrax.com/books/ldap/), and of course the documentation of the OpenLDAP project, but I wish to supplement the above by giving an introduction from a Mathematician's perspective.
+[OpenLDAP](https://www.openldap.org/) is notorious for being a hard technology to grasp. There's an excellent [book by Zytrax on OpenLDAP](https://www.zytrax.com/books/ldap/), and of course the documentation of the OpenLDAP project, but I wish to supplement the above by giving an introduction from a Mathematician's perspective.
 
 The description below is not complete nor comprehensive, but it serves to paint a broad picture of how the parts of LDAP work. Where it diverges is in the nitty-gritty details; for those, you will have to consult the aforementioned references.
 
