@@ -55,7 +55,7 @@ Binding means to provide a DN in a DIT and a password that matches the content o
 
 There's a quirk of OpenLDAP, that its server configuration is also a DIT! ([When you have a hammer](https://en.wikipedia.org/wiki/Law_of_the_instrument)...)
 
-## Conclusion
+## Conclusion and Docker example
 
 This is a high-level overview of what LDAP is, and hopefully it will make learning OpenLDAP easier for you! See also my [MediaWiki \+ OpenLDAP multi-container docker image](https://github.com/createyourpersonalaccount/openldap-mediawiki/) for a practical application of this: basically using the LDAP server for managing user accounts and login on the MediaWiki instance.
 
