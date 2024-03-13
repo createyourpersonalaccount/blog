@@ -2,6 +2,7 @@
 layout: post
 title: OpenLDAP from a Mathematician's perspective
 ---
+{% include mathjax.html %}
 
 # OpenLDAP from a Mathematician's perspective
 
