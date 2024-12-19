@@ -55,7 +55,15 @@ appearance of this string in the final sitemap.org."
          :time-stamp-file nil
          :html-metadata-timestamp-format "%Y-%m-%d %a"
          :html-head ,(html-link-css blog-prefix css-files)
-         :html-mathjax-options ((path ,(format "%s/mathjax/tex-chtml.js" blog-prefix)))
+         :html-mathjax-options ((path ,(format "%s/mathjax/tex-chtml.js" blog-prefix))
+                                (tags "ams")
+                                (tagside "right")
+                                (tagindent ".8em")
+                                (scale 1.0)
+                                (align "center")
+                                (font "mathjax-modern")
+                                (overflow "overflow")
+                                (indent "0em"))
          :html-validation-link ""
          :html-head-include-default-style nil
          :html-head-include-scripts nil
