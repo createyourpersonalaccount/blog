@@ -12,7 +12,7 @@ all: $(TEX_FILES:.tex=.svg) move
 
 move:
 	mkdir -p ../../public/img
-	mv *.svg ../../public/img
+	find . -type f -name '*.svg' -exec mv {} ../../public/img \;
 
 clean:
 	rm -f *.aux *.log *.dvi
