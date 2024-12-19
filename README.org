@@ -1,0 +1,57 @@
+* My personal blog
+
+This blog can be built with:
+
+#+begin_src sh
+  make -C content
+#+end_src
+
+and served with:
+
+#+begin_src sh
+  python3 -m http.server -d public
+#+end_src
+
+Then it may be viewed in Firefox with:
+
+#+begin_src sh
+  firefox localhost:8000
+#+end_src
+
+* TODO Things to do
+
+** DONE Add class property to nagivation links
+CLOSED: [2024-12-19 Thu 03:14]
+
+I can then customize them with CSS.
+
+** TODO Add interesting CSS for directories
+
+This might be possible with ~file-directory-p~ adding that specific attribute. Directories should be cool looking. Also see if you can include interesting bullets for files to simulate the tree-like structure more
+
+** TODO Add title to navigation sidebar
+
+Right now it is not clear what all that information is. Maybe adding a title would be useful. Or some other kind of divider from the main content.
+
+** DONE Add colorized source code block export
+CLOSED: [2024-12-19 Thu 06:00]
+
+To do this, the Emacs solutions won't work. Use either [[https://prismjs.com/][PrismJS]] (see also [[https://macarthur.me/posts/run-prism-js-server-side/][this blog post]]) or [[https://highlightjs.org/][highlight.js]].
+
+I went with highlight.js.
+
+** TODO nav sidebar folds onto content on small screens
+
+To fix this, put the article content inside one div and the nav sidebar in another div. Right now everything is inside
+
+#+begin_src html
+  <div id="content" class="content">
+#+end_src
+
+which org-publish puts in.
+
+** TODO Custom link types
+
+I can add custom link types like ~img:~ and ~svg:~ that will compute the right amount of ~../~ needed to reach the root directory. See [[info:org#Adding Hyperlink Types][(org)Adding Hyperlink Types]].
+
+https://orgmode.org/manual/Adding-Hyperlink-Types.html

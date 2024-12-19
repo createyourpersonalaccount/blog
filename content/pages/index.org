@@ -1,0 +1,6 @@
+#+TITLE: About
+#+OPTIONS: toc:nil
+
+* My personal blog
+
+Welcome to my personal blog. Here I write about Mathematics, Physics, and Computer Science. Feel free to contact me if you have questions or wish to share something.
