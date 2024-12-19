@@ -1,5 +1,5 @@
 #+TITLE: About
-#+OPTIONS: toc:nil
+#+OPTIONS: toc:nil num:nil
 
 * My personal blog
 
