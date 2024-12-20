@@ -1,5 +1,7 @@
 #+TITLE: How to break through Algebraic Geometry
 #+DATE: <2024-12-20 Fri>
+#+bibliography: ../../bibliography.bib
+#+cite_export: csl ../../elsevier-with-titles.csl
 
 * Prelude
 
@@ -20,7 +22,12 @@ The first question came form elliptic curves in cryptography, which I read that 
 Staying in the back of my head, it probably caused some damage. In the meantime, I remembered an old observation that I had read in the past, namely that smooth manifolds $M$ are characterized by their ring of smooth functions $C^\infty(M)$, which is to say that everything about $M$ can be recovered from the algebraic structure of $C^\infty(M)$. I *knew* this were to be the case, but I didn't know *how*.
 
 \begin{align}
+\label{functor}
 C^\infty(M) \xrightarrow{\text{?}} M
 \end{align}
 
-I also knew that I could find the answer in [[https://doi.org/10.1007/978-3-030-45650-4][Nestruev's "Smooth Manifolds and Observables"]] book, and so I did. Chapters 4 details this approach. I got hooked into these new definitions, such as the spectrum of a ring, and I wanted to learn more, so after finishing Chapter 4 I skipped straight to Chapter 8. Because of how this is all presented, I did not realize that I was already into modern Algebraic Geometry territory.
+I also knew that I could find the answer in [cite:@nestruev2020] and so I did. Chapter 4 contains a complete proof of existence of \eqref{functor}. I got hooked into these new definitions, such as the spectrum of a ring, and I wanted to learn more, so after finishing Chapter 4 I skipped straight to Chapter 8. Because of how this is all presented, I did not realize that I was already into modern Algebraic Geometry territory.
+
+* References
+
+#+print_bibliography:
