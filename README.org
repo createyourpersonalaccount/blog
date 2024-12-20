@@ -56,7 +56,8 @@ I can add custom link types like ~img:~ and ~svg:~ that will compute the right a
 
 https://orgmode.org/manual/Adding-Hyperlink-Types.html
 
-** TODO Find a way to deal with bibliography
+** DONE Find a way to deal with bibliography
+CLOSED: [2024-12-20 Fri 09:31]
 
 ** TODO Reload on changes
 
