@@ -1,3 +1,5 @@
+(package-initialize)
+(use-package citeproc)
 (defvar blog-prefix (or (getenv "BLOG_PREFIX") ""))
 (defvar css-files
   (list "style.css"

@@ -7,6 +7,10 @@ a {
   text-decoration: none;
 }
 
+a[id^="citeproc"] {
+    border: transparent !important;
+}
+
 mjx-math a {
     border: transparent !important;
 }
