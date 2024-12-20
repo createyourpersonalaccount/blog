@@ -57,3 +57,7 @@ I can add custom link types like ~img:~ and ~svg:~ that will compute the right a
 https://orgmode.org/manual/Adding-Hyperlink-Types.html
 
 ** TODO Find a way to deal with bibliography
+
+** TODO Reload on changes
+
+To reload on changes on Firefox I can maybe use <https://addons.mozilla.org/en-US/firefox/addon/filewatcher/>.
