@@ -9,7 +9,14 @@ Algebraic geometry is a beautiful subject, but its study is impenetrable to most
 
 * Guidance from my muse
 
-It's important to stay humble: One day I decided to study the [[https://en.wikipedia.org/wiki/Euclidean_algorithm][Euclidean algorithm]], because I wanted to solve a 3-factor RSA exercise. [fn:1] I've studied this algorithm many times before, but it had never "clicked", and so I would forget it after a month or so (or a day!). This time it was different. I took my time, and I thought more carefully about [[https://upload.wikimedia.org/wikipedia/commons/9/96/Euclid%27s_algorithm_Book_VII_Proposition_2_3.svg][this Wikipedia picture]] which completely illustrated the entire algorithm for me. The simplicity of the algorithm is incredible, as it is something that I've been subconsciously doing myself countless times in the past when fidgeting pieces of paper in my hands.
+It's important to stay humble: One day I decided to study the [[https://en.wikipedia.org/wiki/Euclidean_algorithm][Euclidean algorithm]], because I wanted to solve a 3-factor RSA exercise. [fn:1] I've studied this algorithm many times before, but it had never "clicked", and so I would forget it after a month or so (or a day!). This time it was different. I took my time, and I thought more carefully about [[https://en.wikipedia.org/wiki/Euclidean_algorithm#/media/File:Euclid's_algorithm_Book_VII_Proposition_2_3.svg][this Wikipedia picture]] which completely illustrated the entire algorithm for me:
+
+#+ATTR_HTML: :width 40% :height 40%
+#+CAPTION: Two examples of Euclid's algorithm.
+#+NAME: fig:euclid-algorithm
+[[../img/euclid-algorithm.svg]]
+
+The simplicity of the algorithm is incredible, as it is something that I've been subconsciously doing myself countless times in the past when fidgeting pieces of paper in my hands.
 
 The Euclidean algorithm opened a door to more questions surrounding it, especially with regards to [[https://en.wikipedia.org/wiki/Elliptic_curve][elliptic curves]]. The miracle had happened earlier however: to view such a familiar concept under new light, completely elucidated, to finally /understand it/, is a bit shocking.
 
@@ -21,14 +28,14 @@ Armed with this newfound confidence that subjects that in the past were incompre
 
 The first question came form elliptic curves in cryptography, which I read that are curves in the space denoted by $\mathbb{PG}(2, q)$. Since I didn't know what this space is, I already had something that seemed foreign and fascinating: a promise of more geometric intuition if I were to understand the mathematics involved there.
 
-Staying in the back of my head, it probably caused some damage. In the meantime, I remembered an old observation that I had read in the past, namely that smooth manifolds $M$ are characterized by their ring of smooth functions $C^\infty(M)$, which is to say that everything about $M$ can be recovered from the algebraic structure of $C^\infty(M)$. I *knew* this were to be the case, but I didn't know *how*.
+This remained in the back of my head, probably causing some damage. In the meantime, I remembered an old observation that I had read in the past, namely that smooth manifolds $M$ are characterized by their ring of smooth functions $C^\infty(M)$, which is to say that everything about $M$ can be recovered from the algebraic structure of $C^\infty(M)$. I *knew* this were to be the case, but I didn't know *how*.
 
 \begin{align}
 \label{functor}
 C^\infty(M) \xrightarrow{\text{?}} M
 \end{align}
 
-I also knew that I could find the answer in [cite:@nestruev2020] and so I did. Chapter 4 contains a complete proof of existence of \eqref{functor}. I got hooked into these new definitions, such as the [[https://en.wikipedia.org/wiki/Spectrum_of_a_ring][spectrum of a ring]], and I wanted to learn more, so after finishing Chapter 4 I skipped straight to Chapter 8. Because of how this is all presented, I did not realize that I was already into modern Algebraic Geometry territory.
+I also knew that I could find the answer in [cite:@nestruev-2020] and so I did. Chapter 4 contains a complete proof of existence of \eqref{functor}. I got hooked into these new definitions, such as the [[https://en.wikipedia.org/wiki/Spectrum_of_a_ring][spectrum of a ring]], and I wanted to learn more, so after finishing Chapter 4 I skipped straight to Chapter 8. Because of how this is all presented, I did not realize that I was already into modern Algebraic Geometry territory.
 
 * References
 
