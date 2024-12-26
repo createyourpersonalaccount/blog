@@ -1,9 +1,20 @@
 (package-initialize)
 (use-package citeproc)
 (defvar blog-prefix (or (getenv "BLOG_PREFIX") ""))
+(defvar js-files
+  (list "sidebar.js"))
 (defvar css-files
   (list "style.css"
         "atom-one-light.min.css"))
+(defun html-src-js (blog-prefix files)
+  "Create HTML link tags linking to the JS files."
+  (mapconcat
+   (lambda (file)
+     (format "<script src=\"%s/js/%s\"></script>"
+             blog-prefix
+             file))
+   files
+   "\n"))
 (defun html-link-css (blog-prefix files)
   "Create HTML link tags linking to the CSS files."
   (mapconcat
@@ -13,6 +24,11 @@
              file))
    files
    "\n"))
+(defun html-head (blog-prefix)
+  "Create HTML head that includes JS and CSS."
+  (concat (html-src-js blog-prefix js-files)
+          "\n"
+          (html-link-css blog-prefix css-files)))
 (defun inline-html-for-sitemap (html)
   "Produce a string that can be used inside sitemap.org.
 
@@ -56,7 +72,7 @@ appearance of this string in the final sitemap.org."
          :email "nchatz314@gmail.com"
          :time-stamp-file nil
          :html-metadata-timestamp-format "%Y-%m-%d %a"
-         :html-head ,(html-link-css blog-prefix css-files)
+         :html-head ,(html-head blog-prefix)
          :html-mathjax-options ((path ,(format "%s/mathjax/tex-chtml.js" blog-prefix))
                                 (tags "ams")
                                 (tagside "right")

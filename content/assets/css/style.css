@@ -31,11 +31,34 @@ span.subtitle {
     font-size: 80%;
 }
 
-.sidebar {
+div#sidebar {
     position: fixed;
     top: 0;
     right: 0;
     padding: 20px;
+    background-color: #fefefe;
+    border: 2px solid black;
+    border-top: none;
+    width: fit-content;
+}
+
+div#sidebar h2 {
+    text-align: center;
+}
+
+div#sidebar h2:hover {
+    text-decoration: underline;
+}
+
+div#sidebar h2::before {
+    content: var(--sidebar-arrow, "⇓ ");
+}
+
+.sidebar {
+    display: none;
+    margin-top: 20px;
+    right: 0;
+    padding: 5px;
 }
 
 .sidebar ul {
