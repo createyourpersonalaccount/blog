@@ -18,6 +18,10 @@ a mjx-mtext.mjx-n {
     border: 1px solid red;
 }
 
+div.csl-left-margin {
+    margin: 5px;
+}
+
 div.status {
     display: inline-block;
     border: 2px solid black;
