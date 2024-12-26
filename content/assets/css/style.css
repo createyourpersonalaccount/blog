@@ -11,6 +11,10 @@ a[id^="citeproc"] {
     border: transparent !important;
 }
 
+a[href^="#citeproc_bib_item"] {
+    border: 2px solid orange !important;
+}
+
 mjx-math a {
     border: transparent !important;
 }
