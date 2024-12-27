@@ -29,7 +29,8 @@ I can then customize them with CSS.
 
 This might be possible with ~file-directory-p~ adding that specific attribute. Directories should be cool looking. Also see if you can include interesting bullets for files to simulate the tree-like structure more
 
-** TODO Add title to navigation sidebar
+** DONE Add title to navigation sidebar
+CLOSED: [2024-12-27 Fri 05:26]
 
 Right now it is not clear what all that information is. Maybe adding a title would be useful. Or some other kind of divider from the main content.
 
@@ -40,7 +41,8 @@ To do this, the Emacs solutions won't work. Use either [[https://prismjs.com/][P
 
 I went with highlight.js.
 
-** TODO nav sidebar folds onto content on small screens
+** DONE nav sidebar folds onto content on small screens
+CLOSED: [2024-12-27 Fri 05:26]
 
 To fix this, put the article content inside one div and the nav sidebar in another div. Right now everything is inside
 
@@ -49,6 +51,8 @@ To fix this, put the article content inside one div and the nav sidebar in anoth
 #+end_src
 
 which org-publish puts in.
+
+Instead of fixing this properly, I copied what worg does for its website, namely to collapse with javascript if clicked.
 
 ** TODO Custom link types
 
