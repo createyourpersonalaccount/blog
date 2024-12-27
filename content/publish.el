@@ -1,4 +1,5 @@
 (package-initialize)
+(package-refresh-contents)
 (use-package use-package-ensure
   :config
   (setq use-package-always-ensure t))
