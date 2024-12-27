@@ -43,7 +43,9 @@ where $U(0)$ is the identity and $\psi_0 := \psi(0)$. For example, the path in F
 can be specified in either of the two equations for $0 \leq t \leq \pi/2$:
 
 \begin{align}
+\label{eq:particle-path}
 \psi(t) & = \begin{pmatrix}\cos t \\ \sin t \\ 0\end{pmatrix} \\
+\label{eq:rotate-sphere}
 & =
 \begin{pmatrix}
 \cos t & -\sin t & 0 \\
@@ -53,7 +55,9 @@ can be specified in either of the two equations for $0 \leq t \leq \pi/2$:
 \begin{pmatrix}1 \\ 0 \\ 0\end{pmatrix}.
 \end{align}
 
-It is the second form that allows us to derive Schrödinger's equation.
+We imagine \eqref{eq:particle-path} as a particle moving on the surface of the sphere, while \eqref{eq:rotate-sphere} is imagined as if the tip of a pen is placed on the surface of the sphere while the sphere rotates (similar to a [[https://en.wikipedia.org/wiki/Seismometer][seismometer]]).
+
+It is the second form that allows us to derive Schrödinger's equation, because as it turns out the wave function is nothing but a "particle" traveling on the unit sphere of a complex Hilbert space.
 
 * Derivation of the equation
 
