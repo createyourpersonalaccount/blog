@@ -1,8 +1,10 @@
 (package-initialize)
-(package-refresh-contents)
-(package-install 'citeproc)
-(use-package citeproc)
 (defvar blog-prefix (or (getenv "BLOG_PREFIX") ""))
+(defvar blog-citeproc-location (getenv "BLOG_CITEPROC_LOCATION"))
+(if blog-citeproc-location
+    (use-package citeproc
+      :load-path blog-citeproc-location)
+  (use-package citeproc))
 (defvar js-files
   (list "sidebar.js"))
 (defvar css-files
