@@ -36,17 +36,11 @@ jobs:
         run: |
           sudo apt update
           sudo debconf-set-selections <<< "postfix postfix/main_mailer_type string 'No configuration'"
-          sudo apt install -y emacs-nox make npm texlive texlive-pictures
+          sudo apt install -y emacs-nox jq make npm texlive texlive-pictures wget
           npm install cheerio highlight.js html-entities
-      - name: Obtain Emacs packages
-        run: |
-          wget -qO- https://api.github.com/repos/andras-simonyi/citeproc-el/releases/latest | jq -r .tarball_url | wget -qi- -Ociteproc.tar.gz
-          mkdir -p citeproc
-          tar xvf citeproc.tar.gz --strip-components=1 --directory=citeproc
-      - name: Generate blog
+      - name: Run blog makefile
         env:
           BLOG_PREFIX: ${{ github.repository }}
-          BLOG_CITEPROC_LOCATION: citeproc
         run: |
           export BLOG_PREFIX="/${BLOG_PREFIX#*/}"
           make -C content

@@ -1,10 +1,12 @@
-(package-initialize)
+(use-package package
+  :config
+  (add-to-list 'package-archives
+	       '("melpa" . "https://melpa.org/packages/") t))
+(use-package use-package-ensure
+  :config
+  (setq use-package-always-ensure t))
+(use-package citeproc)
 (defvar blog-prefix (or (getenv "BLOG_PREFIX") ""))
-(defvar blog-citeproc-location (getenv "BLOG_CITEPROC_LOCATION"))
-(if blog-citeproc-location
-    (use-package citeproc
-      :load-path blog-citeproc-location)
-  (use-package citeproc))
 (defvar js-files
   (list "sidebar.js"))
 (defvar css-files
