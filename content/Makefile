@@ -10,6 +10,8 @@ publish:
 	cp -r pages pages-tmp
 	find pages-tmp -type f -name '*.org' \
 		-exec sh -c 'printf "#+HTML: <div id=\"sidebar\" onclick=\"toggleNav()\"><h2>Blog Posts</h2><nav class=\"sidebar\">\n#+INCLUDE: \"%s/pages-tmp/sitemap.org\" :lines \"3-\"\n#+HTML: </h2></nav></div>\n" $$1 >> $$2' _ $(CURDIR) {} \;
+	find pages-tmp -type f -name '*.org' \
+		-exec ./prepend-latex-template.bash {} +
 	emacs	--quick --batch \
 		--load 'publish.el' \
 		--file pages-tmp/index.org \

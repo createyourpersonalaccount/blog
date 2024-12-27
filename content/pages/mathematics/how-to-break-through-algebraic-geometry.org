@@ -1,7 +1,5 @@
 #+TITLE: How to break through Algebraic Geometry
 #+DATE: <2024-12-20 Fri>
-#+bibliography: ../../bibliography.bib
-#+cite_export: csl ../../elsevier-with-titles.csl
 
 * Prelude
 
@@ -36,6 +34,13 @@ C^\infty(M) \xrightarrow{\text{?}} M
 \end{align}
 
 I also knew that I could find the answer in [cite:@nestruev-2020] and so I did. Chapter 4 contains a complete proof of existence of \eqref{functor}. I got hooked into these new definitions, such as the [[https://en.wikipedia.org/wiki/Spectrum_of_a_ring][spectrum of a ring]], and I wanted to learn more, so after finishing Chapter 4 I skipped straight to Chapter 8. Because of how this is all presented, I did not realize that I was already into modern Algebraic Geometry territory.
+
+* A plethora of resources
+
+Now that I had my first taste, I wanted to read more. Jumping straight to Chapter 2 of Vakil's notes [cite:@vakil-ag-2024], I found out what the definition of a sheaf is (always keeping in mind the ring of smooth functions $U\mapsto C^\infty(U)$ as an example), and Chapter 3 taught me a lot about the basics of $\Spec A$ (I also did some of the exercises). In Chapter 4 I learned about schemes. Somewhere in all that, I had to understand stalks better, and I figured out how categorical limits work by that example (mind you that I've tried many times in the past to understand categorical limits, but only now did they click). Other interesting concepts I picked up are the intuition behind $\Spec A/p$ and $\Spec A_p$, which I like to think of as the "geometry inside $p$" and the geometry over $p$ (respectively).
+
+It was at that time when I decided that I wanted to once again ground myself to a more basic level of mathematics and I discovered the wonderful video lectures by Borcherds [cite:@borcherds-yt-2020]. I found even more exercises and lecture notes in James McKernan's 18.725 lecture notes
+[cite:@mckernan-18.725-2009].
 
 * References
 
