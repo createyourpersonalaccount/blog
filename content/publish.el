@@ -1,3 +1,5 @@
+(setq package-load-list
+      '((htmlize nil) all))
 (package-initialize)
 (use-package package
   :config
