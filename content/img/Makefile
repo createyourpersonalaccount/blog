@@ -2,7 +2,7 @@
 
 TEX_FILES := $(wildcard *.tex)
 
-all: $(TEX_FILES:.tex=.svg) move
+all: $(TEX_FILES:.tex=.svg) move clean
 
 %.dvi: %.tex
 	latex $<
