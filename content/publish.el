@@ -1,3 +1,4 @@
+(package-initialize)
 (use-package package
   :config
   (add-to-list 'package-archives
