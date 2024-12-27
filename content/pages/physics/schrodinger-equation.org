@@ -20,6 +20,41 @@ Here $\psi$ is a function in some function space and $\widehat{H}$ is an operato
 
 The unitarity principle guarantees that there exists some complex Hilbert space \(\mathcal H\) such that at every moment in time \(t\geq 0\), we have some unit vector \(\psi(t) \in \mathcal H\) that somehow encodes everything there is to know about the system of this example.
 
+* Two ways to think of a path on a sphere
+
+If a path $\psi(t), t\in I$ is on a sphere, then it can be thought of as given in coordinates in some basis,
+
+\begin{align}
+\psi(t) = (c_j(t))_{j\in J}
+\end{align}
+
+or that it is given via rotations
+
+\begin{align}
+\psi(t) = U(t) \psi_0
+\end{align}
+
+where $U(0)$ is the identity and $\psi_0 := \psi(0)$. For example, the path in Figure [[fig:path-on-sphere]]
+
+#+NAME: fig:path-on-sphere
+#+CAPTION: A path on a sphere.
+[[../img/path-on-sphere.svg]]
+
+can be specified in either of the two equations for $0 \leq t \leq \pi/2$:
+
+\begin{align}
+\psi(t) & = \begin{pmatrix}\cos t \\ \sin t \\ 0\end{pmatrix} \\
+& =
+\begin{pmatrix}
+\cos t & -\sin t & 0 \\
+\sin t & \cos t & 0 \\
+0 & 0 & 1
+\end{pmatrix}
+\begin{pmatrix}1 \\ 0 \\ 0\end{pmatrix}.
+\end{align}
+
+It is the second form that allows us to derive Schrödinger's equation.
+
 * Derivation of the equation
 
 We now will talk about the derivation. Since \(\psi(t)\) is a unit vector at all times there must exist a unitary operator \(U(t)\) such that
@@ -42,7 +77,7 @@ for some Hermitian operator \(A(t)\). Using \eqref{eq:exp} in \eqref{eq:unitary}
 \psi'(t) & = -iA'(t)\exp(-iA(t))\psi_0.
 \end{align}
 
-If we define \(H(t) := A'(t)\), which is again a Hermitian operator, (since the Lie algebra is a vector space and thus closed under derivatives unlike curved spaces), we get \eqref{eq:main}.
+If we define \(H(t) := A'(t)\), which is again a Hermitian operator, (since the Lie algebra is a vector space and thus closed under derivatives, unlike curved spaces), we get \eqref{eq:main}.
 
 * Conclusion
 
