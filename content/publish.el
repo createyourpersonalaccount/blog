@@ -1,8 +1,6 @@
 (package-initialize)
 (package-refresh-contents)
-(use-package use-package-ensure
-  :config
-  (setq use-package-always-ensure t))
+(package-install 'citeproc)
 (use-package citeproc)
 (defvar blog-prefix (or (getenv "BLOG_PREFIX") ""))
 (defvar js-files
