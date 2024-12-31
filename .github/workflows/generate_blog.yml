@@ -36,7 +36,7 @@ jobs:
         run: |
           sudo apt update
           sudo debconf-set-selections <<< "postfix postfix/main_mailer_type string 'No configuration'"
-          sudo apt install -y emacs-nox jq make npm texlive texlive-pictures wget
+          sudo apt install -y emacs-nox graphviz jq make npm texlive texlive-pictures wget
           npm install cheerio highlight.js html-entities
       - name: Run blog makefile
         env:
