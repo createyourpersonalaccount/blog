@@ -1,6 +1,7 @@
 digraph G {
     rankdir=LR;
-    node [shape=ellipse];
+    node [fontname="Liberation Mono", shape=ellipse];
+    edge [fontname="Liberation Mono"];
 
     A [label="example.com"];
     B [label="foo"];
