@@ -1,5 +1,7 @@
 ((org-mode
-  . ((eval
+  . ((display-buffer-alist
+      ("[*]compilation[*]" display-buffer-no-window))
+     (eval
       . (keymap-set
          org-mode-map
          "C-c m"
