@@ -1,6 +1,10 @@
 #+TITLE: DNS notes
 #+DATE: <2024-12-30 Mon>
 
+* Introduction
+
+This is an ongoing document where I gather some thoughts from looking into all the RFCs about DNS. I'm mostly focusing on the client-side of things.
+
 * DNS message format
 
 ** RFC1035, the DNS protocol
