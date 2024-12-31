@@ -60,7 +60,7 @@ After this, the list of resource records follows ([[https://datatracker.ietf.org
 Domain names are compressed according to a a compression scheme detailed in [[https://datatracker.ietf.org/doc/html/rfc1035#section-4.1.4][RFC1035 §4.1.4]]. When there are multiple subdomains of a domain, it allows each to use a pointer to the domain and only specify the subdomain part:
 
 #+CAPTION: The message compression algorithm.
-[[../../img/dns-message-compression.svg]]
+[[../img/dns-message-compression.svg]]
 
 The compression algorithm can be tricky to get right, examples and details about vulnerabilities in [[https://datatracker.ietf.org/doc/html/rfc9267/][RFC9267]].
 
