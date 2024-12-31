@@ -1,0 +1,119 @@
+#+TITLE: DNS notes
+#+DATE: <2024-12-30 Mon>
+
+* Introduction
+
+This is an ongoing document where I gather some thoughts from looking into all the RFCs about DNS. I'm mostly focusing on the client-side of things.
+
+* DNS message format
+
+** RFC1035, the DNS protocol
+
+First appears in [[https://datatracker.ietf.org/doc/html/rfc1035#section-4][RFC1035 §4]]:
+
+#+NAME: tbl:dns-header
+#+CAPTION: DNS header format
+| Field   | Bits | Description              |
+|---------+------+--------------------------|
+| ID      |   16 | unique ID                |
+| QR      |    1 | query or response        |
+| OPCODE  |    4 | query type               |
+| AA      |    1 | authoritative answer     |
+| TC      |    1 | truncation               |
+| RD      |    1 | recursion desired        |
+| RA      |    1 | recursion available      |
+| Z       |    1 | reserved                 |
+| RCODE   |    4 | response code            |
+| QDCOUNT |   16 | number of question RRs   |
+| ANCOUNT |   16 | number of answer RRs     |
+| NSCOUNT |   16 | number of NS RRs         |
+| ARCOUNT |   16 | number of additional RRs |
+
+After the header follow the optional sections of questions, answers, authority records, and additional records. RFC1035 describes only the question section format in detail, and as for the rest it says:
+
+#+begin_quote
+/The last three sections have the same format: a possibly empty list of
+concatenated resource records (RRs)/. --- [[https://datatracker.ietf.org/doc/html/rfc1035#section-4.1][RFC1035 §4.1]]
+#+end_quote
+
+The question format is described in [[https://datatracker.ietf.org/doc/html/rfc1035#section-4.1.2][RFC1035 §4.1.2]]:
+
+#+CAPTION: DNS query section format
+| Field  | Bits | Description                           |
+|--------+------+---------------------------------------|
+| QNAME  |  8×N | domain name in sequenced-label format |
+| QTYPE  |   16 | type of query                         |
+| QCLASS |   16 | class of query (IN for internet)      |
+
+After this, the list of resource records follows ([[https://datatracker.ietf.org/doc/html/rfc1035#section-4.1.3][RFC1035 §4.1.3]]):
+
+#+CAPTION: DNS resource record format
+| Field    |       Bits | Description                        |
+|----------+------------+------------------------------------|
+| NAME     |            | domain name for this RR            |
+| TYPE     |         16 | type of RDATA                      |
+| CLASS    |         16 | class of RDATA                     |
+| TTL      |         32 | cache time to live (seconds)       |
+| RDLENGTH |         16 | length of RDATA                    |
+| RDATA    | 8×RDLENGTH | format according to TYPE and CLASS |
+
+Domain names are compressed according to a a compression scheme detailed in [[https://datatracker.ietf.org/doc/html/rfc1035#section-4.1.4][RFC1035 §4.1.4]]. When there are multiple subdomains of a domain, it allows each to use a pointer to the domain and only specify the subdomain part:
+
+#+CAPTION: The message compression algorithm.
+[[../../img/dns-message-compression.svg]]
+
+The compression algorithm can be tricky to get right, examples and details about vulnerabilities in [[https://datatracker.ietf.org/doc/html/rfc9267/][RFC9267]].
+
+A /master file/ is a text file containing RRs in textual form, described in [[https://datatracker.ietf.org/doc/html/rfc1035#section-5][RFC1035 §5]].
+
+A /zone/ can be represented as a set of RRs, and master files can be used to define zones. In this RFC it was assumed that the master files would be, infrequently and solely, edited by hand.
+
+** RFC2136, the UPDATE opcode
+
+Adds the ~UPDATE~ (5) opcode to update RRs in a zone's database. The four last fields of the [[tbl:dns-header][DNS header]] become ~ZOCOUNT, PRCOUNT, UPCOUNT, ADCOUNT~.
+
+Also adds the RCODEs 6-10, and CLASS 254, see [[https://datatracker.ietf.org/doc/html/rfc2136#section-1][RFC2136 §1.3]].
+
+** RFC2845, authentication for UPDATE
+
+The updates of [[https://datatracker.ietf.org/doc/html/rfc2136][RFC2136]] are authenticated via the ~TSIG~ (250) type code, first specified in [[https://datatracker.ietf.org/doc/html/rfc2845][RFC2845]]. ~RCODE~ is expanded to 16 bits inside a ~TSIG~. The current specification of ~TSIG~ is in [[https://datatracker.ietf.org/doc/html/rfc8945][RFC8945]].
+
+** RFC2930, key distribution of authentication
+
+[[https://datatracker.ietf.org/doc/html/rfc2930][RFC2930]] describes the ~TKEY~ mechanism for key exchange for [[https://datatracker.ietf.org/doc/html/rfc2845][RFC2845]], which did not specify any key exchange mechanisms other than manual exchange.
+
+~TKEY~ is a RR of type code 249.
+
+** RFC6891, extended DNS fields
+
+The fixed-width fields of the [[tbl:dns-header][DNS header]] were soon exhausted, and EDNS was invented to extend them in a backwards compatible way, first specified in [[https://datatracker.ietf.org/doc/html/rfc2671][RFC2671]] and obsoleted by [[https://datatracker.ietf.org/doc/html/rfc6891][RFC6891]]. It adds the ~OPT~ (41) type code, and inside it more ~RCODE~ and other fields may be specified. The format of OPT is specified in [[https://datatracker.ietf.org/doc/html/rfc6891#section-6.1.2][RFC6891 §6.1.2]] and has two parts, a fixed and a variable one (specified in RDATA):
+
+#+CAPTION: Fixed part of OPT RR
+| Field | Type         | Description                  |
+|-------+--------------+------------------------------|
+| NAME  | domain name  | MUST be 0 (root domain)      |
+| TYPE  | ~uint16_t~     | OPT (41)                     |
+| CLASS | ~uint16_t~     | requestor's UDP payload size |
+| TTL   | ~uint32_t~     | extended RCODE and flags     |
+| RDLEN | ~uint16_t~     | length of all RDATA          |
+| RDATA | octet stream | {attribute,value} pairs      |
+
+In particular note that the extended ~RCODE~ and flags are specified in the ~TTL~ field. There are 8 bits added to ~RCODE~ for a total of 12.
+
+Adds the ~RCODE=BADVERS~ (16).
+
+** RFC6895, IANA considerations
+
+[[https://datatracker.ietf.org/doc/html/rfc6895][RFC6895]] describes various values of the [[tbl:dns-header][DNS header]] fields and how they are reserved or interpreted by IANA.
+
+* Clarifications to DNS
+
+** RFC2181
+
+Clarifies certain confusions that arose with DNS.
+
+* DNSSEC
+
+** RFC4033
+
+Introduces DNSSEC.
