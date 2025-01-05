@@ -3,6 +3,11 @@ const html_entities = require('html-entities');
 const cheerio = require('cheerio');
 const hljs = require('highlight.js');
 
+const transformed_languages = {
+    "emacs-lisp": "lisp",
+    "elisp": "lisp",
+};
+
 if (process.argv.length <= 2) {
     console.log('Usage: node colorize-source-code.js [HTML file, ...]');
     process.exit(0);
@@ -16,7 +21,8 @@ try {
         const $ = cheerio.loadBuffer(buffer);
         $('div.org-src-container').each((_, divElement) => {
             $(divElement).find('pre.src').each((_, preElement) => {
-                const language = preElement.attribs.class.split('-').pop();
+                let language = preElement.attribs.class.split('-').pop();
+                language = transformed_languages[language] || language;
                 $(preElement).html(
                     hljs.highlight(
                         html_entities.decode($(preElement).html()),
