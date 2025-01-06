@@ -66,3 +66,15 @@ CLOSED: [2024-12-20 Fri 09:31]
 ** TODO Reload on changes
 
 To reload on changes on Firefox I can maybe use <https://addons.mozilla.org/en-US/firefox/addon/filewatcher/>.
+
+** TODO Add @media CSS queries
+
+To have a different view depending on the device size, use [[https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_media_queries/Using_media_queries][CSS media queries]].
+
+** TODO Add Intersection Observer API
+
+The [[https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API][Intersection Observer API]] allows me to figure out what part of the page the reader is viewing so that I can make bold the specific heading in the table of contents.
+
+** TODO HTML5 boilerplate
+
+This example may be of interest <https://gist.github.com/amcgregor/71c62ea2984839a9063232ed2c0adf27>.
