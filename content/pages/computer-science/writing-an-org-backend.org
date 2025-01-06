@@ -41,6 +41,4 @@ The transcoder is defined using ~org-export-define-backend~ by a cons list of or
 
 * A minimal example exporter
 
-The example may be found [[https://github.com/createyourpersonalaccount/ox-mybackend][here]]. The helpful comments in the elisp source file should aid you.
-
-
+The example may be found [[https://github.com/createyourpersonalaccount/ox-mybackend][here]]. The helpful comments in the elisp source file should aid you. It is a slimmed down version of ~ox-org.el~ that ships with Emacs. It essentially exports Org files to Org files, with minimal modification.
