@@ -2,6 +2,10 @@ body {
     background-color: lightgray;
 }
 
+code {
+    background-color: #BEBEBE;
+}
+
 a {
   border: 1px solid red;
   text-decoration: none;
