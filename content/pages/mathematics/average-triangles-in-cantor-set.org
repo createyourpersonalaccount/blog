@@ -1,0 +1,64 @@
+#+TITLE: Average triangle area in the Cantor dust
+#+DATE: <2025-01-06 Mon>
+
+* Introduction to the problem
+
+Consider the [[https://en.wikipedia.org/wiki/Cantor_set][Cantor set]] $\mathcal{C}$ of the real line. The /Cantor dust/ is the set $\mathcal{C}^2$ of the real plane. Both sets are probability spaces; the Cantor set is equipped with a Borel probability measure $\mu$ and the Cantor dust inherits the Borel probability measure $\mu^2$.
+
+The following question is asked: given three random points $P,Q,R$ of $\mathcal{C}^2$, what is the average of the area of the triangle with vertices $P,Q,R$?
+
+In this article will we show the progress we have for this question.
+
+* The one-dimensional case
+
+Indeed before talking about the average triangle area in two dimensions, it is prudent to ask of the average distance in one dimension. Thus we wish to calculate, for two random numbers $X,Y\in\mathcal{C}$, the quantity $\mathbb{E}(|X - Y|)$.
+
+This problem has been solved [cite:@leary-2010;@allen-2017] and it turns out that
+
+\begin{align}
+\mathbb{E}(|X - Y|) = 2/5.
+\end{align}
+
+We'll show one derivation of this result.
+
+** Reduction to CDF powers
+
+We have,
+
+\begin{align}
+\int_0^1\int_0^1 |x-y|dF(y)dF(x)
+& = 2 \int_0^1\int_0^x (x - y)dF(y)dF(x),
+\end{align}
+
+where $F$ denotes /distribution function/ of $\mu$, $F(t) := \mu((-\infty, t])$ for $t\in\mathbb{R}$. [fn:cantor-lebesgue]
+
+We may now perform integration by parts on the inner /Lebesgue-Stieltjes integral/ (see Theorem 3.36 of [cite:@folland-1999]), to obtain:
+
+\begin{align}
+\int_0^x (x-y)dF(y) = \left.(x-y)F(y)\right|_0^x + \int_0^x F(y)dy.
+\end{align}
+
+The first term vanishes and so we're left with:
+
+\begin{align}
+\mathbb{E}(|X - Y|) & = 2\int_0^1\int_0^x F(y)dydF(x)
+\end{align}
+
+One more productive use of integration by parts, this time on the outer integral, yields:
+
+\begin{align}
+\label{eq:moments}
+\mathbb{E}(|X - Y|) & = 2\int_0^1 F(y)dy - 2\int_0^1 F(x)^2dx,
+\end{align}
+
+where we've made use of $d(f(x)) = f'(x)dx$ to get the second term.
+
+The terms in \eqref{eq:moments} have been computed in many ways [cite:@gorin-2006;@gordon-2009].
+
+[fn:cantor-lebesgue] $F$ is also the /Cantor-Lebesgue function/ of $\mathcal{C}$ (see §1.5 of [cite:@folland-1999] for more), which means that it has an explicit form: the increasing bijection $F : \mathcal{C} \to [0,1]$, where $\sum b_j3^{-j} \mapsto b_j2^{-j}$, may be extended into the function $F : \mathbb{R}\to [0,1]$ by setting, for every connected component $I = (a,b)$ of the complement of $\mathcal{C}$, and every $x\in I$, $F(x) := F(a)$. In probabilistic terms, it is the /cumulative distribution function/.
+
+** The moments of the Cantor set
+
+* References
+
+#+print_bibliography:
