@@ -9,6 +9,12 @@ The following question is asked: given three random points $P,Q,R$ of $\mathcal{
 
 In this article will we show the progress we have for this question.
 
+* The construction of the Cantor set
+
+The Cantor set $\mathcal{C}$ is constructed in steps.
+
+We start with the unit interval $\mathcal{C}_0 := [0,1]$. In the zeroth step, we remove one open interval denoted by $I_{0,1} := (1/3, 2/3)$, leaving us with $\mathcal{C}_1$ as a union of two intervals. In the \(k\)-th step, remove $2^k$ open intervals, each of length $3^{-k-1}$ and denoted by $I_{k,1}, \dots, I_{k, 2^k}$, in order of appereance from left to right, to obtain $\mathcal{C}_k$. We then set $\mathcal{C} := \cap_{k=1}^\infty \mathcal{C}_k$.
+
 * The one-dimensional case
 
 Indeed before talking about the average triangle area in two dimensions, it is prudent to ask of the average distance in one dimension. Thus we wish to calculate, for two random numbers $X,Y\in\mathcal{C}$, the quantity $\mathbb{E}(|X - Y|)$.
@@ -16,6 +22,7 @@ Indeed before talking about the average triangle area in two dimensions, it is p
 This problem has been solved [cite:@leary-2010;@allen-2017] and it turns out that
 
 \begin{align}
+\label{eq:average-distance}
 \mathbb{E}(|X - Y|) = 2/5.
 \end{align}
 
@@ -30,7 +37,11 @@ We have,
 & = 2 \int_0^1\int_0^x (x - y)dF(y)dF(x),
 \end{align}
 
-where $F$ denotes /distribution function/ of $\mu$, $F(t) := \mu((-\infty, t])$ for $t\in\mathbb{R}$. [fn:cantor-lebesgue]
+where $F$ denotes /distribution function/ of $\mu$, $F(x) := \mu((-\infty, x])$ for $x\in\mathbb{R}$.  $F$ is also the /Cantor-Lebesgue function/ of $\mathcal{C}$ (see §1.5 of [cite:@folland-1999] for more) and in probabilistic terms, it is the /cumulative distribution function/ of $\mu$.
+
+#+ATTR_HTML: :width 40% :height 40%
+#+CAPTION: The Cantor-Lebesgue function $F(x)$. [[https://commons.wikimedia.org/wiki/File:CantorEscalier-2.svg][(source)]]
+[[../img/cantor-lebesgue-function.svg]]
 
 We may now perform integration by parts on the inner /Lebesgue-Stieltjes integral/ (see Theorem 3.36 of [cite:@folland-1999]), to obtain:
 
@@ -55,9 +66,25 @@ where we've made use of $d(f(x)) = f'(x)dx$ to get the second term.
 
 The terms in \eqref{eq:moments} have been computed in many ways [cite:@gorin-2006;@gordon-2009].
 
-[fn:cantor-lebesgue] $F$ is also the /Cantor-Lebesgue function/ of $\mathcal{C}$ (see §1.5 of [cite:@folland-1999] for more), which means that it has an explicit form: the increasing bijection $F : \mathcal{C} \to [0,1]$, where $\sum b_j3^{-j} \mapsto b_j2^{-j}$, may be extended into the function $F : \mathbb{R}\to [0,1]$ by setting, for every connected component $I = (a,b)$ of the complement of $\mathcal{C}$, and every $x\in I$, $F(x) := F(a)$. In probabilistic terms, it is the /cumulative distribution function/.
+One straightforward computation is to note that $F(x)$ is constant each of the intervals $I_{i,j}$ from §[[The construction of the Cantor set]], and they exhaust $[0,1]$ (in the Lebesgue measure), so for any exponent $M>0$,
 
-** The moments of the Cantor set
+\begin{align}
+\int F^M(x)dx&  = \sum_{k=0}^\infty \sum_{j=1}^{2^k} |I_{k,j}| F(I_{k,j})^M.
+\end{align}
+
+We also have
+
+\begin{align}
+F(I_{k,j}) = 2^{-k-1}(2j - 1)
+\end{align}
+
+We can utilize the above and compute the two integrals from:
+
+\begin{align}
+\int F(x)^Mdx & = \frac{1}{3\cdot 2^M}\sum_{k=0}^\infty (3\cdot 2^M)^{-k}\sum_{j=1}^{2^k}(2j-1)^M,
+\end{align}
+
+to obtain $\int F(x)dx = 1/2$ and $\int F(x)^2dx = 3/10$ which shows \eqref{eq:average-distance}.
 
 * References
 
