@@ -11,6 +11,20 @@ a {
   text-decoration: none;
 }
 
+:target {
+  scroll-margin-top: 100px;
+}
+
+[id^="mjx-eqn"]:target::after {
+  content: '↓';
+  font-size: 30px;
+  color: red;
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
 a[id^="citeproc"] {
     border: transparent !important;
 }
