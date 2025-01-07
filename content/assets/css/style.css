@@ -11,7 +11,7 @@ a {
   text-decoration: none;
 }
 
-:target {
+[id^="mjx-eqn"]:target {
   scroll-margin-top: 100px;
 }
 
