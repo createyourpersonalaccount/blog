@@ -5,7 +5,7 @@
 
 Consider the [[https://en.wikipedia.org/wiki/Cantor_set][Cantor set]] $\mathcal{C}$ of the real line. The /Cantor dust/ is the set $\mathcal{C}^2$ of the real plane. Both sets are probability spaces; the Cantor set is equipped with a Borel probability measure $\mu$ and the Cantor dust inherits the Borel probability measure $\mu^2$.
 
-The following question is asked: given three random points $P,Q,R$ of $\mathcal{C}^2$, what is the average of the area of the triangle with vertices $P,Q,R$?
+An /ordered triangle/ is a triple of points $(P,Q,R)$ from $\mathcal{C}^2$. The following question is asked: given three random points $P,Q,R$ of $\mathcal{C}^2$, what is the average of the area of the ordered triangle with vertices $P,Q,R$?
 
 In this article will we show the progress we have for this question.
 
@@ -85,6 +85,74 @@ We can utilize the above and compute the two integrals from:
 \end{align}
 
 to obtain $\int F(x)dx = 1/2$ and $\int F(x)^2dx = 3/10$ which shows \eqref{eq:average-distance}.
+
+** Making use of a recurring formula
+
+Reasonably one expects that a recurring formula may help in the calculation of the $2/5$ result in \eqref{eq:average-distance}. This would offer an alternative method to compute the result. In §2 of [cite:@leary-2010], the integral is reduced to calculating, for any $k$, the sum $\displaystyle\sum_{i < j} d^k_{ij}$ where $d^k_{ij}$ denotes the distances of the midpoints of the \(i\)-th and \(j\)-th interval of $\mathcal{C}_k$, and indeed they recurringly connected to the next set of distances $d^{k+1}_{m,n}$.
+
+* Open questions
+
+** TODO Find all lines in the Cantor approximation
+
+Can all the lines be computed? More explicitly, can all degenerate triangles be computed?
+
+If a line $L$ is given, how many points does $|L\cap\mathcal{C}^2|$ contain? (it answers how many degenerate triangles on $L$ exist)
+
+** TODO Find all triangle congruence classes pinned at a corner
+
+It may be too difficult to calculate all triangle congruence classes. Can I calculate a subclass such as the pinned triangles? See [cite:@palsson-2024] for an estimate for the integer lattice (my $r=1/2$) where it is estimated that the number of congruence classes is $\sim n^2$ inside $[0,\sqrt{n}]^2$.
+
+** DONE Write down exactly what series the program is calculating     :easy:
+CLOSED: [2025-01-09 Thu 11:06]
+
+I need to figure out exactly what the sums $\pm r \pm r^2 \pm \cdots \pm r^n$ represent.
+
+*** Analysis of Cantor discretization midpoints
+
+Start with the centered interval $\mathcal{C}_0 = [-1/2, 1/2]$. Given a ratio $0 < r \leq 1/2$, remove the middle interval of length $1-2r$, which means that $\mathcal{C}_1$ consists of two intervals, each of length $r$, and of midpoints $m_{1,1} = -(1-r)/2$ and $m_{1,2} = (1-r)/2$. For the next iteration, everything will be repeated at the scale $r$, leaving us e.g. with $m_{2,1} = m_{1,1} + rm_{1,1} = (1 + r)m_{1,1}$, and $\mathcal{C}_2$ being four intervals each of length $r^2$.
+
+In general, each point is given by
+
+\begin{align}
+m\sum_{k=0}^n \pm r^k,
+\end{align}
+
+where $m := (1 - r)/2$. At a simple rescale of the original structure by $r/m$, we obtain the series $\pm r \pm r^2 \pm \cdots \pm r^n$. Note that for $r = 1/3$ we have $r/m = 1$, and so for the standard Cantor set, the series above goes unchanged.
+
+** TODO Singular congruence classes
+
+Some congruence classes are singular in their area, i.e. there are no two different classes $C_1, C_2$ of triangles with the same area.
+
+Can these be classified? What makes them unique?
+
+** TODO Complexity analysis on operations
+
+I need to figure out how many operations are taken for each computation. For example, how much memory is required? For instance, here is a count of the congruence classes:
+
+| depth | ratio | # of congruence classes |
+|-------+-------+-------------------------|
+|     1 | 1/3   |                       4 |
+|     2 | 1/3   |                      67 |
+|     3 | 1/3   |                    2533 |
+|     4 | 1/3   |                  119388 |
+
+Note that they change for different classes. We note their stability:
+
+| depth | stable ratio | # of congruence classes |
+|     1 | 1/2          |                       4 |
+|     2 | 1/5          |                      67 |
+|     3 | 1/7          |                    2572 |
+
+Some remarks on the stability:
+
+- The number of congruence classes increases as the ratio gets smaller.
+- The number appears to immediately stabilize once two different ratios give the same number.
+
+Why do these numbers stabilize? Do they really stabilize or not?
+
+** TODO Talk to Poursalidis on <2025-01-11 Sat>
+
+- Mention the tables and observations appearing in [[Complexity analysis on operations]].
 
 * References
 

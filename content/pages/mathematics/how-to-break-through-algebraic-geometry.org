@@ -10,7 +10,7 @@ Algebraic geometry is a beautiful subject, but its study is impenetrable to most
 It's important to stay humble: One day I decided to study the [[https://en.wikipedia.org/wiki/Euclidean_algorithm][Euclidean algorithm]], because I wanted to solve a 3-factor RSA exercise. [fn:1] I've studied this algorithm many times before, but it had never "clicked", and so I would forget it after a month or so (or a day!). This time it was different. I took my time, and I thought more carefully about [[https://en.wikipedia.org/wiki/Euclidean_algorithm#/media/File:Euclid's_algorithm_Book_VII_Proposition_2_3.svg][this Wikipedia picture]] which completely illustrated the entire algorithm for me:
 
 #+ATTR_HTML: :width 40% :height 40%
-#+CAPTION: Two examples of Euclid's algorithm.
+#+CAPTION: Two examples of Euclid's algorithm. [[https://commons.wikimedia.org/wiki/File:Euclid%27s_algorithm_Book_VII_Proposition_2_3.svg][(source)]]
 #+NAME: fig:euclid-algorithm
 [[../img/euclid-algorithm.svg]]
 
