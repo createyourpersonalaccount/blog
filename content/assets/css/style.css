@@ -8,6 +8,10 @@ code {
 
 span.tag {
     background-color: lightgray;
+    font-family: monospace;
+    padding: 2px;
+    font-size: 80%;
+    font-weight: normal;
 }
 
 span.tag > span {
@@ -121,9 +125,7 @@ div#sidebar h2::before {
 .todo   { font-family: monospace; color: red; }
 .done   { font-family: monospace; color: green; }
 .priority { font-family: monospace; color: orange; }
-.tag    { background-color: #eee; font-family: monospace;
-          padding: 2px; font-size: 80%; font-weight: normal; }
-.timestamp { color: #bebebe; }
+.timestamp { color: #b43757; }
 .timestamp-kwd { color: #5f9ea0; }
 .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
 .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
