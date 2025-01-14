@@ -139,6 +139,7 @@ I need to figure out how many operations are taken for each computation. For exa
 Note that they change for different classes. We note their stability:
 
 | depth | stable ratio | # of congruence classes |
+|-------+--------------+-------------------------|
 |     1 | 1/2          |                       4 |
 |     2 | 1/5          |                      67 |
 |     3 | 1/7          |                    2572 |
@@ -150,7 +151,12 @@ Some remarks on the stability:
 
 Why do these numbers stabilize? Do they really stabilize or not?
 
-** TODO Talk to Poursalidis on <2025-01-11 Sat>
+*** TODO Statistics on congruence classes
+
+What is the average size of a congruence class? What is the standard deviation?
+
+** DONE Talk to Poursalidis on <2025-01-11 Sat>
+CLOSED: [2025-01-11 Sat]
 
 - Mention the tables and observations appearing in [[Complexity analysis on operations]].
 
