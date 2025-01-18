@@ -82,3 +82,27 @@ This example may be of interest <https://gist.github.com/amcgregor/71c62ea298483
 ** TODO study tsujp's derived-html code
 
 https://github.com/tsujp/tree_sitter_noir/blob/master/ox-ngd.el
+
+** TODO Study cbarrett's code
+
+#+begin_src elisp
+  (defun custom-html-template (contents info)
+    (if (plist-get info :body-only)
+        contents
+      (concat
+       "<!DOCTYPE html>\n"
+       "<html>\n"
+       "<head><title>" (org-export-data (plist-get info :title) info) "</title></head>\n"
+       "<body>\n"
+       contents
+       "\n</body>\n"
+       "</html>")))
+
+  (setq custom-html-backend
+    (org-export-create-backend
+     :parent 'html
+     :transcoders '((template . custom-html-template))))
+
+  (defun custom-html-publish-to-html (plist filename pub-dir)
+    (org-publish-org-to custom-html-backend filename ".html" plist pub-dir))
+#+end_src
