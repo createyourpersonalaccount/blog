@@ -78,3 +78,7 @@ The [[https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API
 ** TODO HTML5 boilerplate
 
 This example may be of interest <https://gist.github.com/amcgregor/71c62ea2984839a9063232ed2c0adf27>.
+
+** TODO study tsujp's derived-html code
+
+https://github.com/tsujp/tree_sitter_noir/blob/master/ox-ngd.el
