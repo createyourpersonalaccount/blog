@@ -1,0 +1,49 @@
+#+TITLE: Git hooks
+#+DATE: <2025-01-22 Wed>
+
+* Pre-commit hooks
+
+Some quick pre-commit hooks that I have found useful.
+
+You can drop scripts like the ones below under ~.git/hooks/pre-commit~ for example; it should have the executable bit set with ~chmod +x .git/hooks/pre-commit~.
+
+** Format Python with black
+
+This script will run the [[https://github.com/psf/black][black source code formatter]] on the git diffs of Python files only. It seems overly complicated because I tried to avoid certain issues [fn:path-issue]
+
+#+begin_src sh
+  #!/bin/sh
+
+  if ! command -v black > /dev/null 2>&1; then
+      printf "black is not installed. See <%s>." \
+             "https://black.readthedocs.io/en/stable/" 2>&1
+      exit 1
+  fi
+  unset -v GIT_LITERAL_PATHSPECS
+  staged=$(git diff -z --name-only --staged -- '*.py' | base64)
+  printf "%s" "$staged" | base64 -d | xargs -0 black -q
+  modified=$(git diff -z --name-only --diff-filter=M -- '*.py' | base64)
+  printf "%s" "$staged" | base64 -d \
+      | (printf "%s" "$modified" | base64 -d && cat) \
+      | sort -z | uniq -z -d \
+      | xargs -0 git add
+#+end_src
+
+[fn:path-issue] See the article [[https://dwheeler.com/essays/filenames-in-shell.html][Filenames and Pathnames in Shell: How to do it Correctly]] by David A. Wheeler.
+
+** Format C and C++ with clang-format
+
+This script will run [[https://clang.llvm.org/docs/ClangFormat.html][clang-format]] on the git diffs of C and C++ files (source and header) only. It doesn't work for tricky filenames that contain newlines, so do not use it with untrusted repositories.
+
+#+begin_src sh
+  #!/bin/sh
+
+  if ! command -v clang-format > /dev/null 2>&1; then
+    printf "clang-format is not installed. See <%s>." \
+           "https://clang.llvm.org/docs/ClangFormat.html" 2>&1
+    exit 1
+  fi
+  git clang-format --staged \
+    | tail -n +2 \
+    | xargs git add
+#+end_src
