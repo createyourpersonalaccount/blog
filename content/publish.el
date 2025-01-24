@@ -72,6 +72,7 @@ appearance of this string in the final sitemap.org."
                         (inline-html-for-sitemap "</span>"))
               ""))))
 (setq enable-local-variables :all)
+(setq org-html-checkbox-type 'unicode)
 (setq org-publish-project-alist
       `(("blog"
          :components ("blog-pages" "blog-assets"))
