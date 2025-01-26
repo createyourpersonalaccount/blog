@@ -72,7 +72,16 @@ appearance of this string in the final sitemap.org."
                         (inline-html-for-sitemap "</span>"))
               ""))))
 (setq enable-local-variables :all)
+;; Show the checkboxes as unicode.
 (setq org-html-checkbox-type 'unicode)
+;; Show tables centered and with border lines.
+(setq org-html-table-default-attributes
+      '(:align "center"
+        :border "2"
+        :cellpadding "6"
+        :cellspacing "0"
+        :frame "border"
+        :rules "all"))
 (setq org-publish-project-alist
       `(("blog"
          :components ("blog-pages" "blog-assets"))
