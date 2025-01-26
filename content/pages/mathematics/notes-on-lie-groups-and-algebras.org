@@ -5,7 +5,7 @@
 
 In this blog post I focus on various aspects of Lie groups theory that I find interesting.
 
-* A geometric interpretation of the commutator
+* A geometric interpretation of the commutator bracket
 
 Suppose that we have
 
