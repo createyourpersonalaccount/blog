@@ -1,4 +1,6 @@
 #+HTML: <div style="display: none">
 $\newcommand{\Spec}{\operatorname{Spec}}$
 $\newcommand{\Proj}{\operatorname{Proj}}$
+$\newcommand{\dom}{\operatorname{dom}}$
+$\newcommand{\ran}{\operatorname{ran}}$
 #+HTML: </div>
