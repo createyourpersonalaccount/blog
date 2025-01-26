@@ -42,3 +42,18 @@ Now we can compute,
 \end{align}
 
 Formula \eqref{eq:commutator-result} is inheretedly geometric: it's telling us that when we rotate by a $\theta$ angle on the \(x\)-axis and a $\psi$ angle on the \(y\)-axis, what the difference would've been if we instead did the operations in opposite order.
+
+** Other uses of the Baker-Campbell-Hausdorff formula
+
+If one assumes $[A, [A,B]] = [B, [B, A]] = 0$, then all higher order terms in the Baker-Campbell-Hausdorff formula vanish.
+
+For unbounded operators $A, B$, the product $AB$ may not be defined, e.g. if $\dom(A)\cap\ran(B) = \emptyset$. Due to this, we may not have the luxury of speaking of a Lie group $G$ with a Lie algebra $\mathfrak{g}$. However, for the position and momentum operators $X_j, P_k$ for $1 \leq j, k \leq n$ of $L^2(\mathbb{R}^n)$ of quantum mechanics, we have that the Weyl relations hold, which is the analogue of the above; the proof may be found in chapter 14.2 of [cite:@hall-2013].
+
+* Matrix groups
+
+If $G$ is a matrix group then $SG := \{ g \in G : \det g = 1\}$.
+
+* References
+
+#+print_bibliography:
+
