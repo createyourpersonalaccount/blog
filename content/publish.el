@@ -82,6 +82,12 @@ appearance of this string in the final sitemap.org."
         :cellspacing "0"
         :frame "border"
         :rules "all"))
+;; Always include babel src-block output in HTML export, if it exists.
+(let ((pair (assoc :exports org-babel-default-header-args)))
+  (if pair
+      (setcdr pair "both")
+    (add-to-list 'org-babel-default-header-args
+                 '(:exports . "both"))))
 (setq org-publish-project-alist
       `(("blog"
          :components ("blog-pages" "blog-assets"))
