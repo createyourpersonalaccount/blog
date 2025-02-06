@@ -3,7 +3,7 @@
 
 * Introduction
 
-In these notes I hope to give the complete walkthrough from first principles to Gödel's first incompleness theorems. My notes follow the roadmap of [cite:@barnes-mack-2013], which is a fantastic source to learn all this from. Ultimately a careful study requires reading that book; the notes below are expository and can be considered as a companion.
+In these notes I hope to give the complete walkthrough from first principles to Gödel's first incompleness theorem. My notes follow the roadmap of [cite:@barnes-mack-2013], which is a fantastic source to learn all this from. Ultimately a careful study requires reading that book; the notes below are expository and can be considered as a companion.
 
 The starting point is that the halting problem is undecidable. The task then becomes to encode everything required for the halting problem to be stated inside a given logical theory. This encoding is accomplished with [[Gödel numbers][Gödel numbers]], which require natural numbers, addition, and multiplication. Because these operations must be first-class citizens of the theory, the theory must extend the theory of arithmetic, but once it does, everything is in place to derive the contradiction required and to conclude that the theory is not complete, because effectively axiomatized complete theories are decidable.
 
