@@ -215,6 +215,20 @@ x \mapsto (\lfloor x\rfloor + 1 - \{x\})^{-1}.
 
 Indeed \eqref{eq:calkin-wilf} produces all the positive rationals if we start from $1$ and repeatedly apply this formula.
 
+** Enumerating finite integer sequences
+
+The proof below is taken from Lemma 6.5 in [cite:@barnes-mack-2013]. It is useful in the course of proving that every /partial recursive function/ is /strongly definable/ in a theory that extends Robinson arithmetic; importantly it turns out that the construction below is strongly definable in any theory that extends Robinson arithmetic.
+
+We will define a function $\operatorname{seq}(b,r)$ so that for any $a_0, \dots, a_n\in\mathbb{N}$ there exists some $b$ so that $\operatorname{seq}(b,r) = a_r$ for all $0 \leq r \leq n$. What we need essentially is to construct $n+1$ coprime numbers $m_0,m_1,\dots,m_n$ since we can then use the CRT.
+
+Let $T(n) := n(n+1)/2$ be the \(n\)-th triangular number and for $T(n) < z \leq T(n+1)$ define $y := z - T(n)$ and $x := 1 + T(n+1) - z$. Let
+
+\begin{align}
+\operatorname{seq}(z, r) := \text{remainder of } y \text{ divided by } 1 + (r + 1)x.
+\end{align}
+
+It only remains to find the appropriate $z\in\mathbb{N}$ and to establish the required properties of the function. Let $c > \max(a_0, \dots, a_r)$ divisible by $\lcm(1,2,\dots,n)$, and set $m_r := 1 + (r + 1)c$. The numbers $m_r$ are coprime: a common divisor $d$ must also divide $(s+1)m_r - (r+1)m_s = s-r$, and therefore by the definition of $c$ must also divide $c$, which implies $d=1$. The system $w \equiv a_r \pmod{m_r}$ for $r=0,\dots,n$ has some positive solution $e\in\mathbb{N}$. Let $z := T(e + c - 2) + e$, from which it follows that $y = e$ and $x = c$, and in fact $\operatorname{seq}(b, r) = a_r$ for $r=0,\dots,n$.
+
 * References
 
 #+print_bibliography:
