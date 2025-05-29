@@ -1,0 +1,234 @@
+#+TITLE: The extended Euclidean algorithm
+#+DATE: <2025-01-11 Sat>
+
+* The extended Euclidean algorithm
+
+I've overlooked this algorithm for a long time but it is quite a brilliant algorithm now that I'm looking at it again.
+
+** The algorithm
+
+The algorithm itself can be best described in a picture:
+
+#+ATTR_HTML: :width 40% :height 40%
+#+CAPTION: Two examples of Euclid's algorithm. [[https://commons.wikimedia.org/wiki/File:Euclid%27s_algorithm_Book_VII_Proposition_2_3.svg][(source)]]
+#+NAME: fig:euclid-algorithm
+[[../img/euclid-algorithm.svg]]
+
+Nevertheless, we can also describe it as follows:
+
+The process begins with two (positive, for illustration) integers $a > b$ and ends with computed integers $s, t$ with $sa + tb = \gcd(a,b)$.
+
+1. Write $a = k_0 b + r_1$, where $k_0$ is maximal, so $r_1$ is the remainder.
+2. Write $b = k_1r_1 + r_2$, where $k_1$ is maximal, so $r_2$ is the remainder.
+3. Write $r_1 = k_2r_2 + r_3$, where $k_2$ is maximal, so $r_3$ is the remainder.
+4. At the general step, write $r_j = k_{j+1}r_{j+1} + r_{j+2}$, where $k_{j+1}$ is maximal, so $r_{j+2}$ is the remainder.
+5. Continue this process until the end where there is no remainder, i.e. $r_{n+1} = 0$.
+
+Let's name the final remainder $r_n$ as $g := r_n$. By walking our steps backwards, we have $g\mid a$ and $g\mid b$. Furthermore, by walking our steps forward this time, writing the equations in terms of the new remainder, we may gradually eliminate the remainders until we arrive at the last remainder, $g$:
+
+\begin{align}
+r_1 & = a - k_0b \\
+r_2 & = b - k_1r_1 \implies r_2 = b - k_1(a - k_0b) & \text{eliminate }r_1 \\
+r_3 & = \dots & \text{eliminate }r_2 \nonumber \\
+& \vdots \nonumber \\
+g & = \dots & \text{eliminate }r_{n-1}. \nonumber
+\end{align}
+
+At every step we compute $s_j, t_j$ so that $r_j = s_ja + t_jb$; in our final equation we have arrived at a linear combination $g = sa + tb$ with $s := s_n$ and $t := t_n$.
+
+** Proof that $g$ is the greatest common divisor
+
+The three properties, $g$ dividing $a$ and $b$ as well as being written as a linear combination, uniquely identify $g$ as the greatest common divisor: If $d\mid a$ and $d\mid b$ then since $g$ is a linear combination, $d\mid g$, thus $g = \gcd(a, b)$.
+
+** A recurrence relation
+
+In fact $s_j, t_j$ hold a recurrence relation that we can discover by writing all the remainders \(j\)-th step as linear combinations of $a$ and $b$:
+
+\begin{align}
+s_ja + t_jb & = (k_{j+1}s_{j+1} + s_{j+2})a + (k_{j+1}t_{j+1} + t_{j+2})b \implies \begin{cases}s_{j+2} = s_j - k_{j+1}s_{j+1}, \\ t_{j+2} = t_j - k_{j+1}t_{j+1}.\end{cases}
+\end{align}
+
+(The implication does not follow by "comparing coefficients" because such conclusion is false; but rather from induction on the form of $s_j$ and $t_j$.)
+
+Note that the equations for $r_j, s_j, t_j$ all evolve in the same manner. Extending the sequences by $r_{-1} = a, r_0 = b$ and $s_{-1} = 1, s_0 = 0, t_{-1} = 0, t_0 = 1$, the evolution is exactly the same for either of the sequences, and it may be written in matrix form:
+
+\begin{align}
+\label{eq:matrix}
+\begin{pmatrix}
+r_{j+1} & r_{j+2} \\
+s_{j+1} & s_{j+2} \\
+t_{j+1} & t_{j+2}
+\end{pmatrix} & =
+\begin{pmatrix}
+r_{j} & r_{j+1} \\
+s_{j} & s_{j+1} \\
+t_{j} & t_{j+1}
+\end{pmatrix}\cdot
+\begin{pmatrix}
+0 & 1 \\
+1 & -k_{j+1}
+\end{pmatrix},
+\end{align}
+
+** An estimate on the coefficients $s_j, t_j$
+
+By taking the determinant in the expression
+
+\begin{align}
+\begin{pmatrix}
+s_{j+1} & s_{j+2} \\
+t_{j+1} & t_{j+2}
+\end{pmatrix} & =
+\prod_{l=0}^j \begin{pmatrix}
+0 & 1 \\
+1 & -k_l
+\end{pmatrix},
+\end{align}
+
+it follows that $s_j, t_j$ are coprime for all $j$. Since $r_{n+1} = 0$ the identity $s_{n+1}a + t_{n+1}b = 0$ follows, and by coprimality it follows that $t_{n+1}\mid a$ (and $s_{n+1}\mid b$). If $a = dt_{n+1}$ the identity gives $b = -ds_{n+1}$, and hence by coprimality the common factor $d$ must be $\gcd(a,b)$:
+
+\begin{align}
+s_{n+1} & = \pm b/\gcd(a,b), \\
+t_{n+1} & = \mp a/\gcd(a,b).
+\end{align}
+
+By a sign and magnitude analysis on the $s_j, t_j$, we conclude signs are alternating and magnitudes are increasing, so that
+
+\begin{align}
+|s_{j+1}| & = |s_{j-1}| + k_j|s_{j}|,
+\end{align}
+
+and in particular at $j=n$ we obtain the estimates:
+
+\begin{align}
+\label{eq:estimate}
+|s| \leq \left\lfloor \frac{b}{2\gcd(a,b)}\right\rfloor \text{ and } |t| \leq \left\lfloor \frac{a}{2\gcd(a,b)}\right\rfloor.
+\end{align}
+
+** Minimality of $s, t$ (Bezout's identity)
+
+In general, the equation
+
+\begin{align}
+\lambda a + \kappa b = \gcd(a,b)
+\end{align}
+
+has many solutions in $(\lambda, \kappa)$, and their differences solve:
+
+\begin{align}
+(\lambda - \lambda')a + (\kappa - \kappa')b = 0.
+\end{align}
+
+By dividing with $\gcd(a,b)$, we have that $a/\gcd(a,b)$ and $b/\gcd(a,b)$ are coprime, necessarily giving:
+
+\begin{align}
+\lambda' & = \lambda + \mu b/\gcd(a,b), \\
+\kappa' & = \kappa - \mu a/\gcd(a,b),
+\end{align}
+
+for any $\mu\in\mathbb{Z}$. Evidently there are only two pairs satisfying the estimate in (\ref{eq:estimate}), and they are called "minimal", hence the extended Euclidean algorithm yields a minimal pair. They can be obtained once a generic pair $(\lambda, \kappa)$ has been found by optimizing over $\mu$ with $\mu = \lfloor \lambda\gcd(a,b)/b\rfloor, \lceil \lambda\gcd(a,b)/b\rceil$ in the first equation (assuming $a > b$ and $b$ does not divide $a$)
+
+** Turning the algorithm on its head
+
+Starting with a predecided $g$, and a sequence of $r_j$, how can we choose the starting integers $a, b$ such that the algorithm will compute the remainders to be our chosen $r_j$?
+
+The process is simple, we only have to read our steps backwards:
+
+1. At the last step we have the remainder $g$.
+2. Previous to that we have $r_{n-1} = k_{n} g$.
+3. Previous to that we have $r_{n-2} = k_{n-1} r_{n-1} + g$.
+4. Previous to that we have $r_{n-3} = k_{n-2} r_{n-2} + r_{n-1}$.
+
+In these equations, we are free to first choose the positive integer $k_n$, then $k_{n-1}$ and so on, which has the effect of specifying the remainders $r_{n-1}, r_{n-2}$, and so on, as well as the coefficients $s_j, t_j$.
+
+Essentially, all we did was to right-multiply by the inverse matrix of $\begin{pmatrix}0 & 1 \\ 1 & -k_{j+1}\end{pmatrix}$, which is $\begin{pmatrix}k_{j+1} & 1 \\ 1 & 0\end{pmatrix}$.
+
+** The modular aspect of the solution (the Chinese Remainder Theorem)
+
+Having obtained $s, t$ with $sa + tb = \gcd(a,b)$ we note immediately that
+
+\begin{align}
+sa & \equiv \gcd(a,b) \pmod{b}, \\
+tb & \equiv \gcd(a,b) \pmod{a}.
+\end{align}
+
+This allows us to construct integers $x = q_1sa + q_2tb$ satisfying the requirements of the Chinese Remainder Theorem:
+
+\begin{align}
+x & \equiv q_1\gcd(a,b) \pmod{b}, \\
+x & \equiv q_2\gcd(a,b) \pmod{a}.
+\end{align}
+
+When $\gcd(a,b) = 1$, we find that $s$ is the multiplicative inverse of $a$ modulo $b$, and $t$ the multiplicative inverse of $b$ modulo $a$.
+
+** More than two numbers
+
+Since $\gcd(a, b, c) = \gcd(\gcd(a, b), c)$ the algorithm applies iteratively, first to $a, b$ and then to $\gcd(a,b), c$. Generally it can be applied to any number of terms.
+
+** Combining terms with the Chinese Remainder Theorem (the Pohlig-Hellman algorithm)
+
+Generally speaking the Chinese Remainder Theorem establishes a ring isomorphism $\mathbb{Z}_N \cong \mathbb{Z}_{n_1} \times \mathbb{Z}_{n_2}\times\cdots\times\mathbb{Z}_{n_k}$. Often computations on one side are easier on the other side.
+
+Suppose that we're given $c\in GF(q)$ defined by $c := \alpha^m$ where $m$ is secret. We'd like to compute $\log_\alpha c$, the discrete logarithm, to recover $m$, however we may write $q-1 = p_1^{l_1}p_2^{l_2}\cdots p_k^{l_k}$ and instead recover $m_j$ where
+
+\begin{align}
+m \equiv m_j \pmod{p_j^{l_j}}
+\end{align}
+
+and then with the Chinese Remainder Theorem efficiently solve, for $m$, the system
+
+\begin{align}
+m & \equiv m_1 \pmod{p_1^{l_1}}, \\
+m & \equiv m_2 \pmod{p_2^{l_2}}, \\
+& \vdots \\
+m & \equiv m_k \pmod{p_k^{l_k}}.
+\end{align}
+
+The recovery of $m_j$ is the Pohlig-Hellman algorithm:
+
+Writing $m_j = \sum_{r=0}^{l_j-1}c_r p_j^r$ we may recover the first coefficient $c_0$ from $c^{(q - 1)/p}$, since
+
+\begin{align}
+c^{(q-1)/p} = \alpha^{m(q-1)/p}
+\end{align}
+
+is equal to $\alpha^{m_j(q-1)/p}$ modulo $p_j^{l_j}$, and since for any $x\in GL(q)^\times$, $x^{q-1} = 1$, implying $c^{(q-1)/p} \equiv \omega^{c_0} \pmod{p_j^{l_j}}$ for $\omega = \alpha^{(q-1)/p}$. With a table of the powers of $\omega$ we can quickly recover $c_0$. Then we may iterate by setting $c' = c\alpha^{-c_0}$ and considering $c'^{(q - 1)/p^2}$ to recover $c_1$ and so on until all coefficients are recovered.
+
+** Enumerating the rationals
+
+In [cite:@gibbons-2006], the [[https://en.wikipedia.org/wiki/Stern%E2%80%93Brocot_tree][Stern-Brocot tree]] and [[https://en.wikipedia.org/wiki/Calkin%E2%80%93Wilf_tree][Calkin-Wilf tree]] are described, as well as their applicability to enumerating the rationals. We briefly outline the ideas below.
+
+The problem with the naive proof of the countability of the rational numbers is that it does not produce a bijection $\mathbb{N} \to \mathbb{Q}$: we only wish to enumerate the coprime pairs $(a, b)$ that correspond to $a/b$.
+
+The solution is to "undo" the Euclidean algorithm with $g := 1$ as in §[[Turning the algorithm on its head]] and exactly obtain a bijection between the finite sequences $r_1, \dots, r_{n-1}$ and coprime pairs $(a, b)$.
+
+To construct the Stern-Brocot (binary) tree, we consider the numbers $r_1, \dots, r_{n-1}$ as left/right instructions on a binary tree with root $1/1$. The tacit assumption $a > b$ is dropped and instead the order $a > b$ or $a < b$ decides whether the first number means right or left (respectively). Let's assume $a > b$. The first number $r_1$ is then the number of right moves to make in the binary tree. Then it alternates: $r_2$ is the number of left moves, and so on, until we reach a node on which we place $a/b$.
+
+The binary tree is an infinite complete tree and has a nice order as it is also a [[https://en.wikipedia.org/wiki/Binary_search_tree][binary search tree]].
+
+The other order, to start with $r_{n-1}$ until the last direction $r_1$, gives birth to the Calkin-Wilf tree. A breadth-first traversal is generated from the function
+
+\begin{align}
+\label{eq:calkin-wilf}
+x \mapsto (\lfloor x\rfloor + 1 - \{x\})^{-1}.
+\end{align}
+
+Indeed \eqref{eq:calkin-wilf} produces all the positive rationals if we start from $1$ and repeatedly apply this formula.
+
+** Enumerating finite integer sequences
+
+The proof below is taken from Lemma 6.5 in [cite:@barnes-mack-2013]. It is useful in the course of proving that every /partial recursive function/ is /strongly definable/ in a theory that extends Robinson arithmetic; importantly it turns out that the construction below is strongly definable in any theory that extends Robinson arithmetic.
+
+We will define a function $\operatorname{seq}(b,r)$ so that for any $a_0, \dots, a_n\in\mathbb{N}$ there exists some $b$ so that $\operatorname{seq}(b,r) = a_r$ for all $0 \leq r \leq n$. What we need essentially is to construct $n+1$ coprime numbers $m_0,m_1,\dots,m_n$ since we can then use the CRT.
+
+Let $T(n) := n(n+1)/2$ be the \(n\)-th triangular number and for $T(n) < z \leq T(n+1)$ define $y := z - T(n)$ and $x := 1 + T(n+1) - z$. Let
+
+\begin{align}
+\operatorname{seq}(z, r) := \text{remainder of } y \text{ divided by } 1 + (r + 1)x.
+\end{align}
+
+It only remains to find the appropriate $z\in\mathbb{N}$ and to establish the required properties of the function. Let $c > \max(a_0, \dots, a_r)$ divisible by $\lcm(1,2,\dots,n)$, and set $m_r := 1 + (r + 1)c$. The numbers $m_r$ are coprime: a common divisor $d$ must also divide $(s+1)m_r - (r+1)m_s = s-r$, and therefore by the definition of $c$ must also divide $c$, which implies $d=1$. The system $w \equiv a_r \pmod{m_r}$ for $r=0,\dots,n$ has some positive solution $e\in\mathbb{N}$. Let $z := T(e + c - 2) + e$, from which it follows that $y = e$ and $x = c$, and in fact $\operatorname{seq}(b, r) = a_r$ for $r=0,\dots,n$.
+
+* References
+
+#+print_bibliography:

@@ -1,0 +1,14 @@
+digraph G {
+    rankdir=LR;
+    node [fontname="Liberation Mono", shape=ellipse];
+    edge [fontname="Liberation Mono"];
+
+    A [label="example.com"];
+    B [label="foo"];
+    C [label="baz.bar"];
+    D [label="mail"];
+
+    B -> A [label="foo.example.com"];
+    C -> A [label="baz.bar.example.com"];
+    D -> C [label="mail.baz.bar.example.com"];
+}

@@ -1,0 +1,16 @@
+# -*- mode: org -*-
+#+HTML: <div style="display: none">
+$\DeclareMathOperator{\Spec}{Spec}$
+$\DeclareMathOperator{\Proj}{Proj}$
+$\DeclareMathOperator{\dom}{dom}$
+$\DeclareMathOperator{\ran}{ran}$
+$\DeclareMathOperator{\ar}{ar}$
+$\DeclareMathOperator{\var}{var}$
+$\DeclareMathOperator{\pred}{Pred(V,\mathcal{R})}$
+$\DeclareMathOperator{\encode}{encode}$
+$\DeclareMathOperator{\decode}{decode}$
+$\DeclareMathOperator{\supp}{supp}$
+$\DeclareMathOperator{\lcm}{lcm}$
+$\DeclareMathOperator{\seq}{seq}$
+$\DeclareMathOperator{\var}{var}$
+#+HTML: </div>

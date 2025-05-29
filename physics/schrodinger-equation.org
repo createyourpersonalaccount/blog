@@ -1,0 +1,88 @@
+#+TITLE: Deriving Schrödinger's equation
+#+DATE: <2021-09-05 Sun>
+
+* Introduction
+
+The [[https://en.wikipedia.org/wiki/Schr%C3%B6dinger_equation][Schrödinger equation]] governs the time evolution of a quantum mechanical system. The equation we wish to derive reads,
+
+\begin{align}
+\label{eq:main}
+i\frac d{dt} \psi(t) & = \widehat{H}(t) \psi(t).
+\end{align}
+
+Here $\psi$ is a function in some function space and $\widehat{H}$ is an operator on the function space. To derive the Schrödinger equation, we need a hypothesis, a guiding principle. This is the [[https://en.wikipedia.org/wiki/Unitarity_(physics)][unitarity principle]] which says that whatever the setup, its /state/ (all of the information about the system at a certain time) is some unit vector in some complex Hilbert space.
+
+#+begin_quote
+  *Example setup*
+
+  Consider a box of unit dimensions which contains 5 electrons in it, with some positions and velocities given by certain distributions. What is the probability that after one second we find an electron at a given distance from the corners of the box?
+#+end_quote
+
+The unitarity principle guarantees that there exists some complex Hilbert space \(\mathcal H\) such that at every moment in time \(t\geq 0\), we have some unit vector \(\psi(t) \in \mathcal H\) that somehow encodes everything there is to know about the system of this example.
+
+* Two ways to think of a path on a sphere
+
+If a path $\psi(t), t\in I$ is on a sphere, then it can be thought of as given in coordinates in some basis,
+
+\begin{align}
+\psi(t) = (c_j(t))_{j\in J}
+\end{align}
+
+or that it is given via rotations
+
+\begin{align}
+\psi(t) = U(t) \psi_0
+\end{align}
+
+where $U(0)$ is the identity and $\psi_0 := \psi(0)$. For example, the path in Figure [[fig:path-on-sphere]]
+
+#+NAME: fig:path-on-sphere
+#+CAPTION: A path on a sphere.
+[[../img/path-on-sphere.svg]]
+
+can be specified in either of the two equations for $0 \leq t \leq \pi/2$:
+
+\begin{align}
+\label{eq:particle-path}
+\psi(t) & = \begin{pmatrix}\cos t \\ \sin t \\ 0\end{pmatrix} \\
+\label{eq:rotate-sphere}
+& =
+\begin{pmatrix}
+\cos t & -\sin t & 0 \\
+\sin t & \cos t & 0 \\
+0 & 0 & 1
+\end{pmatrix}
+\begin{pmatrix}1 \\ 0 \\ 0\end{pmatrix}.
+\end{align}
+
+We imagine \eqref{eq:particle-path} as a particle moving on the surface of the sphere, while \eqref{eq:rotate-sphere} is imagined as if the tip of a pen is placed on the surface of the sphere while the sphere rotates (similar to a [[https://en.wikipedia.org/wiki/Seismometer][seismometer]]).
+
+It is the second form that allows us to derive Schrödinger's equation, because as it turns out the wave function is nothing but a "particle" traveling on the unit sphere of a complex Hilbert space.
+
+* Derivation of the equation
+
+We now will talk about the derivation. Since \(\psi(t)\) is a unit vector at all times there must exist a unitary operator \(U(t)\) such that
+
+\begin{align}
+\label{eq:unitary}
+\psi(t) & = U(t)\psi_0,
+\end{align}
+
+where \(\psi_0 = \psi(0)\) is the state of the system at the beginning of the experiment. The group of unitary operators is an infinite dimensional Lie group with Lie algebra that of skew-Hermitian operators. A skew-Hermitian operator \(T\) satisfies \(T^* = -T\), and so \(A = iT\) is Hermitian. Using the exponential map, we have
+
+\begin{align}
+\label{eq:exp}
+U(t) & = \exp(-iA(t)),
+\end{align}
+
+for some Hermitian operator \(A(t)\). Using \eqref{eq:exp} in \eqref{eq:unitary} and differentiating in time gives
+
+\begin{align}
+\psi'(t) & = -iA'(t)\exp(-iA(t))\psi_0.
+\end{align}
+
+If we define \(H(t) := A'(t)\), which is again a Hermitian operator, (since the Lie algebra is a vector space and thus closed under derivatives, unlike curved spaces), we get \eqref{eq:main}.
+
+* Conclusion
+
+The conclusion is that the Schrödinger equation is nothing but the equation for the dynamics of a point in a sphere. Instead of moving the point around, we rotate the sphere around, and thus study the dynamics of the group of rotations; using the exponential map we are led to the exponential equation (essentially \(f' = cf\)), and the correspondence of skew-Hermitian with Hermitian simply introduces the imaginary factor.

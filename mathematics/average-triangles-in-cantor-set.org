@@ -1,0 +1,165 @@
+#+TITLE: Average triangle area in the Cantor dust
+#+DATE: <2025-01-06 Mon>
+
+* Introduction to the problem
+
+Consider the [[https://en.wikipedia.org/wiki/Cantor_set][Cantor set]] $\mathcal{C}$ of the real line. The /Cantor dust/ is the set $\mathcal{C}^2$ of the real plane. Both sets are probability spaces; the Cantor set is equipped with a Borel probability measure $\mu$ and the Cantor dust inherits the Borel probability measure $\mu^2$.
+
+An /ordered triangle/ is a triple of points $(P,Q,R)$ from $\mathcal{C}^2$. The following question is asked: given three random points $P,Q,R$ of $\mathcal{C}^2$, what is the average of the area of the ordered triangle with vertices $P,Q,R$?
+
+In this article will we show the progress we have for this question.
+
+* The construction of the Cantor set
+
+The Cantor set $\mathcal{C}$ is constructed in steps.
+
+We start with the unit interval $\mathcal{C}_0 := [0,1]$. In the zeroth step, we remove one open interval denoted by $I_{0,1} := (1/3, 2/3)$, leaving us with $\mathcal{C}_1$ as a union of two intervals. In the \(k\)-th step, remove $2^k$ open intervals, each of length $3^{-k-1}$ and denoted by $I_{k,1}, \dots, I_{k, 2^k}$, in order of appereance from left to right, to obtain $\mathcal{C}_k$. We then set $\mathcal{C} := \cap_{k=1}^\infty \mathcal{C}_k$.
+
+* The one-dimensional case
+
+Indeed before talking about the average triangle area in two dimensions, it is prudent to ask of the average distance in one dimension. Thus we wish to calculate, for two random numbers $X,Y\in\mathcal{C}$, the quantity $\mathbb{E}(|X - Y|)$.
+
+This problem has been solved [cite:@leary-2010;@allen-2017] and it turns out that
+
+\begin{align}
+\label{eq:average-distance}
+\mathbb{E}(|X - Y|) = 2/5.
+\end{align}
+
+We'll show one derivation of this result.
+
+** Reduction to CDF powers
+
+We have,
+
+\begin{align}
+\int_0^1\int_0^1 |x-y|dF(y)dF(x)
+& = 2 \int_0^1\int_0^x (x - y)dF(y)dF(x),
+\end{align}
+
+where $F$ denotes /distribution function/ of $\mu$, $F(x) := \mu((-\infty, x])$ for $x\in\mathbb{R}$.  $F$ is also the /Cantor-Lebesgue function/ of $\mathcal{C}$ (see §1.5 of [cite:@folland-1999] for more) and in probabilistic terms, it is the /cumulative distribution function/ of $\mu$.
+
+#+ATTR_HTML: :width 40% :height 40%
+#+CAPTION: The Cantor-Lebesgue function $F(x)$. [[https://commons.wikimedia.org/wiki/File:CantorEscalier-2.svg][(source)]]
+[[../img/cantor-lebesgue-function.svg]]
+
+We may now perform integration by parts on the inner /Lebesgue-Stieltjes integral/ (see Theorem 3.36 of [cite:@folland-1999]), to obtain:
+
+\begin{align}
+\int_0^x (x-y)dF(y) = \left.(x-y)F(y)\right|_0^x + \int_0^x F(y)dy.
+\end{align}
+
+The first term vanishes and so we're left with:
+
+\begin{align}
+\mathbb{E}(|X - Y|) & = 2\int_0^1\int_0^x F(y)dydF(x)
+\end{align}
+
+One more productive use of integration by parts, this time on the outer integral, yields:
+
+\begin{align}
+\label{eq:moments}
+\mathbb{E}(|X - Y|) & = 2\int_0^1 F(y)dy - 2\int_0^1 F(x)^2dx,
+\end{align}
+
+where we've made use of $d(f(x)) = f'(x)dx$ to get the second term.
+
+The terms in \eqref{eq:moments} have been computed in many ways [cite:@gorin-2006;@gordon-2009].
+
+One straightforward computation is to note that $F(x)$ is constant each of the intervals $I_{i,j}$ from §[[The construction of the Cantor set]], and they exhaust $[0,1]$ (in the Lebesgue measure), so for any exponent $M>0$,
+
+\begin{align}
+\int F^M(x)dx&  = \sum_{k=0}^\infty \sum_{j=1}^{2^k} |I_{k,j}| F(I_{k,j})^M.
+\end{align}
+
+We also have
+
+\begin{align}
+F(I_{k,j}) = 2^{-k-1}(2j - 1)
+\end{align}
+
+We can utilize the above and compute the two integrals from:
+
+\begin{align}
+\int F(x)^Mdx & = \frac{1}{3\cdot 2^M}\sum_{k=0}^\infty (3\cdot 2^M)^{-k}\sum_{j=1}^{2^k}(2j-1)^M,
+\end{align}
+
+to obtain $\int F(x)dx = 1/2$ and $\int F(x)^2dx = 3/10$ which shows \eqref{eq:average-distance}.
+
+** Making use of a recurring formula
+
+Reasonably one expects that a recurring formula may help in the calculation of the $2/5$ result in \eqref{eq:average-distance}. This would offer an alternative method to compute the result. In §2 of [cite:@leary-2010], the integral is reduced to calculating, for any $k$, the sum $\displaystyle\sum_{i < j} d^k_{ij}$ where $d^k_{ij}$ denotes the distances of the midpoints of the \(i\)-th and \(j\)-th interval of $\mathcal{C}_k$, and indeed they recurringly connected to the next set of distances $d^{k+1}_{m,n}$.
+
+* Open questions
+
+** TODO Find all lines in the Cantor approximation
+
+Can all the lines be computed? More explicitly, can all degenerate triangles be computed?
+
+If a line $L$ is given, how many points does $|L\cap\mathcal{C}^2|$ contain? (it answers how many degenerate triangles on $L$ exist)
+
+** TODO Find all triangle congruence classes pinned at a corner
+
+It may be too difficult to calculate all triangle congruence classes. Can I calculate a subclass such as the pinned triangles? See [cite:@palsson-2024] for an estimate for the integer lattice (my $r=1/2$) where it is estimated that the number of congruence classes is $\sim n^2$ inside $[0,\sqrt{n}]^2$.
+
+** DONE Write down exactly what series the program is calculating     :easy:
+CLOSED: [2025-01-09 Thu 11:06]
+
+I need to figure out exactly what the sums $\pm r \pm r^2 \pm \cdots \pm r^n$ represent.
+
+*** Analysis of Cantor discretization midpoints
+
+Start with the centered interval $\mathcal{C}_0 = [-1/2, 1/2]$. Given a ratio $0 < r \leq 1/2$, remove the middle interval of length $1-2r$, which means that $\mathcal{C}_1$ consists of two intervals, each of length $r$, and of midpoints $m_{1,1} = -(1-r)/2$ and $m_{1,2} = (1-r)/2$. For the next iteration, everything will be repeated at the scale $r$, leaving us e.g. with $m_{2,1} = m_{1,1} + rm_{1,1} = (1 + r)m_{1,1}$, and $\mathcal{C}_2$ being four intervals each of length $r^2$.
+
+In general, each point is given by
+
+\begin{align}
+m\sum_{k=0}^n \pm r^k,
+\end{align}
+
+where $m := (1 - r)/2$. At a simple rescale of the original structure by $r/m$, we obtain the series $\pm r \pm r^2 \pm \cdots \pm r^n$. Note that for $r = 1/3$ we have $r/m = 1$, and so for the standard Cantor set, the series above goes unchanged.
+
+** TODO Singular congruence classes
+
+Some congruence classes are singular in their area, i.e. there are no two different classes $C_1, C_2$ of triangles with the same area.
+
+Can these be classified? What makes them unique?
+
+** TODO Complexity analysis on operations
+
+I need to figure out how many operations are taken for each computation. For example, how much memory is required? For instance, here is a count of the congruence classes:
+
+| depth | ratio | # of congruence classes |
+|-------+-------+-------------------------|
+|     1 | 1/3   |                       4 |
+|     2 | 1/3   |                      67 |
+|     3 | 1/3   |                    2533 |
+|     4 | 1/3   |                  119388 |
+
+Note that they change for different classes. We note their stability:
+
+| depth | stable ratio | # of congruence classes |
+|-------+--------------+-------------------------|
+|     1 | 1/2          |                       4 |
+|     2 | 1/5          |                      67 |
+|     3 | 1/7          |                    2572 |
+
+Some remarks on the stability:
+
+- The number of congruence classes increases as the ratio gets smaller.
+- The number appears to immediately stabilize once two different ratios give the same number.
+
+Why do these numbers stabilize? Do they really stabilize or not?
+
+*** TODO Statistics on congruence classes
+
+What is the average size of a congruence class? What is the standard deviation?
+
+** DONE Talk to Poursalidis on <2025-01-11 Sat>
+CLOSED: [2025-01-11 Sat]
+
+- Mention the tables and observations appearing in [[Complexity analysis on operations]].
+
+* References
+
+#+print_bibliography:

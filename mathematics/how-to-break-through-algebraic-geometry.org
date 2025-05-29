@@ -1,0 +1,63 @@
+#+TITLE: How to break through Algebraic Geometry
+#+DATE: <2024-12-20 Fri>
+
+* Prelude
+
+Algebraic geometry is a beautiful subject, but its study is impenetrable to most of us. This was certainly the case for /me/. I was surprised to find myself studying it in late 2024. In this article I will detail how this came to be and what worked for me to help me approach this subject.
+
+* Guidance from my muse
+
+It's important to stay humble: One day I decided to study the [[https://en.wikipedia.org/wiki/Euclidean_algorithm][Euclidean algorithm]], because I wanted to solve a 3-factor RSA exercise. [fn:1] I've studied this algorithm many times before, but it had never "clicked", and so I would forget it after a month or so (or a day!). This time it was different. I took my time, and I thought more carefully about [[https://en.wikipedia.org/wiki/Euclidean_algorithm#/media/File:Euclid's_algorithm_Book_VII_Proposition_2_3.svg][this Wikipedia picture]] which completely illustrated the entire algorithm for me:
+
+#+ATTR_HTML: :width 40% :height 40%
+#+CAPTION: Two examples of Euclid's algorithm. [[https://commons.wikimedia.org/wiki/File:Euclid%27s_algorithm_Book_VII_Proposition_2_3.svg][(source)]]
+#+NAME: fig:euclid-algorithm
+[[../img/euclid-algorithm.svg]]
+
+The simplicity of the algorithm is incredible, as it is something that I've been subconsciously doing myself countless times in the past when fidgeting pieces of paper in my hands.
+
+The Euclidean algorithm opened a door to more surrounding questions, especially with regards to [[https://en.wikipedia.org/wiki/Elliptic_curve][elliptic curves]]. The miracle had happened earlier however: to view such a familiar concept under new light, completely elucidated, to finally /understand it/, is a bit shocking.
+
+Armed with this newfound confidence that subjects that in the past were incomprehensible may become understandable today, I began sailing towards Algebraic Geometry. My first point of contact came from listening to an interview of McLarty on the life and work of Alexander Grothendieck [cite:@mclarty-2024].
+
+[fn:1] [[https://2024.csc.tf/challenges][CyberSpace CTF 2024]], /"Modulus RSA"/.
+
+* The first questions
+
+The first question came form elliptic curves in cryptography, which I read that are curves in the space denoted by $\mathbb{PG}(2, q)$. Since I didn't know what this space is, I already had something that seemed foreign and fascinating: a promise of more geometric intuition if I were to understand the mathematics involved there.
+
+This remained in the back of my head, probably causing some damage. In the meantime, I remembered an old observation that I had read in the past, namely that smooth manifolds $M$ are characterized by their ring of smooth functions $C^\infty(M)$, which is to say that everything about $M$ can be recovered from the algebraic structure of $C^\infty(M)$. I *knew* this were to be the case, but I didn't know *how*.
+
+#+ATTR_HTML: :width 40% :height 40%
+#+CAPTION: How to construct such a functor?
+#+NAME: fig:smooth-function-functor
+[[../img/smooth-function-functor.svg]]
+
+I also knew that I could find the answer in [cite:@nestruev-2020] and so I did. Chapter 4 contains a complete answer to the question in Figure [[fig:smooth-function-functor]]. I got hooked into these new definitions that were introduced, such as the [[https://en.wikipedia.org/wiki/Spectrum_of_a_ring][spectrum of a ring]], and I wanted to learn more, so after finishing Chapter 4 I skipped straight to Chapter 8. Because of how this is all presented, I did not realize that I was already into modern Algebraic Geometry territory.
+
+* A plethora of resources
+
+Now that I had my first taste, I wanted to read more. Jumping straight to Chapter 2 of Vakil's notes [cite:@vakil-ag-2024], I found out what the definition of a sheaf is (always keeping in mind the ring of smooth functions $U\mapsto C^\infty(U)$ as an example), and Chapter 3 taught me a lot about the basics of $\Spec A$ (I also did some of the exercises). In Chapter 4 I learned about schemes. Somewhere in all that, I had to understand stalks better, and I figured out how categorical limits work by that example (mind you that I've tried many times in the past to understand categorical limits, but only now did they click). Other interesting concepts I picked up are the intuition behind $\Spec A/p$ and $\Spec A_p$, which I like to think of as the "geometry inside $p$" and the geometry over $p$ (respectively).
+
+It was at that time when I decided that I wanted to once again ground myself to a more basic level of mathematics. I discovered Fulton's book [cite:@fulton-2008] which is short and contains the classical treatment of Algebraic Geometry up to the [[https://en.wikipedia.org/wiki/Riemann%E2%80%93Roch_theorem][Riemann-Roch theorem]]. Seeking further inspiration, I found the wonderful video lectures by Borcherds [cite:@borcherds-yt-2020]. I found even more exercises and lecture notes in James McKernan's 18.725 lecture notes
+[cite:@mckernan-18.725-2009].
+
+* An insight for projective spaces
+
+At some point I started thinking more about what projective space $\mathbb{P}^n$ really is. Although the definition is trivial, the geometry is hard. One insight I had was that the geometry of the projective space is really just the geometry over the origin in affine space $\mathbb{A}^{n+1}$, with a small modification: Imagine all the shapes (varieties, etc) that pass through the origin. We may understand this space as the spectrum of the localization of $k[X_0, \dots, X_n]$ at the origin, i.e. $\Spec k[X_0, \dots, X_n]_p$ for $p$ defined to be the maximal ideal $(X_0, \dots, X_n)$. However, the lift of shapes of $\mathbb{P}^n$ to $\mathbb{A}^{n+1}$ are [[https://en.wikipedia.org/wiki/Convex_cone][double-ended cones]], and so not every shape should be considered, but only double-ended cones and thus $\Spec k[X_0, \dots, X_n]_p$ is not the right spectrum. To obtain the right geometry, we would like instead of $k[X_0,\dots, X_n]$ to localize some other ring $A$, but the obvious choice of homogeneous polynomials of $k[x_0,\dots,X_n]$ is not a ring, as it is not closed under addition! Something unnatural is going on, and indeed here lies the [[https://en.wikipedia.org/wiki/Proj_construction][Proj construction]], which is not a functor, reflecting the unnaturality of the above.
+
+* Recommendation for further studying
+
+The subject is very rich. I recommend that you make a list of topics that you'd like to explore further, and study them when you have the chance. Here is mine for example:
+
+- Étale cohomology, a generalization of Galois cohomology.
+- Stack, a generalization of scheme. Appears to use different topologies to Zariski.
+- [[https://en.wikipedia.org/wiki/Hilbert%27s_sixteenth_problem][Hilbert's sixteenth problem]]
+- Insight: when UFD property missing, relates to concepts such as analytic continuation somehow. For example, in the rational functions of $V(XW - YZ)$, the elements $X/Y$ and $Z/W$ are defined for $Y\not = 0$ and $W \not = 0$ respectively but they correspond to the same function $f$, defined on the union $Y\not = 0$ or $W \not= 0$. TODO Explore this more.
+- Cubic surfaces, <https://en.wikipedia.org/wiki/Cubic_surface>. See also Borcherd's 4th lecture, last 4 minutes.
+- [[https://en.wikipedia.org/wiki/Segre_embedding][Segre embedding]].
+- A ton of combinatorics lie in [[https://en.wikipedia.org/wiki/Projective_plane][projective planes]]. See e.g. the [[https://en.wikipedia.org/wiki/Bruck%E2%80%93Ryser%E2%80%93Chowla_theorem][Buck-Ryser-Chowla theorem]].
+
+* References
+
+#+print_bibliography:

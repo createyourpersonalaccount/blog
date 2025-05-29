@@ -1,0 +1,699 @@
+#+TITLE: Haskell notes
+
+* Haskell notes
+
+** The trouble with learning Haskell
+
+A lot of things in Haskell are implicit, for example, how type inference is used. Haskell has many conventions (admittedly, like any language), that a newcomer without familiarity will run into and undoubtedly get confused by. Because Haskell appears very sophisticated, the newcomer might not expect these dirty hacks to be present, due to historical reasons (e.g. Applicative after Monad), bad design (e.g. the design of ~head~ in Base, its flat namespace) or even a type system that is not as expressive as perhaps one would expect (e.g. lack of dependent types).
+
+Another issue with Haskell is that practically one writes GHC-specific Haskell; the standard is lackluster for many of the needs of programmers, and solutions have been provided as extensions in the one implementation that matters, GHC. A newcomer may assume that these extensions are the gospel, but again they're not, they're just more dirty hacks on top of the previous pile: they solved the problems encountered by the respective programmers at the time, they're not perfect solutions worthy of crystallization and preservation.
+
+What may end up happening with a newcomer is that they will spend an unreasonable amount studying the parts of Haskell not worth studying, like the parts that I've outlined above. No wisdom is to be gained in this way because there is no wisdom in studying hacks unless one intends to make use of them or participate in their evolution. I would instead recommend to study [[https://rocq-prover.org/][Rocq]] if a newcomer wants to learn more about type theory and beautiful concepts. Haskell is more dirty — it gets the job done for programmers who want to solve ugly problems, such as parsing a JPEG file, for instance, in a reasonable amount of programmer-time. There are efforts to bring more cool features in Haskell, like linear types, dependent types, and so on, but if too much energy is spent on paying attention to these developments, the newcomer will miss the opportunity to learn practical Haskell.
+
+** Lazy evaluation
+
+*Lazy evaluation* means the following:
+
+1. Evaluate only enough to match patterns and guards. For example:
+   #+begin_src haskell
+   (\c _ -> c) 0 undefined
+   #+end_src
+
+   #+RESULTS:
+   : 0
+
+   Here we won't evaluate ~undefined~ because it fits the hole.
+2. Evaluate only enough to expose a lambda form (in expressions of the form ~func_expr arg~, ~func_expr~ must be evaluated until a lambda form is exposed; we say that we have reached a *weak head normal form*, WHNF). For example:
+   #+begin_src haskell
+   (id (\x -> x + 1)) 1
+   #+end_src
+
+   #+RESULTS:
+   : 2
+
+   Here we need to evaluate ~id~ until the lambda term is exposed.
+
+There are exceptions:
+
+1. Arithmetic is not lazily evaluated; when we need ~2*3+4*5~ we must evaluate ~2*3~ and ~4*5~ and then ~6+20~.
+2. The types introduced with ~newtype~ only have one constructor and will not perform any evaluation when required to match:
+   #+begin_src haskell
+   newtype Foo = Foo Int
+   case undefined of { Foo _ -> 42 }
+   #+end_src
+
+   #+RESULTS:
+   : 42
+
+   Here the expression is assumed to match; the hole is never requested to be evaluated, and therefore the above evaluates to ~42~ instead of a runtime error.
+
+(An introduction to lazy evaluation with more in-depth examples is given in an article by Albert Lai, <https://www.vex.net/~trebla/haskell/lazy.xhtml>.)
+
+Evaluated and unevaluated Haskell expressions are collectively called *thunks*. Although it is harmless to imagine that thunks contain literal Haskell text code, in reality there are several intermediate representations that occur, the most important being the /spineless tagless G-machine/; see <https://www.microsoft.com/en-us/research/wp-content/uploads/1992/04/spineless-tagless-gmachine.pdf>.
+
+*** Sharing
+
+Lazy evaluation also comes with *sharing*, which is an optimization that prevents expressions from being evaluated multiple times. The simplest example:
+
+#+begin_src haskell
+(\x -> (x, x)) expr
+#+end_src
+
+Sharing does not always happen; and sometimes it can cause memory usage to increase a lot. For example, if ~expr~ has to be shared in two different places that have a long time in between them being evaluated, then ~expr~ will linger in memory for that long. Not sharing can also cause time and memory usage by keeping two expressions in memory.
+
+Sharing is supposed to be strictly an optimization. Haskell does not have side effects; i.e. even ~IO~ values are pure in that sense. Remember that doing
+
+#+begin_src haskell
+(\x -> (x, x)) (putStrLn "Hello")
+#+end_src
+
+does not mean that the ~putStrLn~ expression gets executed. Another example that does not print anything:
+
+#+begin_src haskell
+putStrLn "Hello" `seq` 42
+#+end_src
+
+#+RESULTS:
+: 42
+
+We can think of ~IO~ as building a bunch of assembly instructions, and ~putStrLn~ would be just an ~IO~ constructor, but actual execution happens by GHC when bootstrapping the special symbol ~main~ (or say, the REPL).
+
+Nevertheless, primitives that cause side effects can be used to demonstrate sharing. For example, let's run the code below in the (unoptimized) GHCi REPL:
+
+#+begin_src haskell
+import Debug.Trace
+let x = trace "x-thunk" 1 in (x, x)
+#+end_src
+
+#+RESULTS:
+: (x-thunk 1,x-thunk 1)
+
+On the other hand, with the following we will observe a different result:
+
+#+begin_src haskell
+import Debug.Trace
+let x = trace "x-thunk" 1 :: Int in (x, x)
+#+end_src
+
+#+RESULTS:
+: (x-thunk 1,1)
+
+Nevertheless, both will produce the same result when compiled with GHC and executed as a program. The reason is that GHCi is unoptimized and lacks the [[https://wiki.haskell.org/GHC_optimisations][Common Subexpression Elimination]] optimization. The variable ~x~ can be shared when specified as an ~Int~ but if not, it is a ~Num a => a~ and it cannot (without optimizations) be determined to be the same thunk, so it is not shared. Whether CSE is applied or not is difficult to say; if one wishes to have it explicitly done, it must be done by hand, by using ~let x = ...~ and repeating ~x~ inside the body, but also /ensuring/ that the value of ~x~ is monomorphic with type annotations.
+
+Thus ~Debug.Trace.trace~ can help us track down the sharing behavior if the need arises.
+
+*** Multiple threads and black hole marks
+
+When switching between threads, entered thunks are marked as *black holed*, that is, there is automatic protection that no two threads attempt to evaluate the same expression concurrently. See <https://simonmar.github.io/bib/papers/multiproc.pdf>. When a thread attempts to enter a black hole, it will wait until the other thread, responsible for putting the black hole in place, is finished with its evaluation. Black holing is not a perfect mutually exclusive lock; sometimes threads may end up doing redundant work.
+
+Black Holing is also used to prevent loops when evaluating terms, even on a single thread:
+
+#+begin_src haskell
+let x = head [x] in x
+#+end_src
+
+#+RESULTS:
+: Exception: <<loop>>.
+
+The above code will cause a ~<<loop>>~ exception because a thunk attempts to re-enter a previously black holed thunk. However, this is not reliable, unlike the multiple thread situation above, and only detects a very specific infinite loop; nevertheless it is also implemented with black hole marks.
+
+Note that there can be OS threads (handled by the *runtime system* (RTS) of the OS, i.e. the process/thread scheduler) or green threads (handled by GHC's RTS or programmer's RTS). Haskell comes with threaded RTS and single RTS; the former will use OS threads while the latter will use a single thread, but both will use Haskell's green threads.
+
+Whether a thunk gets marked as a black hole on entry will depend on whether one opted for eager black holing or used the default lazy black holing; the details for that are in <https://gitlab.haskell.org/ghc/ghc/-/blob/wip/T17910/rts/Updates.h>.
+
+Further details on the heap layout and black holes can be found here: <https://gitlab.haskell.org/ghc/ghc/-/wikis/commentary/rts/storage/heap-objects>.
+
+** The Monad class
+
+One intuition of monads is that they're "values in a context". Another way to think of them is as composable state machines. Consider the parser of megaparsec:
+
+#+begin_src haskell
+type Parser = Parsec Void Text
+#+end_src
+
+A bunch of composed parser steps could look like this:
+
+#+begin_src haskell
+do
+  name <- getName    -- getName :: Parser Name
+  age <- getAge      -- getAge  :: Parser Age
+  return Person {..} --         :: Parser Person
+#+end_src
+
+Since ~do~ is syntactic sugar for ~>>=~ the idea is that the above parsers compose, and their outputs ~name, age~ are collected; if the first parser fails, the fail state is carried inside the monad into the next parser which also fails immediately. Thus monads can be thought of as carrying state from one action to the next.
+
+Monad transformers (see \S[[Monad transformers]]), such as ~StateT~ allow us to wrap the monad inside another monad, say ~IO~, so that we can also perform ~IO~ actions inside:
+
+#+begin_src haskell
+do
+  one_thing
+  another_thing
+  liftIO $ putStrLn "Hello world from StateT!"
+  return ()
+#+end_src
+
+*** A counter-example to the above intuition
+
+An example monad that does not fit this intuition is the list monad. Note for example:
+
+#+begin_src haskell
+[1,2,3] >> [4,5]
+#+end_src
+
+#+RESULTS:
+: [4, 5, 4, 5, 4, 5]
+
+Thus the notions of state and output do not apply here. In general there is no intuition that can apply to all monads, and the best we can do is follow the interface of the ~Monad~ class:
+
+#+begin_src haskell
+class Applicative m => Monad m where
+  return      :: a -> m a
+  (>>=)       :: m a -> (a -> m b) -> m b
+#+end_src
+
+*** The Functor-Applicative-Monad proposal
+
+The [[https://wiki.haskell.org/Functor-Applicative-Monad_Proposal][Functor-Applicative-Monad proposal]] makes Functor a superclass of Applicative and Applicative a superclass of Monad. That means the programmer must provide definitions of those classes when defining a monad.
+
+** The State class
+
+The ~State~ class allows us to define operations that take input and a state and produce an output. The ~StateT~ transformer further wraps our output into some monad like ~IO~ which allows us to do ~IO~.
+
+One interesting thing that is different from how state machines are typically designed is this: In a language like Python, we would define a state machine ~Foo~ with its API to feed it input and obtain its output. In Haskell, the class ~State~ encompasses all state machines simultaneously, and one can seamlessly move from one to the other, which means we are allowed to change the inner types of state and data to whatever we want on a whim; for example ~put~ will change the data to ~()~. This may seem strange; to obtain the same effect as Python, we would design an API that keeps the state and values consistent, but we (or the user of our API) is free to do whatever they want outside of the confines of the API. This approach from Haskell allows the composability of all state machines that are written with ~State~. We elaborate on all this with an example below.
+
+Here is an example /Turnstile/ state machine that can receive coins and open a locked door:
+
+*** The Python Turnstile example
+
+#+begin_src python
+class Turnstile:
+    def __init__(self):
+        self.state = "locked"
+    def coin(self):
+        self.state = "unlocked"
+        return "Thank"
+    def push(self):
+        if self.state == "unlocked"
+            self.state = "locked"
+            return "Open"
+        else
+            return "Tut"
+#+end_src
+
+*** The Haskell Turnstile example
+
+#+begin_src haskell
+import Control.Monad.Trans.State
+
+data TurnstileState = Locked | Unlocked
+
+data TurnstileOutput = Thank | Open | Tut
+
+coin :: TurnstileState -> (TurnstileOutput, TurnstileState)
+coin _ = (Thank, Unlocked)
+
+push :: TurnstileState -> (TurnstileOutput, TurnstileState)
+push Unlocked = (Open, Locked)
+push Locked   = (Tut, Locked)
+#+end_src
+
+*** Comparison of the two languages
+
+Here are some differences between the two snippets above:
+
+1. In Python we have to set a default state to the state machine. In Haskell there is no "state machine", but rather state processors; we'd feed them an initial state with ~runState~ for example.
+2. In Python we used strings for output and state (we could also have used enums) but in Haskell we get types for output and state.
+3. In Python the API modifies state but in Haskell it is pure. In order to actually perform stateful actions with Haskell we would have to promote the pure functions, e.g. ~coin~ with ~state coin~. A pure API is informative of what happens inside the ~coin~ and ~push~ functions; it is pure branching logic, without side effects.
+4. In Python, if we want to change the locked and unlocked states to 0 and 1, we'd have to design another state machine. In Haskell we can just compose the Turnstile API, i.e. the ~coin~ and ~push~ functions, with some transformations, such as ~f . coin . g~ or similar, for appropriate ~f, g~.
+
+*** A simple counter
+
+We can decrease by one with this state processor:
+
+#+begin_src haskell
+decrease :: State Int Int
+decrease = do c <- get
+              put $ c - 1
+              pure c
+#+end_src
+
+Then we may create a new state processor that will count down 10 times and gather the results in a list:
+
+#+begin_src haskell
+s = sequence $ replicate 10 $ decrease
+#+end_src
+
+If we run this state processor we will get:
+
+#+begin_src haskell
+evalState s 100
+#+end_src
+
+#+RESULTS:
+: [100, 99, 98, 97, 96, 95, 94, 93, 92, 91]
+
+** ~Reader~ and ~ReaderT~ monads
+
+This article is about some monads in the [[https://hackage.haskell.org/package/transformers][transformers]] package.
+
+The ~ReaderT~ monad is a fancy way of passing an extra argument to functions. Examples can be found at the bottom of [[https://hackage.haskell.org/package/mtl/docs/Control-Monad-Reader.html][this page]].
+
+I summarize material from [[https://upload.wikimedia.org/wikiversity/en/1/1d/Monad.11.A.Reader.20180821.pdf][Monad.11.A.Reader.20180821]] by [[https://dblp.org/pid/15/4700.html][Young Won Lim]] as well as the documentation of [[https://hackage.haskell.org/package/transformers/docs/Control-Monad-Trans-Reader.html][~Control.Monad.Trans.Reader~]].
+
+The ~MonadReader~ class from [[https://hackage.haskell.org/package/mtl/docs/Control-Monad-Reader.html#g:1][~mtl~]] is the class of all monads that can /read/ from an environment. Both ~Reader~ and ~ReaderT~ are instances, the latter can be thought of as adding a /read-only/ environment to its monad argument.
+
+It appears that a ~Reader~ is a chain of function applications from ~r~ to ~a~, like ~r ↦ b0 ↦ b1 ↦ ... ↦ a~. The intermediate types are not recorded in the final type of ~Reader r a~. We can continue the chain on the right with ~mapReader~ (or ~>>=~) and on the left with ~withReader~. For example, if ~f : a -> a'~ then ~mapReader f readEnv~ will be the chain ~r ↦ b0 ↦ b1 ↦ ... ↦ a ↦ a'~  while if ~g :: r' -> r~ then ~withReader g readEnv~ will be the chain ~r' ↦ r ↦ b0 ↦ b1 ↦ ... ↦ a~. The actual computation will be carried out with ~runReader readEnv r0~, where the initial value ~r0 :: r~ will yield a value of type ~a~ through the chain of computations. Note that ~mapReader~ is just a specialized ~fmap~.
+
+The ~ReaderT~ transformer monad will result, when ran via ~runReaderT~, into a value ~m a~. It is still created with ~reader~. Unlike a regular ~IO~ monad, the ~ReaderT~ monad transform allows us to stack effects of any kind but not run them unless we desire to.
+
+#+begin_src haskell
+ReaderT String IO String
+-- r is the input to the reader environment
+-- a is the output of the reader environment
+-- m is the inner monad
+newtype ReaderT r m a = ReaderT { runReaderT :: r -> m a }
+type Reader r = ReaderT r Identity
+#+end_src
+
+The ~MonadReader~ class has ~local~, which is composition on the left; and composition on the right can be accomplished in, say, a do block either with ~ask~ or ~reader~.
+
+*** TODO The ~ReaderT~ design pattern
+
+See <https://tech.fpcomplete.com/blog/2017/06/readert-design-pattern/>.
+
+*** TODO Why mtl is bad and should use effectful instead
+
+See <https://github.com/haskell-effectful/effectful/blob/master/transformers.md>.
+
+** Debugging
+
+*** Debugging types in expressions
+
+If you have the LSP server [[https://haskell-language-server.readthedocs.io/en/stable/][haskell-language-server]] installed, you can hover over an expression and see its inferred type. In the REPL, you can insert a hole ~_~ where an expression is and GHC will tell you its inferred type.
+
+** Exceptions
+
+*Exceptions* are unpredictable situations at runtime. They are distinct from *errors* which are programmer errors. They are handled by [[https://hackage.haskell.org/package/base-4.21.0.0/docs/Control-Exception.html][~Control.Exception~]]. Although misnamed, the ~IOError~ type is actually an exception, and the module ~Control.Error.Monad~ is about exception handling.
+
+** Monad transformers
+
+Many monads come with a *monad transformer* variant, e.g. ~Foo~ and ~FooT~. What is a monad transformer? A good way to be introduced to monad transformers is via the [[https://wiki.haskell.org/index.php?title=Exception][Exception Haskell wiki article]], which we reproduce in part and comment on below.
+
+Consider this home-made exception class:
+
+#+begin_src haskell
+import Control.Monad
+
+data Exceptional e a =
+     Success a
+   | Exception e
+   deriving (Show)
+
+instance Functor (Exceptional e) where
+    fmap = liftM
+
+instance Applicative (Exceptional e) where
+    pure  = Success
+    (<*>) = ap
+
+instance Monad (Exceptional e) where
+   return              =  pure
+   Exception l >>= _   =  Exception l
+   Success   r >>= k   =  k r
+
+throw :: e -> Exceptional e a
+throw = Exception
+
+catch :: Exceptional e a -> (e -> Exceptional e a) -> Exceptional e a
+catch (Exception  l) h = h l
+catch (Success r)    _ = Success r
+#+end_src
+
+The ~Exceptional~ data type carries either a computed value or an exception; by matching on the constructor we know which it is. For example, a function ~f :: a -> Exceptional e a~ may compute a new value or may throw an exception. Exceptions may be thrown with ~throw "This is an exception"~, for a ~String~ exception, for example. Once we have the exception, we can do something to the string using ~catch~, which will apply the function it is passed to the exception data (it will simply propagate success, if the computation succeeded). Nevertheless, we can't, for example, print the exception string! That's the type of ~catch~ prohibits us from changing the resulting type from the argument type.
+
+Here's how we can perform IO inside exception handling, for example.
+
+First we define the ~ExceptionalT~ monad transformer:
+
+#+begin_src haskell
+newtype ExceptionalT e m a =
+  ExceptionalT { runExceptionalT :: m (Exceptional e a) }
+#+end_src
+
+This sets up a type isomorphism between ~ExceptionalT e m a~ and ~m (Exceptional e a)~; in the forward direction the map is the member accessor ~runExceptionalT~ and in the backward direction it is the ~ExceptionalT~ constructor. 
+
+We now make it monadic:
+
+#+begin_src haskell
+instance Monad m => Functor (ExceptionalT e m) where
+    fmap = liftM
+
+instance Monad m => Applicative (ExceptionalT e m) where
+    pure  = ExceptionalT . return . Success
+    (<*>) = ap
+
+instance Monad m => Monad (ExceptionalT e m) where
+   return   = pure
+   -- m' is the outer ExceptionalT monad while m is the inner monad.
+   m' >>= k = ExceptionalT $
+     runExceptionalT m' >>= \a ->
+         case a of
+            Exception e -> return (Exception e)
+            Success   r -> runExceptionalT (k r)
+#+end_src
+
+Notice what ~(>>=)~ does: it converts ~m' :: ExceptionalT e m a~ into ~runExceptionalT m' :: m (Exceptional e a)~, and now uses the monad operator of ~m~ to feed the ~Exceptional e a~ value into the ~k~ handle (in the case of success) and otherwise propagates the exception. The final outcome is converted back from ~m (Exceptional e a)~ into ~ExceptionalT e m a~ via the constructor ~ExceptionalT~.
+
+Let's look at the throw and catch now:
+
+#+begin_src haskell
+throwT :: Monad m => e -> ExceptionalT e m a
+throwT = ExceptionalT . return . Exception
+
+catchT :: Monad m =>
+   ExceptionalT e m a -> (e -> ExceptionalT e m a) -> ExceptionalT e m a
+catchT m' h = ExceptionalT $
+   runExceptionalT m' >>= \a ->
+      case a of
+         Exception l -> runExceptionalT (h l)
+         Success   r -> return (Success r)
+#+end_src
+
+There is an obvious symmetry between ~(>>=)~ and ~catchT~: they both operate on one constructor and propagate the other, although ~catchT~ propagates success, which makes sense as a catch statement only wants to trigger on an exception.
+
+With these types, one can define for example a function ~open~ that would open some resource:
+
+#+begin_src haskell
+  open :: MyURI -> ExceptionalT MyException IO MyHandle
+#+end_src
+
+To summarize, a transformer ~MonadT m a~ is isomorphic to ~m (Monad a)~. A reason we don't use the latter type and bother with the transformer is because we can define a ~(>>=)~ operator for the transformer that does something sensible, i.e. it performs two binds, the outer bind for the ~m~ type and the inner bind for ~Monad a~. The two binds would require a difficult type too, i.e. the function passed to bind would need to be ~m (Monad a)~ which does not easily lend itself to manipulations.
+
+** Megaparsec
+
+*** Lexing
+
+There are two lexer modules, ~Text.Megaparsec.Char.Lexer~ for character streams and ~Text.Megaparsec.Byte.Lexer~ for byte streams.
+
+Megaparsec's lexer modules follow the strategy assume no white space before token and consume all white space after token, although the means by which spaces are filtered can be defined by the user using [[https://hackage.haskell.org/package/megaparsec/docs/Text-Megaparsec-Char-Lexer.html#v:space][~Lexer.space~]]. This assumes that the user is interested in lexing a programming language or similar, and so helpers for line and block comments are provided too.
+
+*** The purpose of the ~MonadParsec~ class
+
+All tools in megaparsec work with any instance of the ~MonadParsec~ type class, which abstracts /primitive combinators/, the elementary building blocks of all megaparsec parsers. The megaparsec package defines instances for all the MTL monad transformers, e.g. ~StateT~. Practically this means that one can define:
+
+#+begin_src haskell
+type Parser = StateT String (ParsecT Void Text Identity)
+#+end_src
+
+and be able to construct a parser from a state machine and have backtracking, say via the ~Alternative~ operator ~<|>~. The user can wrap ~ParsecT~ around those MTL transformers or insert a transformer inside ~ParsecT~.
+
+** GHC
+
+*** Core desugaring
+
+When GHC compiles a Haskell program, after parsing into a syntax tree, it performs name resolution (replacing bound identifiers with unique, etc) and type checking, and then a process called *desugaring*, which produces /core/ output.
+
+An example program such as:
+
+#+begin_src haskell
+example :: Int
+example = length $ filter (== 'x') ['x', 'y', 'x']
+#+end_src
+
+#+RESULTS:
+: 2
+
+can be desugared (with optimizations ~-O1~ or without ~-O0~) using GHC:
+
+#+begin_src sh
+ghc -O0 -fforce-recomp \
+    -ddump-ds -dno-typeable-binds \
+    -dsuppress-idinfo -dsuppress-core-sizes Core.hs
+#+end_src
+
+Note that we may add the options ~-c -no-keep-hi-files -no-keep-o-files~ to avoid producing any intermediate files.
+
+It will give us the GHC Core output:
+
+#+begin_src
+==================== Desugar (after optimization) ====================
+Result size of Desugar (after optimization)
+  = {terms: 25, types: 18, coercions: 0, joins: 0/2}
+
+example :: Int
+example
+  = $ @GHC.Types.LiftedRep
+      @[Char]
+      @Int
+      (length @[] Data.Foldable.$fFoldable[] @Char)
+      (filter
+         @Char
+         (let {
+            v_B1 :: Char -> Char -> Bool
+            v_B1 = == @Char GHC.Classes.$fEqChar } in
+          let {
+            v_B3 :: Char
+            v_B3 = GHC.Types.C# 'x'# } in
+          \ (v_B2 :: Char) -> v_B1 v_B2 v_B3)
+         (GHC.Types.:
+            @Char
+            (GHC.Types.C# 'x'#)
+            (GHC.Types.:
+               @Char
+               (GHC.Types.C# 'y'#)
+               (GHC.Types.: @Char (GHC.Types.C# 'x'#) (GHC.Types.[] @Char)))))
+#+end_src
+
+Here a few things are visible, such as the explicit instantiations of the polymorphic functions involved via ~Char~; the boxed character literal ~GHC.Types.C# 'x'#~, which one also obtain information using ~:info Char~ in the GHCi REPL, and even a /dictionary/ ~GHC.Classes.$fEqChar~, which is a runtime object that contains the implementations of the methods in the given type class. Note that this dictionary has a specialized (optimized) method for ~Char~ hence why it carries ~Char~ in its name. A user defined class ~MyProperty a~ might have a generic dictionary name, say called ~$fMyProperty~.
+
+Now the output is not an actual language; it is merely a printable representation of the Core AST, and thus it may have its ambiguities (in print).
+
+*** STG output
+
+To produce STG output using GHC, we can use:
+
+#+begin_src sh
+  ghc -no-keep-hi-files -no-keep-o-files -ddump-stg-from-core $file
+#+end_src
+
+An external STG interpreter is available: <https://github.com/grin-compiler/ghc-whole-program-compiler-project/tree/master/external-stg-interpreter>.
+
+** The spineless tagless g-machine
+
+We summarize the article in [cite:@jones-1992].
+
+The *spineless tagless g-machine* (STG) is a non-strict purely functional language that has
+
+1. a /denotational/ meaning,
+2. /operational/ semantics.
+
+What this means is that instead of abstract assembly, there is an abstract low-level functional language with both Haskell-like programming semantics and machine-operational semantics (the latter means that there's well-defined abstract state machine transitions for the language).
+
+/Tagless/ means that all objects in the heap (unevaluated suspensions, head normal forms) have a uniform representation and do not require a tag that must be inspected. Instead, there is a pointer to code, which is followed blindly.
+
+STG compiles into C. Unboxed values are directly manipulated (for efficient arithmetic).
+
+After Haskell is desugared, it is compiled into Core. Then the Core language is transformed into STG, and finally STG is translated into Abstract C, a data type that can be printed out into a C source file and compiled by a C compiler. Note that since GHC 7.2 (see [[https://downloads.haskell.org/~ghc/7.2.1/docs/html/users_guide/release-7-2-1.html][GHC 7.2 release notes]] 1.5.6 second point) this is not the case; instead after Cmm, it produces assembly and calls ~as~ (in LLVM mode, LLVM IR and calls ~opt~ and ~llc~.
+
+*** The features of STG
+
+We ask the following three questions:
+
+**** How are function values, data values and unevaluated expressions represented?
+
+The heap contains /head normal forms/ (or /values/), and as-yet /unevaluated suspensions/ (or /thunks/). Head normal forms are classified into /function values/ and /data values/. A value that contains no thunks in it is called a /normal form/. We use the term /closure/ to refer to both values and thunks.
+
+In memory, a function is represented by ~[ code pointer ] [ free variables ]~. To execute the code, the distinguished register called /environment pointer/ is made to point at the closure, and it is executed. When the value of a thunk is required, the thunk is /forced/. In principle, a think is a zero-parameter value, but in practice it is more efficient to share evaluations of the thunk across the program. This sharing happens by updating the thunk with its value the first time it is forced. The /self-updating model/ of STG means that the code inside the thunk is responsible for updating the thunk with its value once forced, or to return the value if it has already been forced previously. Closures have code pointers, and after a code pointer has been entered, a value is guaranteed to be usable.
+
+The self-updating model allows for great uniformization, as both values and thunks are treated the same and many situations can be treated the same, as e.g. a large value can be stored via an /indirection pointer/ in the code pointer, or a /black hole/ code pointer can be stored while a thunk is entered (see \S[[Multiple threads and black hole marks]]), which with concurrent threads means that the threads that enter the closure while it's been black holed will be pooled into a waiting list for the thunk until evaluation is complete by the thread that put the black hole in place.
+
+**** How is function application performed?
+
+The /push-enter/ model based on lazy [[https://en.wikipedia.org/wiki/Graph_reduction][graph reduction]] pushes the arguments of a function to the /evaluation stack/ and /enters/ the function. The main cost of the push-enter model is that it does away with stack frames, using instead one single contiguous frame, making debugging and certain other techniques more complicated.
+
+**** How is case analysis performed on data structures?
+
+Data values are built by constructors and taken apart with ~case~ pattern matching. A case expression forces its given closure and then selects the appropriate alternative. The self-updating model allows the forcing of a thunk and the case analysis to be woven together, and often that means that there is no heap allocation, e.g. in:
+
+#+begin_src haskell
+case (f x) of
+  Nil      -> e1
+  Cons a b -> e2
+#+end_src
+
+we do not need to place the ~Cons~ data type in the heap; the forcing of the closure can put the ~head~ and ~tail~ in registers, so that they're immediately available. Furthermore, instead of the ~case~ analysis performing a multi-way jump based on the appropriate constructor found, the constructor itself can return to the appropriate address from a vector of addresses, known as /vectored return/, a convention that can be chosen independently for every data type.
+
+*** The language of STG
+
+In terms of operational semantics, we have the following correspondence:
+
+| Construct                | Operational reading    |
+|--------------------------+------------------------|
+| Function application     | Tail call              |
+| Let expression           | Heap allocation        |
+| Case expression          | Evaluation             |
+| Construction application | Return to continuation |
+
+- Function and constructor arguments are simple variables or constants; we can accomplish this by simply adding new ~let~ bindings for non-trivial arguments.
+- Pattern matching is only performed by ~case~ and the patterns are simple one-level patterns. More complex forms are a composite of ~case~ expressions.
+
+** The Hedgehog package
+
+[[https://hackage.haskell.org/package/hedgehog][Hedgehog]] generates test cases. A ~Hedgehog.Property~ is the type of a property test that will be conducted by hedgehog. To automatically discover all such tests whose names are prefixed with ~prop_~, we do at the end:
+
+#+begin_src haskell
+tests :: IO Bool
+tests =
+  checkSequential $$(discover)
+#+end_src
+
+Because all these tests have the type ~:: Property~, we will not annotate them. The simplest property test always succeeds:
+
+#+begin_src haskell
+prop_success = property success
+#+end_src
+
+We can limit the number of tests ran with ~withTests~:
+
+#+begin_src haskell
+prop_test_limit =
+  withTests 100 . property $ success
+#+end_src
+
+We can use ~element~ and ~integral~ from ~Hedgehog.Gen~ to create monad generators, for example, assuming we have a constructor ~Item Product USD~, where ~Product String~ and ~USD Int~,
+
+#+begin_src haskell
+cheap :: Gen Item
+cheap =
+  Item
+    <$> (Product <$> Gen.element ["sandwich", "noodles"])
+    <*> (USD <$> Gen.integral (Hedgehog.Range.constant 5 10))
+#+end_src
+
+These generators can create test objects. We can then for example create a list of 0 to 50 of them with:
+
+#+begin_src haskell
+order :: Gen Item -> Gen Order
+order gen =
+  Order <$> Gen.list (Range.linear 0 50) gen
+#+end_src
+
+** Do notation
+
+Do notation has several syntactic expansions:
+
+*** Sequencing
+
+#+begin_src haskell
+do putStrLn "one"
+   putStrLn "two"
+#+end_src
+
+or equivalent:
+
+#+begin_src haskell
+putStrLn "one"
+  >> putStrLn "two"
+#+end_src
+
+Note that in the IO monad, the ~>>~ does more than just dismiss the first monad value; it actually outputs its wrapped contents. It's the same as ~*>~ except it only applies to monads and not other applicatives.
+
+*** Monadic binding
+
+#+begin_src haskell
+do x <- getLine
+   putStrLn $ "-> " <> x
+#+end_src
+
+or equivalent:
+
+#+begin_src haskell
+getLine
+  >>= (\s -> putStrLn $ "-> " <> s)
+#+end_src
+
+Note that this is very similar to how let bindings work, just using ~>>=~ instead of function application.
+
+*** Let binding
+
+In do-notation the let bindings are just without ~in~ and apply for every line following beneath.
+
+* GHCupp
+
+To install a particular (e.g. newest) version of hls, one can use:
+
+#+begin_src sh
+ghcup compile hls -g master --ghc $GHC_VERSION
+#+end_src
+
+Note that ~--disable-tests~ will skip building the tests of hls, which may save time in building it.
+
+* Resources for Haskell
+
+- The [[https://www.youtube.com/@well-typed][Well-Typed youtube channel]].
+- [[https://github.com/grin-compiler/ghc-whole-program-compiler-project/tree/master/external-stg-interpreter][External STG interpreter]].
+- [[https://downloads.haskell.org/ghc/latest/docs/users_guide/][GHC Users Guide]].
+- [[https://gitlab.haskell.org/ghc/ghc/-/wikis/commentary][GHC Source Commentary]].
+- [[https://wiki.haskell.org/Typeclassopedia][Typeclassopedia]] on haskell wiki.
+
+* Chronicle of studies
+
+Here I document the various things I've studied relating to Haskell, in the order that I have studied them.
+
+1. I've read Karpov's [[https://markkarpov.com/tutorial/megaparsec.html][Megaparsec tutorial]], only up to /Controlling backtracking with try/, and then I figured out that I had to understand monads better to understand what's going on in the ~do~ block of the example. I also wanted to understand monad transformers because they appear in Megaparsec.
+2. I read the [[https://en.wikibooks.org/wiki/Haskell/Understanding_monads/State][wikibooks article on the Haskell State monad]]. The useful /value in a context/ or /state machine/ intuition of monads became apparent, but it was noted to me that it does not always apply, for example lists are monads that do not have this intuition applicable. Monad transformers like ~StateT~ remained a mystery; I only had a vague idea from discussions that they allow ~IO~-wrapped actions to take place, for example, printing messages between state transitions. See \S[[The State class]].
+3. I read an article about [[https://www.vex.net/~trebla/haskell/lazy.xhtml][lazy evaluation from Albert Lai]]. This was very illuminating for me, as it made me understand the conceptual evaluation model of Haskell, and in particular it explains how lazy evaluation works. As Lai notes, it is not an ultimatum, as lower-level understanding is required from those who want to make assessments on the optimizations of the code, so if one wishes to write optimized code, they must dig in deeper. See \S[[Lazy evaluation]].
+4. I read the [[https://wiki.haskell.org/index.php?title=Exception][haskell wiki article on Exceptions]]. They have two home-made types, a monad ~Exceptional~ and a monad transformer ~ExceptionalT~. From that example I understood the purpose of monad transformers, see \S[[Monad transformers]].
+5. I watched (part of) the [[https://www.youtube.com/watch?v=T5y8sFmCFnA][Async Exception Handling in Haskell YouTube video by FP Complete]]. It showed some interesting unintuitive results about exceptions, and hinted at three different exception types, impure, synchronous, and asynchronous. It lumped the first two together, and I sort of grasped them, but I still didn't know what asynchronous exceptions were.
+6. I read the 1992 STG paper [cite:@jones-1992]. See \S[[The spineless tagless g-machine]]. I read about half the paper and I stopped due to the complexity, although I learned a few things.
+7. I read [[https://leanpub.com/optics-by-example][/Optics by Example, Functional Lenses in Haskell/]] by Chris Penner, which teaches the concepts of the [[https://hackage.haskell.org/package/lens][lens]] package. After Chapter 7, I perused the rest quickly.
+8. I studied [[https://hackage.haskell.org/package/hedgehog][hedgehog]] and used it for testing leetcode solutions.
+9. I studied ~Reader~ and ~ReaderT~ from the [[https://hackage.haskell.org/package/transformers][transformers]] package. I also had to learn the [[https://en.wikibooks.org/wiki/Haskell/Syntactic_sugar#Do_notation][do-notation syntactic sugar]] (up until now I was using it without understanding).
+10. I wanted to write a megaparsec parser that involved state, and I decided to revisit the state monad, transformers, and so on, realizing that I did not understand them as well as I thought. [[https://www.williamyaoh.com/posts/2023-06-10-monad-transformers-101.html][Monad Transformers 101]] by William Yao was a good article that helped me. I also then read his [[https://www.williamyaoh.com/posts/2023-07-01-why-monad-transformers-matter.html][Why Monad Transformers Matter]] article.
+
+** TODO Read applications of monad transformers
+
+Read <https://www.williamyaoh.com/posts/2023-07-01-why-monad-transformers-matter.html>.
+
+** TODO Hindley-Milner type system
+
+I should study the [[https://en.wikipedia.org/wiki/Hindley%E2%80%93Milner_type_system][Hindley-Milner type system]] because it's how Haskell infers types.
+
+** TODO Study type error slices
+
+Someone thinks they can be used to improve type errors in GHC. The paper I'd be reading is [cite:@haack-wells-2004].
+
+** TODO Check out this validation with partial data round trip article
+
+Read <https://blog.ploeh.dk/2020/12/21/a-haskell-proof-of-concept-of-validation-with-partial-data-round-trip/>.
+
+** TODO Check out parsing sexps with megaparsec article
+
+Read <https://serokell.io/blog/parser-combinators-in-haskell>.
+
+** TODO Read the difference between ~foldl~ and ~foldr~.
+
+Read <https://okmij.org/ftp/Haskell/AlgorithmsH1.html#foldl>.
+
+** TODO Watch /performance of effect systems/ talk
+
+See <https://www.youtube.com/watch?v=0jI-AlWEwYI>.
+
+** Deal with dependencies using pvp
+
+See <https://pvp.haskell.org/>.
+
+#+begin_quote
+<tomsmeding> at present, GHC is hard-bound to `base`, so
+    version-bounding `base` also means version-bounding GHC
+<tomsmeding> more generally, you can branch on the GHC version in a
+    *.cabal file
+<tomsmeding> and there is a `buildable: False` declaration you can put
+    in a *.cabal file in case you have a configuration that you want
+    to disallow
+#+end_quote
+
+* References
+
+#+print_bibliography:
+

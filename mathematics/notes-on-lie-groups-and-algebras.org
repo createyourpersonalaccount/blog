@@ -1,0 +1,59 @@
+#+TITLE: Notes on Lie groups and algebras
+#+DATE: <2025-01-26 Sun>
+
+* Introduction
+
+In this blog post I focus on various aspects of Lie groups theory that I find interesting.
+
+* A geometric interpretation of the commutator bracket
+
+Suppose that we have
+
+\begin{align}
+\label{eq:commutator}
+[X, Y] = Z.
+\end{align}
+
+What use can we make of the above? Well, for one it is certainly useful in any equation that involves mixed terms of $X$ and $Y$, since we can replace $XY$ with $YX + Z$ if we want. In order to connect this formula to geometry we need some result for the exponentials.
+
+Let's look at a geometric example. In the spatial rotation group $SO(3,\mathbb{R})$ we have a Lie algebra $\mathfrak{so}(3,\mathbb{R})$ with a basis $\{J_x, J_y, J_z\}$ where $\exp(\theta J_x)$ corresponds to rotation about the \(x\)-axis of angle $\theta$, and so on for the rest. We furthermore have:
+
+\begin{align}
+\label{eq:so3-commutator}
+[J_x, J_y] = J_z.
+\end{align}
+
+Obviously such an equation asks for a geometric interpretation, but if someone fidgets around with a 3D shape (like a notebook) and its rotations, it is not obvious what fact \eqref{eq:so3-commutator} corresponds to for the three axis rotations.
+
+The connection to geometry comes from the [[https://en.wikipedia.org/wiki/Baker%E2%80%93Campbell%E2%80%93Hausdorff_formula][Baker-Campbell-Hausdorff formula]], telling us that:
+
+\begin{align}
+e^{\theta J_x}e^{\psi J_y}
+& = e^{\theta J_x + \psi J_y + \frac{\theta\psi}{2}[J_x, J_y] + O((\theta + \psi)\theta\psi)} \\
+& = e^{\theta J_x + \psi J_y} + \frac{\theta\psi}{2}[J_x, J_y] + O((\theta + \psi)\theta\psi).
+\end{align}
+
+Now we can compute,
+
+\begin{align}
+\label{eq:commutator-result}
+[e^{\theta J_x}, e^{\psi J_y}]
+& = \theta\psi J_z + O((\theta + \psi)\theta\psi).
+\end{align}
+
+Formula \eqref{eq:commutator-result} is inheretedly geometric: it's telling us that when we rotate by a $\theta$ angle on the \(x\)-axis and a $\psi$ angle on the \(y\)-axis, what the difference would've been if we instead did the operations in opposite order.
+
+** Other uses of the Baker-Campbell-Hausdorff formula
+
+If one assumes $[A, [A,B]] = [B, [B, A]] = 0$, then all higher order terms in the Baker-Campbell-Hausdorff formula vanish.
+
+For unbounded operators $A, B$, the product $AB$ may not be defined, e.g. if $\dom(A)\cap\ran(B) = \emptyset$. Due to this, we may not have the luxury of speaking of a Lie group $G$ with a Lie algebra $\mathfrak{g}$. However, for the position and momentum operators $X_j, P_k$ for $1 \leq j, k \leq n$ of $L^2(\mathbb{R}^n)$ of quantum mechanics, we have that the Weyl relations hold, which is the analogue of the above; the proof may be found in chapter 14.2 of [cite:@hall-2013].
+
+* Matrix groups
+
+If $G$ is a matrix group then $SG := \{ g \in G : \det g = 1\}$.
+
+* References
+
+#+print_bibliography:
+

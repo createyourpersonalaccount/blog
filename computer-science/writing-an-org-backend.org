@@ -1,0 +1,44 @@
+#+TITLE: Writing an Org-mode backend
+#+DATE: <2025-01-05 Sun>
+
+* Introduction
+
+If you have an [[https://orgmode.org/][org file]] how do you export it to HTML using your custom exporter? This is the question I set to answer for myself to improve my blog's generated pages. The org exporter framework is called /ox/, and below its usage is detailed. A good place to find documentation on ox is the ~ox.el~ file itself that distributes with Emacs, and in particular one can start with the ~;;; Commentary:~ comments in it.
+
+* Parsing org files in elisp
+
+The syntax parser is called /Org Elements/, and its functions start with ~org-element-*~. A /blob/ in org-mode is the AST of a self-contained piece of the org file, such as a subtree, or a single element.
+
+The function ~org-element-parse-buffer~ will return the AST of the entire org buffer.
+
+#+begin_src elisp
+  (org-element-parse-buffer)
+#+end_src
+
+This AST blob is complicated and typically it is passed to other functions that can access its parts. A selective tree-walker is ~org-element-map~, allowing us for instance to walk over the entire document, performing actions only on selected elements, while ~org-element-property~ can be used to extract a particular property of an element:
+
+#+begin_src elisp
+  (org-element-map
+    (org-element-parse-buffer)
+    'headline
+    (lambda (element)
+      (format "%s" (org-element-property :raw-value element))))
+#+end_src
+
+Evaluating the above with the contents of this blog post thusfar will give:
+
+#+begin_src elisp
+  ("Introduction" "Parsing org files in elisp")
+#+end_src
+
+In the opposite direction we may convert a blob into its unparsed state with ~org-export-expand~.
+
+* The transcoder
+
+With ~ox.el~, one does not need to sully their hands directly with the parsing functions. The transformation of the AST into the final output text is done by the /transcoder/, which calls  programmer-specified /transcoding functions/, each of which is passed the blob, its contents, and a /communication channel/ property list. The communication channel contains useful information, e.g. to find the author, date, and so on, typically set with ~#+AUTHOR:~, ~#+DATE:~, etc, one peeks at the communication channel with ~plist-get~ for ~:author~, ~:date~, and so on (for more [[https://orgmode.org/worg/dev/org-export-reference.html#communication][see here]]).
+
+The transcoder is defined using ~org-export-define-backend~ by a cons list of org element types and their corresponding transcoding functions.
+
+* A minimal example exporter
+
+The example may be found [[https://github.com/createyourpersonalaccount/ox-mybackend][here]]. The helpful comments in the elisp source file should aid you. It is a slimmed down version of ~ox-org.el~ that ships with Emacs. It essentially exports Org files to Org files, with minimal modification.

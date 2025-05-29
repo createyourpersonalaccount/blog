@@ -1,0 +1,223 @@
+#+TITLE: Gödel's first incompleteness theorem
+#+DATE: <2025-02-01 Sat>
+
+* Introduction
+
+In these notes I hope to give the complete walkthrough from first principles to Gödel's first incompleness theorem. My notes follow the roadmap of [cite:@barnes-mack-2013], which is a fantastic source to learn all this from. Ultimately a careful study requires reading that book; the notes below are expository and can be considered as a companion.
+
+The starting point is that the halting problem is undecidable. The task then becomes to encode everything required for the halting problem to be stated inside a given logical theory. This encoding is accomplished with [[Gödel numbers][Gödel numbers]], which require natural numbers, addition, and multiplication. Because these operations must be first-class citizens of the theory, the theory must extend the theory of arithmetic, but once it does, everything is in place to derive the contradiction required and to conclude that the theory is not complete, because effectively axiomatized complete theories are decidable.
+
+* Universal algebras
+
+Algebra often deals with [[https://en.wikipedia.org/wiki/Universal_property][/universal objects/]], which are the most general of their kind. An example is the [[https://en.wikipedia.org/wiki/Free_group][free group]] $F_S$ on the generator set $S$; any other group $\langle S \mid R\rangle$ given by relations $R$ in the elements of $S$ factors through $F_S$.
+
+*Universal algebras* are an algebraic means by which we can speak of all possible expressions of a set of functions $T$ and their compositions, modulo whatever relations we want. A useful example to keep in mind is that we'd like to think of a logical expression such as $p\implies q$ as a formal function $t(p,q)$; and furthermore, we'd like to be able to substitute /True/ and /False/ for $p$ and $q$. Each function has an /arity/ assigned to it (the number of arguments it takes) and there must be a base set $A$ on which all these functions operate, and then we may write down all possible expressions. We describe universal algebras fomally next.
+
+A *type* $\mathcal{T}$ is a set $T$ together with a function $\ar : T \to \mathbb{N}$ giving the arity of each $t\in T$. A \(\mathcal{T}\)-algebra is a set $A$ and an assignment $t_A : A^{\ar(t)}\to A$ for each $t\in T$. In particular, a \(\mathcal{T}\)-algebra is simply a concretization of the type $\mathcal{T}$ as real functions. This algebraic structure has all the usual features found in other common algebraic structures, such as \(\mathcal{T}\)-subalgebras and homomorphisms (of types and base sets). Universal algebras are not necessarily universal objects, as the word /universal/ is overloaded; there are free universal algebras however, which are universal objects, and which we denote by $F_{\mathcal{T}, X}$. A word of caution: the set $X$ is not the base set of $F_{\mathcal{T},X}$, as $t(x)$ is an element of the base set for $t\in T$ and $x\in X$, but it cannot coincide with any $x\in X$! See Theorem 2.2 of [cite:@barnes-mack-2013] for the construction, which amounts to an inductive construction of the base set, comprising of all functional composition expressions of $T$ with arguments from $X$. In general we always intend to take $X$ to be countably infinite and thought of as a set of variable; from now on we drop it from subscripts.
+
+** Example: Boolean algebras
+
+We have a particular idea of /evaluation homomorphisms/ $F_{\mathcal{T}}\to A$ and $A$ as a set of values where we can make substitution assignments $x_n := a_n$.
+
+[[https://en.wikipedia.org/wiki/Boolean_algebra][Boolean algebras]] are described by $T := \{\lnot, \wedge, \vee\}$ and $A := \mathbb{Z}_2$. The functions of $T$ on $A$ are given by the truth tables of the respective logic operators.
+
+** Relations
+
+An /identical relation/ is a pair $(u,v)$ where $u,v\in F_{\mathcal{T}}$. A set of relations $L$ defines a class $V$ of \(\mathcal{T}\)-algebras that satisfy the relations; for a \(\mathcal{T}\)-algebra $A$ in the variety, we have that $v(u) = v(v)$ for all $(u,v)\in L$ and all homomorphisms $v : F_{\mathcal{T}} \to A$. The identical relations $L(V)$ satisfied by all members of the variety may be larger than $L$. The variety $V$ is always non-empty because it contains at least the relatively-free $\langle F_{\mathcal{T}} \mid L \rangle$; this is constructed in Theorem 4.3 of [cite:@barnes-mack-2013] as an equivalence of words of $F_{\mathcal{T}}$ where subexpressions of $u$ may be replaced by $v$ for each $(u,v)\in L$.
+
+** Example: Propositional calculus
+
+With $T := \{F, \implies\}$, we obtain $P := F_{\mathcal{T}}$, the language of propositional calculus.
+
+We have two notions of truth available to us, that which comes from evaluations (semantics), and that which comes from grammatical rules (syntax) that we define. They turn out to be equivalent. Together with these two notions, $P$ is called the *propositional calculus*.
+
+*** Semantics
+
+We restrict ourselves to evaluations $v : P \to \mathbb{Z}_2$ with $v(F) = 0$ and $v(\implies)$ given by its truth table. A proposition $p\in P$ is /true with respect to $v$/ if $v(p) = 1$, otherwise it is /false/. For $\Gamma \subseteq P$, we have the /semantic consequence/ $\Gamma \vDash p$ if $v(p) = 1$ for all evaluations $v : P\to\mathbb{Z}_2$ with $v(\Gamma) = 1$.
+
+*** Syntax
+
+The axioms of propositional calculus are:
+
+\begin{align}
+p & \implies (q \implies p),  \\
+(p \implies (q \implies r)) & \implies ((p \implies q) \implies (p \implies r)), \\
+\lnot \lnot p & \implies p,
+\end{align}
+
+where $p,q,r\in P$. With a minor (equivalent) variation this is known as /the schematic form of $P_2$/, attributed to von Neumann and Hilbert.
+
+As it stands we have defined our axioms, things we take for true, so we know that they must be true. But what else is true? It's impossible to say without inference rules, i.e. rewriting rules that allow us to modify our propositions based on what we have established earlier. There is a single inference rule called /modus ponens/, which tells us that we can replace a formula of the form $p \implies q$ with $q$ if we have deduced $p$ (either because $p$ is an axiom or $p$ has been deduced by a previous applciation of modus ponens).
+
+The wider context of what we're defining here is an instance of an [[https://en.wikipedia.org/wiki/Abstract_rewriting_system][abstract rewriting system]], i.e. a language with rewriting rules. Obviously here one can depart from classical logic if desired and syntactically define other logics like [[https://en.wikipedia.org/wiki/Intuitionistic_logic][intuitionistic logic]], but we won't do so.
+
+For $\Gamma\subseteq P$, we have the /syntactic consequence/ $\Gamma\vdash p$ if using the axioms of propositional calculus and the propositions of $\Gamma$ we can (eventually, with potentially multiple applications of modus ponens) infer $p$.
+
+*** Properties of propositional calculus
+
+A *logic* is a language with semantics and syntax.
+
+- A logic is /sound/ if $\Gamma\vdash p$ implies $\Gamma\vDash p$ for all $\Gamma$ and $p$.
+- A logic is /consistent/ if it does not hold that $\vdash F$.
+- A logic is /adequate/ if $\Gamma\vDash p$ implies $\Gamma\vdash p$ for all $\Gamma$ and $p$.
+- A logic is /decidable for validity/ if we can algorithmically determine whether or not $\vDash p$, and /decidable for provability/ if we can algorithmically decide $\vdash p$.
+
+Propositional calculus has all these properties: Propositional calculus is sound and adequate, meaning that the two notions of truth are equivalent, but the proof is long and not obvious. It can be seen to be decidable for validity, as any proposition $p(x_1, \dots, x_n)$ can be checked by substitutions $x_j\mapsto b_j \in \mathbb{Z}_2$; if all possible substitutions yield $p\mapsto 1$ then $p$ is true, otherwise false. By the equivalence of the two notions of truth, propositional calculus is also decidable for provability.
+
+* Predicate calculus
+
+Propositional calculus is not expressive enough to axiomatize various theories like [[https://en.wikipedia.org/wiki/Zermelo%E2%80%93Fraenkel_set_theory][ZFC]]. The main ingredient lacked is the universal quantifier $\forall$, allowing us to express properties that hold /for all elements/ in our theory. Also missed are available symbols that we can use to define symbols in our theory, such as the relation $\in$ of set theory, or variables that we can use with these relations.  Similarly in Peano arithmetic we will need to define zero and successor. Thus we set $\mathcal{R}$ to be a set of symbols with arities $\ar(r)\in\mathbb{N}$ for $r\in\mathbb{N}$ axiomatize. Furthermore, the set of variables $X$ was previously used to take values in $\mathbb{Z}_2$ with evaluation maps; but now we wish to have another, separate, variable set $V$ for which we can give values with the interpretation maps. These variables serve a different purpose, that of the theories which we wish to axiomatize, and those variables will take values in /their objects/ of their models.
+
+Thus we augment the type by setting $T := \{F, \implies, \forall x \mid x \in V\}$, and the free generators are now $X := \{(r, x_1, \dots, x_n)\mid r\in\mathcal{R}, \ar(r) = n, x_1,\dots,x_n\in V\}$. For these choices, we set $\pred := F_{\mathcal{T}, X}$, but not before we first quotient out /redundant/ elements: in the language of predicate calculus, an enrichment over the language of propositional calculus, for every variable $x\in V$ we have a function $\forall x : \pred \to \pred$ such that $(\forall x)p(x) = (\forall y)p(y)$; this is achieved by quotienting the language with such identical relations but one must be careful with free and bound variables to do this correctly.
+
+An *interpretation* is a universe set $U$, an assignment map $\varphi : V \to U$, and where every $r\in\mathcal{R}$ maps to an \(n\)-ary relation $\psi r$ of $U$, together with an evaluation $v : \pred \to \mathbb{Z}_2$, such that there is a certain compatibility between these maps and the universal quantifier. Interpretations provide semantics and models of theories.
+
+For syntax, we have two extra axioms,
+
+\begin{align}
+(\forall x)(p\implies q) & \implies (p\implies((\forall x)q), & x\not\in\var(p),\\
+(\forall x)p(x) & \implies p(y).
+\end{align}
+
+An additional rule of inference called /generalization/ which says that if $\Gamma \vdash p(x)$ for $x \not \in \var(\Gamma)$ then we may infer $\Gamma\vdash (\forall x)p(x)$.
+
+It turns out that predicate calculus is consistent, sound, and adequate (the last two facts known as the [[https://en.wikipedia.org/wiki/G%C3%B6del%27s_completeness_theorem][Gödel-Henkin completeness theorem]]; Henkin simplified the proof and connected it to the existence of interpretations). However there are no decidability algorithms for it (we will discuss this later).
+
+We may thrown in the /identity binary relation/ $\mathcal{I}$ and enrich the syntax with a few axioms to allow us to replace $x$ with $y$ whenever a claim that $x$ and $y$ are equal has been established. A /proper interpretation/ is one where $\psi\mathcal{I}$ becomes the identity relation on $U$. In this framework we can finally define theories.
+
+A *first-order theory* is a triple $(\mathcal{R}, A, C)$ where $A\subseteq\pred$ for some $V := C \cup \{x_1, x_2,\dots\}$. The set $A$ is of the /axioms/ of the theory and the set $C$ of the /constants/ of the theory. The /language/ of the theory is the set $L := \{p\in\pred\mid\var(p)\subseteq C\}$. A *model* $M$ of the first-order theory $(\mathcal{R}, A, C)$ is a proper interpretation with $v(A) \subseteq\{1\}$. The map $\psi$ extends to all words of $\pred$ by mapping a word $p$ with $n$ free variables to an \(n\)-ary relation of $M$; we have $\psi p(m_1,\dots, m_n)$ if and only if $v(p) = 1$ for all evaluations $v$ of proper interpretations where $\varphi(x_j) = m_j$. A relation of $M$ is /definable in the theory/ if it belongs to the image of $\psi$. An \(n+1\)-ary relation $r(x_1,\dots,x_n y)$ that is provably (in the theory) a function in $y$ is called a definable function in the theory if it is a definable relation in the theory.
+
+First-order theories are consistent iff they have a model. They're called /complete/ if for every word $p$ of their language, $\vdash p$ or $\vdash \lnot p$, and they're complete iff every $p\in L$ consistently remains true or false in every model of the theory.
+
+For example, [[https://en.wikipedia.org/wiki/Grothendieck_universe][Grothendieck universes]] are models of ZFC.
+
+* Turing machines
+
+A *Turing machine* is a device of finitely many $\mathfrak{Q}$ internal states and an infinite tape $\mathbb{Z}$ marked with symbols from the finite /alphabet/ set $\mathfrak{G}$, shown as $s : \mathbb{Z} \to \mathfrak{G}$. The alphabet must contain a blank symbol and the markings $\mathbb{Z}\to\mathfrak{G}$ must be eventually blank on both directions. Time is denoted by $\mathbb{N}$ and we have the internal state $q : \mathbb{N}\to\mathfrak{Q}$ that the machine is currently in and the [[https://en.wikipedia.org/wiki/Program_counter][/program counter/]] $j : \mathbb{N} \to \mathbb{Z}$ denoting the marking to be processed next. At any time $t\in\mathbb{N}$, Turing machines can perform one of four actions:
+
+1. Replace the symbol $s(j(t))$ with some other symbol from the alphabet and set $q(t+1)$ to some internal state.
+2. Set $j(t+1) = j(t) + 1$ and set $q(t+1)$ to some internal state.
+3. Set $j(t+1) = j(t) - 1$ and set $q(t+1)$ to some internal state.
+4. Halt.
+
+Each action is decided based on the current internal state $q(t)$ and symbol $s(j(t))$, and thus a \((\mathfrak{Q},\mathfrak{G})\)-Turing machine's algorithm is specified by a function with domain $\mathfrak{Q}\times\mathfrak{G}$ which indicates which of the above four steps is taken. The input of the Turing machine is the initial markings on the tape and its output is the final markings on the tape after it has halted. Remarkably a Turing machine may never halt, and thus have no output. This description requires the algorithm to be given by a total function; we can instead give it by a relation to avoid having to specify when to halt: if the quadruple is not listed, it's understood to halt. Thus we specify a Turing machine $M$ by a set of quadruples of the form
+
+\begin{equation}
+\label{eq:quadruples}
+\begin{split}
+(q,s,s',q'), \\
+(q,s,R,q'), \\
+(q,s,L,q'),
+\end{split}
+\end{equation}
+
+corresponding to the above actions.
+
+The distinction between internal state and overall state is that we must also take into account the program counter and the contents of the tape. Furthermore we want a convenient symbolic description of the tape and program counter, which we accomplish by writing $d := \sigma qt\tau$, where $\sigma\in\mathfrak{G}^n$, $t\in\mathfrak{G}$, and $\tau\in\mathfrak{G}^m$ are sequences of symbols of the alphabet. This description tells us the overall contents of the tape and where the program counter is: we are at internal state $q$ and we are processing the symbol $t$. Symbols on the tape untouched by the Turing machine are not necessary; the minimal description is again denoted by $d$ (slight abuse of notation). A state transition is denoted by $M : d \mapsto d'$, and the maximal chain $d_0\mapsto d_1\mapsto\cdots\mapsto d_p$ is the *computation* of $M$ with input $d_0$ and output $d_p$; we denote the partial function $d_0 \mapsto d_p$ by $\overline{M}$:
+
+\begin{align}
+\label{eq:computation}
+\overline{M} : d_0 \mapsto d_p.
+\end{align}
+
+In fact the above rules of evolution may now be written as:
+
+\begin{align}
+\label{eq:evolution}
+\begin{split}
+(q, t, t', q') : \sigma sqt\tau & \mapsto \sigma s q' t' \tau, \\
+(q, t, R, q') : \sigma sqt\tau & \mapsto \sigma s t q' \tau, \\
+(q, t, L, q') : \sigma sqt\tau & \mapsto \sigma q' s t \tau.
+\end{split}
+\end{align}
+
+** Recursive functions
+
+Let $1^n = 1\cdots 1$ for a total of \(n\) times, where $n = 0$ gives an empty string.
+
+For given $k\in\mathbb{N}$ we have a /coding/ function,
+
+\begin{align}
+\encode(n) & := 1^{n_1}~01^{n_2}~0\cdots 01^{n_k}, & n\in\mathbb{N}^k,
+\end{align}
+
+which we may invert for given $l\in\mathbb{N}$ as
+
+\begin{align}
+\decode(1^{n_1}~01^{n_2}~0\cdots 01^{n_l}) := (n_1, \dots, n_l).
+\end{align}
+
+We have a partially-defined function $\overline{M}_{k,l}$ from a subset of $\mathbb{N}^k$ into $\mathbb{N}^l$ defined by $\overline{M} = \decode_l\circ \overline{M}\circ\encode_k$. It is partially defined for the inputs that halt. Functions of this form are called recursive functions. The alphabet $\{0,1\}$ is enough to compute any algorithmically computable function, and indeed this is how computers work. The point being made is that the notion of recursive functions captures all algorithmically described functions.
+
+** Gödel numbers
+
+From now on we assume a universal alphabet $\mathfrak{G} := \{L, R, s_1, s_2, \dots\}$ and universal internal states $\mathfrak{Q} := \{q_1, q_2, \dots\}$, both countably infinite sets. Let $p_1 < p_2 < \dots$ denote the enumeration of primes and set the Gödel number function
+
+\begin{align}
+G(x) & :=
+\begin{cases}
+1, & x = L, \\
+3, & x = R, \\
+4i + 5, & x = s_i, \\
+4j + 7, & x = q_j.
+\end{cases}
+\end{align}
+
+We furthermore map $G(\sigma) := p_1^{G(\sigma(1))}\cdots p_k^{G(\sigma(k))}$ for a string $\sigma$ and for a finite sequence of strings we set $G(\sigma_1, \dots, \sigma_n) := p_1^{G(\sigma_1)}\cdots p_n^{G(\sigma_n)}$.
+
+This numbering system is injective; the /Gödel number/ $G(M)$ of a Turing machine $M$ is $G(\sigma_1, \dots, \sigma_n)$ where the $\sigma_j$ are the ordered list of quadruples describing $M$ as in \eqref{eq:quadruples}.
+
+Simiarly we can extend the Godel numbering to all words in the predicate calculus $\pred$ (if worried about the universal quantifier bound variable identification, we resolve by using minimal representatives; and if worried about cardinality, we require all involved sets, such as relations, variables, etc, to be countable). The definitions may have to be modified to have the Turing part of $G$ use one infinite subset of primes and the predicate calculus part use another, disjoint, infinite subset of primes.
+
+** Universal Turing machines
+
+It turns out that $G$ is computable and from any Turing machine $M$ and initial state $d_0$ we can furthermore compute the final state $d_p$. In particular, there exists a /universal Turing machine/ $U$ such that starting from $(k, l) := (G(M), G(d_0))$, we can set it up to start in the initial state $q\sigma$ where $\sigma := \encode(k,l)$ and it will arrive at $G(d_p)$ as its output.
+
+** Effectively axiomatized theories
+
+We must make the assumption that the axiom set of a theory is effective, meaning that a Turing machine can distinguish an element $p\in\pred$ as an axiom or not, that is, the characteristic set is a recursive function. We will only work with such theories, because they permit us to check if $p_1, \dots, p_n$ is a proof of $p_n$ inside a Turing machine. Now let $q : \mathbb{N} \to \pred$ be a sequence such that $G(q(n))$ is a recursive function; we call $q$ /recursively enumerated/ in this case. If the characteristic function of $\{ \vdash q(n) : n \in \mathbb{N}\}$ is recursive, we say that $q$ is /recursively soluble/. We can actually take for $q$ the ordered (via Gödel numbers) enumeration of the language $L$, which indeed is recursively enumerated, and if $L$ is recursively soluble then the theory is /decidable/.
+
+For example, an effectively axiomatized complete theory is decidable (see [[https://faculty.washington.edu/keyt/theories.pdf][quick proof by David Keyt]]) and in fact every proof is constructed.
+
+** Robinson arithmetic
+
+Let $\mathbf{Q}$ denote the theory of [[https://en.wikipedia.org/wiki/Robinson_arithmetic][Robinson arithmetic]]. We'll show that if a theory $\mathbf{T}$ extends $\mathbf{Q}$, meaning that its relations, axioms, and constants are a superset of those of Robinson arithmetic, and has $\mathbb{N}$ as a model, then every recursive function $f(m)$ is *strongly definable* in $\mathbf{T}$, meaning that it is defined for some $p\in\pred$ by $f(m) = n \iff \mathbf{T} \vdash p(m, n)$. For example, functions of finite support are always strongly definable as $(n = 0)\vee\bigvee_{m_0\in\supp f} (m = m_0 \wedge n = f(m_0))$. In fact more is true: the sequences $\cup_{k\in\mathbb{N}} \mathbb{N}^k$ are indexed by a strongly definable function, which is to say there is a function $\seq$ with $\seq(m,n) = f_m(n)$ for an enumeration $\{f_m\}_{m\in\mathbb{N}}$ of them. To see this look in my other article at [[file:extended-euclidean-algorithm.org::Enumerating finite integer sequences][enumerating finite sequences]].
+
+** State functions
+
+The /state function/ $f$ corresponding to $\sigma q\tau$ is defined by setting $f(0) = G(q)$, mapping the evens to $G(\sigma(j))$ in reverse order, and the odds to $G(\tau(k))$, until they run out and then everything else is mapped to $G(0)$. State functions are more naturally defined over the index set $\mathbb{Z}$ but we use the odd/even packing to define them over $\mathbb{N}$ as $\mathbb{N}$ is a model of the theory.
+
+For any sequence $(a_0, \dots, a_n)$ we can constructively find $b\in\mathbb{N}$ such that $\seq(b, r) = a_r$ for $r=0,\dots,n$.
+
+** Encoding Turing machine evolution in propositions using arithmetic
+
+We define a function $E(x,y,z)$ with the meaning that if $M : d_0\mapsto d_1$ with state functions $f_0, f_1$, where $n$ is the minimal length of $d_0$, and if $b\in\mathbb{N}$ corresponds to $\seq(b,r) = f_0(r)$ for $r=0,\dots,n+2$, then $f_1(r) = k \iff \mathbf{T}\vdash E(b,r,k)$. The idea is as follows: we want to define $E(x,y,z) = \bigvee_{q,t} E_{q,t}(x,y,z)$, a finite disjunction over $(q,t,\cdot,\cdot)\in M$. Here each term $E_{q,t}(x,y,z)$ claims that $x$ corresponds to sequences starting with $G(q), G(t)$, and defines a function $z = z(y)$ where the sequence is the output and $x(y)$ the input, and the relationship of input to output is as given in \eqref{eq:evolution}, in the encoding of state functions. Since only a finite part from the input is modified in the output, these functions are strongly defined, and there's finitely many of them thus $E(x,y,z)$ is strongly defined. If you are curious to see it defined explicitly, see \S6 of Chapter IX in [cite:@barnes-mack-2013].
+
+The $E(x,y,z)$ proposition captures single-step evolution; what about computation? We want to write a computation proposition that captures \eqref{eq:computation}, and then we want to write an algorithm that uses this proposition to iterate over all Turing machines. If we had a decidability criterion, we'd be able to resolve the halting problem for each, a contradiction.
+
+The trick is this: in order to apply $E(b,r,v)$ to check that $M : f_0\mapsto f_1$ with $f_1(r) = v$, we must compute the number $b$ corresponding to $f_0$. For a maximal computation chain $M : f_0\mapsto f_1\mapsto \cdots \mapsto f_p$, we have corresponding numbers $b_0, b_1, \dots, b_p$ obtained by the finite-sequence enumeration theorem. This is another finite sequence, where we can find apply the finite-sequence enumeration to find another number $b$ with $\seq(b, r) = b_r$. Equipped with all this, if $f$ is strongly definable, we can define $\varphi(p,r,v)$ with the meaning that $\forall i, f_0(i) = f(i)$, that $f_p(r) = v$, and that $f_{w-1}(t) = f_w(t)$ for all $1 \leq w \leq p$ and $t \leq r + 2(p - w)$. This proposition tells us that our number $b$ corresponds to the statement $f_p(r) = v$ for a chain $f_0\mapsto \cdots \mapsto f_p$, but not necessarily that the Turing machine halts there:
+
+\begin{align}
+f_p(r) = v \iff \mathbf{T} \vdash \varphi(p,r,v).
+\end{align}
+
+To further claim that no more computation is possible and that the Turing machine has halted is done as follows: the proposition $\phi(p,r,v)$ depends on the strongly definable function $f$, i.e. on the number $b_0$. Thus the sentence:
+
+\begin{align}
+(\exists p)(\varphi(b_0, p, r, v) \wedge (\forall p' > p) (\forall v') (\lnot \varphi(b_0, p', r, v')),
+\end{align}
+
+is telling us that $f_p$ is the output of the computation, i.e. the final state reached.
+
+At this point we've strongly defined $\overline{M}$. Since both $\encode$ and $\decode$ functions are strongly defined, we can further strongly define the functions $\overline{M}_{k,l}$ for each $k,l$. If $M^n$ is an enumeration of the Turing machines (ordered by their quadruples), we can form the sequence $p_n\in L(\mathbf{T})$ of sentences:
+
+\begin{align}
+\label{eq:halting}
+p_n := (\exists v) (\overline{M^n}_{1,1}(n) = v).
+\end{align}
+
+If we had a decision algorithm for the language of $\mathbf{T}$, we would be able to decide each $p_n$ for validity, which is the halting problem, which is undecidable. Because $\mathbf{T}$ is undecidable, it cannot be complete (see the David Keyt note referenced in [[Effectively axiomatized theories]]). Thus $\mathbf{T}$ is incomplete.
+
+* References
+
+#+print_bibliography:
