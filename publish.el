@@ -1,11 +1,12 @@
 ;;; Initialize the package manager
 (require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 
 ;;; Load blorg.
 (use-package blorg
-  ;; Don't attempt to install if package is missing.
-  :ensure nil)
+  ;; Attempt to install if package is missing.
+  :ensure t)
 
 ;;; Load htmlize to colorize source blocks.
 (use-package htmlize)
@@ -25,15 +26,16 @@
 ;;
 ;; It is different for local builds versus server (or CI) builds.
 (setq-local blorg-root
-            (ensure-suffix "/"
-                           (expand-file-name
-                            (if (getenv "BLORG_SERVE")
-                                ;; The server/CI value
-                                "/blog"
-                              ;; The local build value
-                              (concat
-                               (ensure-suffix "/" (or (locate-dominating-file "." "index.org") ""))
-                               blorg-publishing-directory)))))
+            (blorg-ensure-suffix
+             "/"
+             (expand-file-name
+              (if (getenv "BLORG_SERVE")
+                  ;; The server/CI value
+                  "/blog"
+                ;; The local build value
+                (concat
+                 (blorg-ensure-suffix "/" (or (locate-dominating-file "." "index.org") ""))
+                 blorg-publishing-directory)))))
 
 ;;; Bibliographic files.
 (setq org-cite-global-bibliography `(,(expand-file-name "bibliography.bib")))
