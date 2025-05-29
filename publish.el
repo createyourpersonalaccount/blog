@@ -1,12 +1,15 @@
 ;;; Initialize the package manager
 (require 'package)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 
-;;; Load blorg.
-(use-package blorg
-  ;; Attempt to install if package is missing.
-  :ensure t)
+;;; Load ox-blorg.
+(let ((blorg-load-path (getenv "BLORG_LOAD_PATH")))
+  (if blorg-load-path
+      ;; Load from local directory.
+      (use-package ox-blorg
+        :load-path blorg-load-path)
+    ;; User has already installed ox-blorg.
+    (use-package ox-blorg)))
 
 ;;; Load htmlize to colorize source blocks.
 (use-package htmlize)
@@ -16,17 +19,17 @@
 ;;; The publishing directory
 ;; 
 ;; Where the browsable content of the blog will be.
-(setq-local blorg-publishing-directory "public_html")
+(setq-local ox-blorg-publishing-directory "public_html")
 
 ;;; Include every headline in the table of contents.
 (setq org-export-headline-levels 99)
 (setq org-export-with-toc 99)
 
-;;; This is the blorg root.
+;;; This is the ox-blorg root.
 ;;
 ;; It is different for local builds versus server (or CI) builds.
-(setq-local blorg-root
-            (blorg-ensure-suffix
+(setq-local ox-blorg-root
+            (ox-blorg-ensure-suffix
              "/"
              (expand-file-name
               (if (getenv "BLORG_SERVE")
@@ -34,8 +37,8 @@
                   "/blog"
                 ;; The local build value
                 (concat
-                 (blorg-ensure-suffix "/" (or (locate-dominating-file "." "index.org") ""))
-                 blorg-publishing-directory)))))
+                 (ox-blorg-ensure-suffix "/" (or (locate-dominating-file "." "index.org") ""))
+                 ox-blorg-publishing-directory)))))
 
 ;;; Bibliographic files.
 (setq org-cite-global-bibliography `(,(expand-file-name "bibliography.bib")))
@@ -78,16 +81,16 @@
                ;; Articles to publish.
                :base-directory "."
                :base-extension "org"
-               :publishing-directory ,blorg-publishing-directory
+               :publishing-directory ,ox-blorg-publishing-directory
                :recursive t
                ;; Backend function to convert to HTML.
-               :publishing-function blorg-html-publish-to-html
+               :publishing-function ox-blorg-html-publish-to-html
                ;; Sitemap.
                :auto-sitemap t
                :sitemap-filename "sitemap.org"
                :sitemap-title "My Blog"
                :sitemap-sort-files anti-chronologically
-               :sitemap-function blorg-sitemap-function
+               :sitemap-function ox-blorg-sitemap-function
                ;; CSS and JavaScript.
                :html-head ,(concat
                             "<link rel=\"icon\" type=\"image/x-icon\" href=\"blorg:favicon.ico\">"
@@ -116,7 +119,7 @@
                ;; BLORG_SERVE is defined in the environment, so that
                ;; users can discard it when they build their blog for
                ;; local viewing.
-               :blorg-root ,blorg-root
+               :blorg-root ,ox-blorg-root
                ;; Inside the <header> element, under the
                ;; title. Typically you want to place a navigation bar
                ;; here.
@@ -134,9 +137,9 @@
 (add-to-list 'org-publish-project-alist
              `("blog-assets"
                ;; Copy the entire contents of this directory to the
-               ;; blorg-publishing-directory.
+               ;; ox-blorg-publishing-directory.
                :base-directory "assets"
                :base-extension ".*"
                :recursive t
                :publishing-function org-publish-attachment
-               :publishing-directory ,blorg-publishing-directory))
+               :publishing-directory ,ox-blorg-publishing-directory))
