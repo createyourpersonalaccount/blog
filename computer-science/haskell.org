@@ -684,13 +684,11 @@ See <https://www.youtube.com/watch?v=0jI-AlWEwYI>.
 See <https://pvp.haskell.org/>.
 
 #+begin_quote
-<tomsmeding> at present, GHC is hard-bound to `base`, so
-    version-bounding `base` also means version-bounding GHC
-<tomsmeding> more generally, you can branch on the GHC version in a
-    *.cabal file
-<tomsmeding> and there is a `buildable: False` declaration you can put
-    in a *.cabal file in case you have a configuration that you want
-    to disallow
+At present, GHC is hard-bound to `base`, so version-bounding `base`
+also means version-bounding GHC. More generally, you can branch on the
+GHC version in a *.cabal file and there is a `buildable: False`
+declaration you can put in a *.cabal file in case you have a
+configuration that you want to disallow ---tomsmeding
 #+end_quote
 
 * References
