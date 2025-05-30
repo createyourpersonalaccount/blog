@@ -36,18 +36,21 @@ jobs:
         run: |
           sudo apt update
           sudo debconf-set-selections <<< "postfix postfix/main_mailer_type string 'No configuration'"
-          sudo apt install -y emacs-nox graphviz jq make texlive texlive-pictures wget
-      - name: Run blog makefile
-        env:
-          BLOG_PREFIX: ${{ github.repository }}
+          sudo apt install -y emacs-nox graphviz jq make texlive texlive-pictures git
+      - name: obtain ox-blorg sources
+        working-directory: ./ox-blorg
         run: |
-          BLORG_SERVE=1 make
+          git clone "https://github.com/createyourpersonalaccount/ox-blorg"
+      - name: Run blog makefile
+        working-directory: ./blog
+        run: |
+          BLORG_SERVE=1 BLORG_LOAD_PATH=../ox-blorg make
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'public_html'
+          path: 'blog/public_html'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
