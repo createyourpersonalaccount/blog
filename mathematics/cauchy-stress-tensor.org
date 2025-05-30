@@ -65,7 +65,7 @@ m\frac{D\boldsymbol{v}}{Dt} = -\nabla p - m\boldsymbol{F}.
 
 Here $\frac{D\boldsymbol{v}}{Dt}$ denotes the [[https://en.wikipedia.org/wiki/Material_derivative][material derivative]] of $\boldsymbol{v}$, that is $\partial_t\boldsymbol{v} + (\boldsymbol{v}\cdot\nabla)\boldsymbol{v}$.
 
-By making some simplifications, we can arrive at [[https://en.wikipedia.org/wiki/Bernoulli%27s_principle][Bernoulli's principle]]. Let $\boldsymbol{\omega} := \nabla\times\boldsymbol{v}$ and $H := u^2/2 + p/m + \Phi$, and assume steady flow ($\partial_t\boldsymbol{v} = 0$), constant pressure, and a potential for the body forces ($\boldsymbol{F} = -\nabla\Phi$), and write Euler's equation ($\ref{eq:euler}$) as:
+By making some simplifications, we can arrive at [[https://en.wikipedia.org/wiki/Bernoulli%27s_principle][Bernoulli's principle]]. Let $\boldsymbol{\omega} := \nabla\times\boldsymbol{v}$ and $H := u^2/2 + p/m + \Phi$, and assume steady flow ($\partial_t\boldsymbol{v} = 0$), constant pressure, and a potential for the body forces ($\boldsymbol{F} = -\nabla\Phi$), and write Euler's equation \eqref{eq:euler} as:
 
 \begin{align}
 \boldsymbol{\omega}\times\boldsymbol{v} + \nabla H = 0.
@@ -73,7 +73,7 @@ By making some simplifications, we can arrive at [[https://en.wikipedia.org/wiki
 
 It implies $\boldsymbol{\omega}\cdot\nabla H = 0$ and $\boldsymbol{v}\cdot\nabla H = 0$, and so $H$ is constant along vortex and stream lines. $H$ constant means that high pressure iff low velocity and low pressure iff high velocity. This perhaps unintuitive result is explained in the particle scale in [[https://www.youtube.com/watch?v=TcMgkU3pFBY][this youtube video]]. The simple explanation is that high velocities are more likely to be tangential to the pipe, while low velocities are more likely to be random, thus having a larger normal component (pressing against the pipe surface) on average.
 
-We should also note that the integrals we wrote down were under the assumption that the fluid is inviscid. If we had allowed for viscosity, we would have derived the Navier-Stokes equations instead. In this case, stress becomes a 2-tensor $\sigma$. With the intuition that $\nabla\cdot\sigma$ is the net force per volume, we can replace the gradient of pressure in ($\ref{eq:euler}$) with $\nabla\cdot\sigma$ to obtain [[https://en.wikipedia.org/wiki/Cauchy_momentum_equation][Cauchy's momentum equation]]:
+We should also note that the integrals we wrote down were under the assumption that the fluid is inviscid. If we had allowed for viscosity, we would have derived the Navier-Stokes equations instead. In this case, stress becomes a 2-tensor $\sigma$. With the intuition that $\nabla\cdot\sigma$ is the net force per volume, we can replace the gradient of pressure in \eqref{eq:euler} with $\nabla\cdot\sigma$ to obtain [[https://en.wikipedia.org/wiki/Cauchy_momentum_equation][Cauchy's momentum equation]]:
 
 \begin{align}
 m\frac{D\boldsymbol{v}}{Dt} = \nabla\cdot\sigma - m\boldsymbol{F}.
