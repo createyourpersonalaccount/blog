@@ -28,6 +28,9 @@
   :ensure t)
 ;;; Use external CSS to stylize the source blocks.
 (setq org-html-htmlize-output-type 'css)
+;;; Colorize haskell source code.
+(use-package haskell-mode
+  :ensure t)
 
 ;;; The publishing directory
 ;; 
