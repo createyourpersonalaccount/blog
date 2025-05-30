@@ -19,7 +19,8 @@
   :ensure nil)
 
 ;;; Load htmlize to colorize source blocks.
-(use-package htmlize)
+(use-package htmlize
+  :ensure t)
 ;;; Use external CSS to stylize the source blocks.
 (setq org-html-htmlize-output-type 'css)
 
