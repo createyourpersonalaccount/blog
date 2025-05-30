@@ -618,9 +618,9 @@ Note that this is very similar to how let bindings work, just using ~>>=~ instea
 
 In do-notation the let bindings are just without ~in~ and apply for every line following beneath.
 
-* GHCupp
+* GHCup
 
-To install a particular (e.g. newest) version of hls, one can use:
+Using [[https://www.haskell.org/ghcup/][ghcup]], to install a particular (e.g. newest) version of hls, one can use:
 
 #+begin_src sh
 ghcup compile hls -g master --ghc $GHC_VERSION
