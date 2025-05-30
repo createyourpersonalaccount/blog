@@ -3,13 +3,20 @@
 (package-initialize)
 
 ;;; Load ox-blorg.
-(let ((blorg-load-path (getenv "BLORG_LOAD_PATH")))
-  (if blorg-load-path
-      ;; Load from local directory.
-      (use-package ox-blorg
-        :load-path blorg-load-path)
-    ;; User has already installed ox-blorg.
-    (use-package ox-blorg)))
+
+;; In the server, you should use BLORG_LOAD_PATH. Locally, my blog
+;; resides in the same parent directory as the ox-blorg
+;; repository. Your layout may be different; adjust the local
+;; configuration accordingly.
+(push (or
+       ;; Server configuration.
+       (getenv "BLORG_LOAD_PATH")
+       ;; Local configuration.
+       "../ox-blorg")
+      load-path)
+
+(use-package ox-blorg
+  :ensure nil)
 
 ;;; Load htmlize to colorize source blocks.
 (use-package htmlize)
