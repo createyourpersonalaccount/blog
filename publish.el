@@ -142,7 +142,6 @@
                :blorg-header "<nav id=\"navbar\"><ul>
 <li><a href=\"blorg:index.html\">Home</a></li>
 <li><a href=\"blorg:sitemap.html\">Sitemap</a></li>
-<li><a href=\"blorg:about.html\">About</a></li>
 <li><a href=\"blorg:license.html\">License</a></li>
 </ul>
 <hr id=\"navbar-divider\">

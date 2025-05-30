@@ -1,79 +1,9 @@
-#+TITLE: Welcome to my blog
-#+DATE: [2025-05-28 Wed]
+#+TITLE: About
+#+DATE: [2025-05-29 Thu]
+#+OPTIONS: toc:nil num:nil
 
-* Description
+* About this blog
 
-** Links
+In this blog you will find topics on Mathematics, Physics, and Computer Science (or computers more broadly). Feel free to reach out if you have something to share.
 
-This is *my blog* yes! Link to my [[file:page.org][page]].
-
-** Math
-Some math: \(x = 1\). Some more math: $\int_{-\infty}^{+\infty} e^{-2\pi ix\cdot\xi} dx = \delta(\xi)$.
-
-and with align environment:
-
-\begin{align}
-\label{eq:test}
-\int_{-\infty}^{+\infty} e^{-2\pi ix\cdot\xi} dx = \delta(\xi).
-\end{align}
-
-Link to the equation: \eqref{eq:test}.
-
-** Source code
-
-Here is some C source code in a source block:
-
-#+begin_src c
-#include <stdio.h>
-int main(void) {
-  printf("Hello world!\n");
-  return 0;
-}
-#+end_src
-
-** Blorg links
-
-A blorg link: [[blorg:page.org][foo]]
-
-** Testing footnotes
-
-Here is a footnote. [fn:1]
-
-[fn:1] This is a footnote.
-
-** Testing tags                                            :one_tag:another:
-
-** Deep
-
-*** TODO Nested
-
-- [ ] Some things pending.
-- [X] Completed.
-
-**** DONE Links
-CLOSED: [2025-05-27 Tue 14:02]
-
-Here is a timestamp: [2025-05-28 Wed].
-
-** Citations
-
-This is a cited work. [cite:@nestruev-2020]
-
-Here's another attempt: [cite:@mckernan-18.725-2009; @difh-1976; @nestruev-2020]
-
-** Testing tables
-
-| This | Is | A | Test |
-|------+----+---+------|
-|    1 |  2 | 3 |    4 |
-|    5 |  6 | 7 |    8 |
-
-** Testing babel
-
-#+begin_src scheme
-(let ((x 1))
-  (1+ x))
-#+end_src
-
-#+RESULTS:
-: 2
+The entire collection of blog articles may be found in the [[blorg:sitemap.org][sitemap]].

@@ -1,6 +1,0 @@
-#+TITLE: A funny page
-
-* Introduction
-
-This is a /joke/!
-

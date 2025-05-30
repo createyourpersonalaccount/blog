@@ -1,7 +1,0 @@
-#+TITLE: About
-#+DATE: [2025-05-29 Thu]
-#+OPTIONS: toc:nil num:nil
-
-* About this blog
-
-In this blog you will find topics on Mathematics, Physics, and Computer Science (or computers more broadly). Feel free to reach out if you have something to share.
