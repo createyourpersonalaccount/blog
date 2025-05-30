@@ -18,6 +18,10 @@
 (use-package ox-blorg
   :ensure nil)
 
+;;; Deal with citations.
+(use-package citeproc
+  :ensure t)
+
 ;;; Load htmlize to colorize source blocks.
 (use-package htmlize
   :ensure t)
