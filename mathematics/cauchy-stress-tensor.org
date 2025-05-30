@@ -3,7 +3,7 @@
 
 * The Cauchy stress tensor
 
-It feels appropriate to mention here my journey in my quest to understand the [[https://en.wikipedia.org/wiki/Cauchy_stress_tensor][Cauchy stress tensor]].
+Before I start with the details, it feels appropriate to mention here my journey in my quest to understand the [[https://en.wikipedia.org/wiki/Cauchy_stress_tensor][Cauchy stress tensor]].
 
 The mysterious stress tensor has eluded me for a long time but I've finally come around to understanding it. The story begins surprisingly with [[https://en.wikipedia.org/wiki/Hooke%27s_law][Hooke's law]]! The first time I've encountered the stress tensor was when I tried to study [[https://en.wikipedia.org/wiki/Einstein_field_equations][Einstein's field equations]]. I thought that I knew enough Riemannian geometry to be able to understand the equations, but the formidable [[https://en.wikipedia.org/wiki/Stress%E2%80%93energy_tensor][stress-energy tensor]] stumped me and I gave up for years. I came back to it at some point from the angle of [[https://en.wikipedia.org/wiki/Continuum_mechanics][Continuum mechanics]]; but the meaning of body forces and surface forces again felt cryptic and once more I quit. Recently I've been studying [[https://doi.org/10.1007/978-3-319-09036-8][Zohdi's Finite Element Primer for Beginners]] and his Appendix B renewed my interest in understanding body and surface forces. Equipped with renewed determination, I decided to research material that would explain these forces and found a great ally in the notes of [[https://en.wikipedia.org/wiki/Michael_E._McIntyre][Michael E. McIntyre]]. With their aid, I derived Euler's equation I realized I was very close to the stress tensor AND [[https://en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations][Navier-Stokes equations]]. I was stoked! The final blow to ignorance came from humbling myself by reading the chapter on stress from the undergraduate book by Giancoli and watching a youtube video on the stress tensor. 
 
@@ -11,7 +11,7 @@ If you've come across this article in hopes of understanding the stress tensor, 
 
 ** Hooke's law
 
-From Doug Giancoli's /Physics, §12 Static Equilibrium; Elasticity and Fracture/, I learned that Hooke's law,
+From [cite:@giancoli-2013], /§12 Static Equilibrium; Elasticity and Fracture/, I learned that Hooke's law,
 
 \begin{align}
 F = -kx,
