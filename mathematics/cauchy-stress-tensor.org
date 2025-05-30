@@ -1,0 +1,93 @@
+#+TITLE: The Cauchy Stress Tensor
+#+DATE: [2024-04-24 Wed]
+
+* The Cauchy stress tensor
+
+It feels appropriate to mention here my journey in my quest to understand the [[https://en.wikipedia.org/wiki/Cauchy_stress_tensor][Cauchy stress tensor]].
+
+The mysterious stress tensor has eluded me for a long time but I've finally come around to understanding it. The story begins surprisingly with [[https://en.wikipedia.org/wiki/Hooke%27s_law][Hooke's law]]! The first time I've encountered the stress tensor was when I tried to study [[https://en.wikipedia.org/wiki/Einstein_field_equations][Einstein's field equations]]. I thought that I knew enough Riemannian geometry to be able to understand the equations, but the formidable [[https://en.wikipedia.org/wiki/Stress%E2%80%93energy_tensor][stress-energy tensor]] stumped me and I gave up for years. I came back to it at some point from the angle of [[https://en.wikipedia.org/wiki/Continuum_mechanics][Continuum mechanics]]; but the meaning of body forces and surface forces again felt cryptic and once more I quit. Recently I've been studying [[https://doi.org/10.1007/978-3-319-09036-8][Zohdi's Finite Element Primer for Beginners]] and his Appendix B renewed my interest in understanding body and surface forces. Equipped with renewed determination, I decided to research material that would explain these forces and found a great ally in the notes of [[https://en.wikipedia.org/wiki/Michael_E._McIntyre][Michael E. McIntyre]]. With their aid, I derived Euler's equation I realized I was very close to the stress tensor AND [[https://en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations][Navier-Stokes equations]]. I was stoked! The final blow to ignorance came from humbling myself by reading the chapter on stress from the undergraduate book by Giancoli and watching a youtube video on the stress tensor. 
+
+If you've come across this article in hopes of understanding the stress tensor, I hope that you will leave satisfied!
+
+** Hooke's law
+
+From Doug Giancoli's /Physics, §12 Static Equilibrium; Elasticity and Fracture/, I learned that Hooke's law,
+
+\begin{align}
+F = -kx,
+\end{align}
+
+is not merely about springs but applies generally to materials to tell us how they deform when forces push them or pull them (approximately and as long as $x \ll 1$.)
+
+For example, for a solid cylinder of length $l$ and cross-sectional area $A$ if we apply a force $F$ on its ends we have
+
+\begin{align}
+\frac{\Delta l}{l} = \frac{1}{E}\frac{F}{A}.
+\end{align}
+
+The factor $\frac{\Delta l}{l}$ is called the /strain/ while $\frac{F}{A}$ is called the /stress/. For example, a strain of $1$ means that the material is now twice as long. The constant $E$ is [[https://en.wikipedia.org/wiki/Young%27s_modulus][Young's modulus]], it depends on the material and orientation (for instance, pulling perpendicularly to the grain in wooden material stretches differently than pulling parallel to it.)
+
+Hooke's law implies that the conditions $\sum F = 0$ and $\sum \tau = 0$ (net linear and torsion forces) are not equivalent to *no forces* being present. This is simple but important to keep in mind; it tells us that internally, something is happening to the material.
+
+Another type of deformation is shear deformation that occurs from shear stress. This occurs when the forces are tangent to the surfaces they are applied. A simple example is when we push with our hand the top cover of a book on a table; a shear deformation will occur. Again it follows Hooke's law but with a different constant called the [[https://en.wikipedia.org/wiki/Shear_modulus#:~:text=In%20materials%20science%2C%20shear%20modulus,Shear%20modulus][shear modulus]].
+
+This was a real aha moment for me; I'm surprised that in my high school or undergrad education I was not told of this fact about Hooke's law. Hooke's law seems a lot more important than some spring-and-load exercises.
+
+All in all, a cube may be deformed by forces in 9 different ways: 3 by pulling opposite sides in the normal direction and 6 by tangent forces. This is all collected in a 2-tensor $\sigma$ called the [[https://en.wikipedia.org/wiki/Cauchy_stress_tensor][Cauchy stress tensor]]. For any normal vector $\boldsymbol{n}$, the quantity $\boldsymbol{n}\cdot\sigma$ is the stress force on the infinitesimal surface $\delta S$ corresponding to $\boldsymbol{n}$, and for any surface $S$, the quantity $\int_S \boldsymbol{n}\cdot\sigma dS$ is the net force on the surface, which by Stoke's theorem equals $\int_V \nabla\cdot\sigma dV$ for the enclosed volume $V$, thus $\nabla\cdot\sigma$ is the net force per volume.
+
+I recommend chapter 12 from Giancoli's book and [[https://www.youtube.com/watch?v=uO_bW2zzrNU][this youtube video]] if something hasn't made sense so far.
+
+** Example equations using the stress tensor
+
+*** Cauchy's momentum equation
+
+From Michael McIntyre's [[https://www.damtp.cam.ac.uk/user/mem/FLUIDS-IB/][IB lectures notes on fluid dynamics]] (2nd section), I've learned how to understand the terms appearing in the momentum equation.
+
+Viscocity is the internal friction in a fluid. For an inviscid fluid, where $m$ is the mass distribution, $\boldsymbol{v}$ is the velocity field, $\boldsymbol{F}$ are the body forces per volume and $p$ is the pressure, the following equation holds.
+
+\begin{align}
+\frac{d}{dt} \int_V m \boldsymbol{v} dV = \int_V m\boldsymbol{F} dV - \int_S p\boldsymbol{n} dS - \int_S m\boldsymbol{v}(\boldsymbol{v}\cdot\boldsymbol{n})dS
+\end{align}
+
+Numbering these terms as 1, 2, 3, 4, we have:
+
+1. $m\boldsymbol{v}$ is the momentum field and the integral over $V$ is the total momentum in $V$. (check units: the time derivative of momentum is force from Newton's second law $F = \dot{p}$.)
+2. A body force is really acceleration per volume; thus $\boldsymbol{F}dV$ is the acceleration of the particles in the fluid due to the body forces. (An example body force is $g$, the [[https://en.wikipedia.org/wiki/Gravity_of_Earth][gravity of Earth]].)
+3. Pressure is the net momentum transfer between inner and outer regions of a surface (force per unit area.) Pressure in fluids is a scalar quantity, see [[https://en.wikipedia.org/wiki/Pascal%27s_law][Pascal's law]] and [[https://www.doi.org/10.1007/s00016-018-0221-3][How Pressure Became a Scalar, Not a Vector]]. The basic idea is this: fluid is defined as not being able to hold its shape in the presence of a force. If fluid is in equilibrium, it means that the pressure in all directions is the same.
+4. We're trying to determine how much fluid (momentum) has exited or entered $V$. If $m$ fluid moves with velocity $v$ through an opening $dS$ of the surface for $dt$ time, it traverses through a cylinder of base $dS$ and height $\boldsymbol{v}\cdot\boldsymbol{n}dt$. By multiplying the volume of the cylinder with the momentum field $m\boldsymbol{v}$ we obtain the net change in momentum from $dS$ in an instant $dt$.
+
+The corresponding pointwise equation is [[https://en.wikipedia.org/wiki/Euler_equations_(fluid_dynamics)][Euler's equation]]. It follows by Stoke's theorem on the surface integrals and by using the conservation of mass equation $\partial_t m = -\nabla\cdot m\boldsymbol{v}$ (this is the [[https://en.wikipedia.org/wiki/Continuity_equation][continuity equation]] for mass transport). It is given by:
+
+\begin{align}
+\label{eq:euler}
+m\frac{D\boldsymbol{v}}{Dt} = -\nabla p - m\boldsymbol{F}.
+\end{align}
+
+Here $\frac{D\boldsymbol{v}}{Dt}$ denotes the [[https://en.wikipedia.org/wiki/Material_derivative][material derivative]] of $\boldsymbol{v}$, that is $\partial_t\boldsymbol{v} + (\boldsymbol{v}\cdot\nabla)\boldsymbol{v}$.
+
+By making some simplifications, we can arrive at [[https://en.wikipedia.org/wiki/Bernoulli%27s_principle][Bernoulli's principle]]. Let $\boldsymbol{\omega} := \nabla\times\boldsymbol{v}$ and $H := u^2/2 + p/m + \Phi$, and assume steady flow ($\partial_t\boldsymbol{v} = 0$), constant pressure, and a potential for the body forces ($\boldsymbol{F} = -\nabla\Phi$), and write Euler's equation ($\ref{eq:euler}$) as:
+
+\begin{align}
+\boldsymbol{\omega}\times\boldsymbol{v} + \nabla H = 0.
+\end{align}
+
+It implies $\boldsymbol{\omega}\cdot\nabla H = 0$ and $\boldsymbol{v}\cdot\nabla H = 0$, and so $H$ is constant along vortex and stream lines. $H$ constant means that high pressure iff low velocity and low pressure iff high velocity. This perhaps unintuitive result is explained in the particle scale in [[https://www.youtube.com/watch?v=TcMgkU3pFBY][this youtube video]]. The simple explanation is that high velocities are more likely to be tangential to the pipe, while low velocities are more likely to be random, thus having a larger normal component (pressing against the pipe surface) on average.
+
+We should also note that the integrals we wrote down were under the assumption that the fluid is inviscid. If we had allowed for viscosity, we would have derived the Navier-Stokes equations instead. In this case, stress becomes a 2-tensor $\sigma$. With the intuition that $\nabla\cdot\sigma$ is the net force per volume, we can replace the gradient of pressure in ($\ref{eq:euler}$) with $\nabla\cdot\sigma$ to obtain [[https://en.wikipedia.org/wiki/Cauchy_momentum_equation][Cauchy's momentum equation]]:
+
+\begin{align}
+m\frac{D\boldsymbol{v}}{Dt} = \nabla\cdot\sigma - m\boldsymbol{F}.
+\end{align}
+
+Euler's equation is a specific instance of this equation with $\sigma = -pI$ where $p$ is pressure (thus all surfaces feel the same pressure.) The Navier-Stokes equation makes a different choice; I will not go further into this topic since I don't know a lot about fluid dynamics.
+
+*** Einstein's field equations
+
+In a Riemannian manifold with metric $g$, the equations can be written in tensor form as
+
+\begin{align}
+G + \Lambda g = \kappa T.
+\end{align}
+
+The quantities $\Lambda$ and $\kappa$ are constants and $G$, the [[https://en.wikipedia.org/wiki/Einstein_tensor][Einstein tensor]], is a function of the metric $g$. Thus the entire left-hand side of the equation is a function of the metric, while in the right sits alone the stress-energy tensor $T$.
+
