@@ -1,3 +1,30 @@
+blockquote {
+    position: relative;
+    margin: 1.5em 0;
+    padding: 1.2em 2em;
+    background: #BEBAAA;
+    border-radius: 8px;
+    font-style: italic;
+    color: #333;
+    line-height: 1.6;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+blockquote::before {
+    content: '“';
+    position: absolute;
+    left: 0em;
+    top: -0.1em;
+    font-size: 3em;
+    color: black;
+    opacity: 0.3;
+}
+
+blockquote p {
+    margin: 0;
+    font-size: 1.1em;
+}
+
 code {
     background-color: #BEBEBE;
 }
