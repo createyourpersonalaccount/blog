@@ -1,0 +1,44 @@
+digraph G {
+    node [fontname="Liberation Mono", shape=rectangle];
+    edge [fontname="Liberation Mono"];
+
+    A [label="network", style=filled];
+
+    subgraph cluster_0 {
+        label = "Receival";
+        fontsize="20pt"
+
+        B [label="smtpd(8)", style=filled];
+        C [label="cleanup(8)", style=filled];
+        D [label="incoming", style=filled];
+
+
+        B -> C [label="  pass e-mail for minor\n  touchups to format"];
+        C -> D [label="  place into\n  incoming queue"];
+    }
+
+    A -> B [label="  incoming e-mail\n  (say from gmail.com)"];
+
+    subgraph cluster_1 {
+        label = "Delivery";
+        fontsize="20pt"
+
+        E [label="active\n(currently processed)", style=filled];
+        F [label="qmgr(8)\n(queue manager)", style=filled];
+
+        D -> E;
+        E -> F;
+
+        subgraph cluster_2 {
+            label = "Delivery Agents";
+            fontsize="20pt"
+            graph[style=dashed];
+
+            G [label="local(8)", style=filled];
+            H [label="virtual(8)", style=filled];
+            I [label="pipe(8)", style=filled];
+        }
+
+        F -> {G, H, I};
+    }
+}

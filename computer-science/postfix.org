@@ -1,0 +1,28 @@
+#+TITLE: Notes on the Postfix mail server
+#+DATE: [2025-06-01 Sun]
+
+* Introduction
+
+This is not a step-to-step guide to set up Postfix, but rather a collection of notes that will help you understand how Postfix and e-mail works. Postfix is complex; why? because e-mail is complex due to its long-term decentralized evolution. To cut down on the refactoring cost for the developer, Postfix is designed as a set of programs, each having a specific duty. To many it may seem a peculiar design compared to other programs, and there's certainly alternatives to Postfix.
+
+* Preliminaries
+
+A high-level overview of how Postfix works is presented [[https://www.postfix.org/OVERVIEW.html][here]]. I recommend a cursory reading of RFC 821 [cite:@rfc821], which while obsoleted by subsequent RFCs, should contain a lot of illuminating information on how e-mail operates. In particular, keep in mind that SMTP is a server-to-server protocol, and no clients (e.g. like [[https://www.thunderbird.net/][thunderbird]]) are involved. 
+
+A (simplified) description of how e-mail travels through Postfix is this:
+
+#+ATTR_HTML: :width 40% :height 40%
+#+CAPTION: Arriving e-mail is being processed by Postfix.
+[[file:../img/postfix-route.svg]]
+
+Received e-mail delivery (processing) can be understood in terms of /filtering/ and /delivery/.
+
+Filtering can occur in ~smtpd(8)~, ~cleanup(8)~, and in the delivery agents.
+
+The processing by ~local(8)~ and ~virtual(8)~ is for storage as files or to be processed further by a user command. The ~pipe(8)~ agent also passes the e-mail content to a supplied command's stdin, the difference being that ~local(8)~ is per Unix user, while ~pipe(8)~ is a lot more configurable and can e.g. run on a single user that is responsible for the processing (e.g. SpamAssassin)
+
+There's a lot of processes associated with Postfix. The supervisor is called ~master(8)~.
+
+* Testing by sending e-mail
+
+Undoubtedly at some point you'd like to test your configuration by sending e-mail locally. [[https://www.jetmore.org/john/code/swaks/][Swaks]] is a handy tool for that purpose.

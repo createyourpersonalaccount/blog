@@ -539,7 +539,9 @@ In terms of operational semantics, we have the following correspondence:
 
 ** The Hedgehog package
 
-[[https://hackage.haskell.org/package/hedgehog][Hedgehog]] generates test cases. A ~Hedgehog.Property~ is the type of a property test that will be conducted by hedgehog. To automatically discover all such tests whose names are prefixed with ~prop_~, we do at the end:
+[[https://hackage.haskell.org/package/hedgehog][Hedgehog]] generates test cases and automatically shrinks failures. The [[https://well-typed.com/blog/2019/05/integrated-shrinking/][Integrated versus Manual Shrinking]] article is a good tutorial for Hedgehog.
+
+A ~Hedgehog.Property~ is the type of a property test that will be conducted by hedgehog. To automatically discover all such tests whose names are prefixed with ~prop_~, we do at the end:
 
 #+begin_src haskell
 tests :: IO Bool
@@ -650,6 +652,7 @@ Here I document the various things I've studied relating to Haskell, in the orde
 8. I studied [[https://hackage.haskell.org/package/hedgehog][hedgehog]] and used it for testing leetcode solutions.
 9. I studied ~Reader~ and ~ReaderT~ from the [[https://hackage.haskell.org/package/transformers][transformers]] package. I also had to learn the [[https://en.wikibooks.org/wiki/Haskell/Syntactic_sugar#Do_notation][do-notation syntactic sugar]] (up until now I was using it without understanding).
 10. I wanted to write a megaparsec parser that involved state, and I decided to revisit the state monad, transformers, and so on, realizing that I did not understand them as well as I thought. [[https://www.williamyaoh.com/posts/2023-06-10-monad-transformers-101.html][Monad Transformers 101]] by William Yao was a good article that helped me. I also then read his [[https://www.williamyaoh.com/posts/2023-07-01-why-monad-transformers-matter.html][Why Monad Transformers Matter]] article.
+11. After a hiatus, I studied a minimal scheme implementation in C from [[https://peter.michaux.ca/articles/scheme-from-scratch-introduction][Peter Michaux's blog]]. The [[https://wespiser.com/writings/wyas/00_overview.html][Write you a Scheme v2.0]] article implements one in Haskell; I rewrote it using attoparsec and Hedgehog for testing.
 
 ** TODO Read applications of monad transformers
 
