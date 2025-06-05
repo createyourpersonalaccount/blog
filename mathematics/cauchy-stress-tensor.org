@@ -60,7 +60,7 @@ The corresponding pointwise equation is [[https://en.wikipedia.org/wiki/Euler_eq
 
 \begin{align}
 \label{eq:euler}
-m\frac{D\boldsymbol{v}}{Dt} = -\nabla p - m\boldsymbol{F}.
+m\frac{D\boldsymbol{v}}{Dt} = -\nabla p + m\boldsymbol{F}.
 \end{align}
 
 Here $\frac{D\boldsymbol{v}}{Dt}$ denotes the [[https://en.wikipedia.org/wiki/Material_derivative][material derivative]] of $\boldsymbol{v}$, that is $\partial_t\boldsymbol{v} + (\boldsymbol{v}\cdot\nabla)\boldsymbol{v}$.
@@ -76,7 +76,7 @@ It implies $\boldsymbol{\omega}\cdot\nabla H = 0$ and $\boldsymbol{v}\cdot\nabla
 We should also note that the integrals we wrote down were under the assumption that the fluid is inviscid. If we had allowed for viscosity, we would have derived the Navier-Stokes equations instead. In this case, stress becomes a 2-tensor $\sigma$. With the intuition that $\nabla\cdot\sigma$ is the net force per volume, we can replace the gradient of pressure in \eqref{eq:euler} with $\nabla\cdot\sigma$ to obtain [[https://en.wikipedia.org/wiki/Cauchy_momentum_equation][Cauchy's momentum equation]]:
 
 \begin{align}
-m\frac{D\boldsymbol{v}}{Dt} = \nabla\cdot\sigma - m\boldsymbol{F}.
+m\frac{D\boldsymbol{v}}{Dt} = \nabla\cdot\sigma + m\boldsymbol{F}.
 \end{align}
 
 Euler's equation is a specific instance of this equation with $\sigma = -pI$ where $p$ is pressure (thus all surfaces feel the same pressure.) The Navier-Stokes equation makes a different choice; I will not go further into this topic since I don't know a lot about fluid dynamics.
