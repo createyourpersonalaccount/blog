@@ -3,7 +3,7 @@
 
 * Introduction
 
-This is not a step-to-step guide to set up Postfix, but rather a collection of notes that will help you understand how Postfix and e-mail works. Postfix is complex; why? because e-mail is complex due to its long-term decentralized evolution. To cut down on the refactoring cost for the developer, Postfix is designed as a set of programs, each having a specific duty. To many it may seem a peculiar design compared to other programs, and there's certainly alternatives to Postfix.
+This is not a step-to-step guide to set up Postfix, but rather a collection of notes that will help you understand how Postfix and e-mail works. It is still *work in progress*. Postfix is complex; why? because e-mail is complex due to its long-term decentralized evolution. To cut down on the refactoring cost for the developer, Postfix is designed as a set of programs, each having a specific duty. To many it may seem a peculiar design compared to other programs, and there's certainly alternatives to Postfix.
 
 * Preliminaries
 
