@@ -138,10 +138,6 @@ a {
     transform: translateX(-50%);
 }
 
-ol.org-ol > li > a {
-    border: transparent !important;
-}
-
 a[id^="citeproc"] {
     border: transparent !important;
 }
