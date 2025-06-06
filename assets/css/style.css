@@ -119,8 +119,6 @@ span.tag > span {
 
 a {
     position: relative;
-    z-index: 1;
-    border: 1px solid red;
     text-decoration: none;
 }
 
