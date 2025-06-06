@@ -151,9 +151,6 @@ a:has(img) {
 mjx-math a {
     border: transparent !important;
 }
-a mjx-mtext.mjx-n {
-    border: 1px solid red;
-}
 
 div.csl-left-margin {
     margin-right: 5px;
