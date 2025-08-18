@@ -1,0 +1,75 @@
+#+TITLE: USB SSD hangs on Linux
+#+DATE: [2021-09-05 Sun]
+
+* Thanks to
+
+I was helped by the friendly folks at [[https://libera.chat/][Libera.Chat]]. A great network for computer-related discussions.
+
+* The issue
+
+I bought a new 250G [[https://en.wikipedia.org/wiki/Solid-state_drive][ssd]] that I wanted to use as data backup. After plugging it in, I wanted to run
+
+#+begin_src sh
+sudo fdisk /dev/sdc
+#+end_src
+
+to format it and create a 32G partition. Unfortunately, the =fdisk= command would either hang right then and there or at a later stage when I tried to write out the partition with the =w= command.
+
+* The cause
+
+The cause turned out to be the [[https://en.wikipedia.org/wiki/USB_Attached_SCSI][UAS]] protocol. Hard drive manufacturers often do not implement it correctly and the =uas= Linux kernel module is then unable to communicate with the hard drive properly.
+
+* The solution
+
+** Diagnostics
+
+First, let us verify that the issue has to do with the =uas= module:
+
+Unplug the usb ssd, run
+
+#+begin_src sh
+journalctl --dmesg --follow
+#+end_src
+
+and then plug it in. In my case, one of the messages was =kernel: scsi host4: uas=, which indicates that the uas module is in effect. Moreover, I got
+
+#+begin_src
+kernel: usb 2-2: Product: SSD-PGU3-A
+kernel: usb 2-2: Manufacturer: BUFFALO
+#+end_src
+
+Now run =lsusb= to obtain the ID of the ssd:
+
+#+begin_src
+Bus 002 Device 002: ID 0411:02d0 BUFFALO INC. (formerly MelCo., Inc.) SSD-PGU3-A
+#+end_src
+
+The part we are interested in is given above by =0411:02d0=. Set a temporary shell variable,
+
+#+begin_src sh
+ID=0411:02d0
+#+end_src
+
+** On a permanent environment
+
+If you are trying to fix this issue on a permanent environment, use:
+
+#+begin_src sh
+echo options usb_storage quirks=$ID:u | sudo tee -a /etc/modprobe.d/usb_storage.conf
+#+end_src
+
+Then, the instructions to initrd need to be updated, so that it loads the module with the quirk. This depends on the distribution; on Debian-based distributions you would use =sudo update-initramfs -u= and on Fedora you would use =sudo dracut -v -f=. Do not blindly use these commands, it won't work; read the manual to see exactly what it is you need to do.
+
+In theory, initrd only needs to load the modules required to access the root filesystem. Some distributions put all common kernel modules to be loaded in initrd; there's also udev involved which may load additional modules. As a consequence the modules are loaded before the quirk, and that's why a new initramfs has to be generated.
+
+** On a live environment
+
+On a live environment, such as a liveCD, use instead:
+
+#+begin_src sh
+echo $ID:u | sudo tee /sys/module/usb_storage/parameters/quirks
+#+end_src
+
+* Conclusion
+
+What we did was inform the =usb_storage= kernel module that when handling the usb device with id =$ID=, it should not load up the =uas= module. The UAS protocol is useful because it is a standarized and efficient way to communicate with a usb hard drive. When manufacturers do not follow the UAS protocol, the only hope is that the =uas= module developers have created patches for the specific mishandling of the manufacturer. Otherwise, we have to disable the =uas= module for the specific device and default to [[https://en.wikipedia.org/wiki/USB_mass_storage_device_class][USB Mass Storage]], which is slower.
