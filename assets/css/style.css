@@ -98,8 +98,11 @@ span.tag {
 
 pre.example::before {
     content: "⟹ ";
+    position: absolute;
+    left: 0;
 }
 pre.example {
+    padding-left: 3em;
     background-color: inherit;
     border: none;
     position: relative;
