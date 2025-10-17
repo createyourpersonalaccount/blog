@@ -1,0 +1,16 @@
+digraph G {
+  node [fontname="Liberation Mono", shape=rectangle];
+  edge [fontname="Liberation Mono"];
+  rankdir="LR";
+  R [label="Source"];
+  S [label="Scheme"];
+  T [label="Tree-IL"];
+  C [label="CPS"];
+  V [label="VM Bytecode"];
+  M [label="Machine Code"];
+  S -> T -> C -> V;
+  R -> S [label="reader"];
+  T -> T [label="optimize"];
+  C -> C [label="optimize"];
+  V -> M [label="JIT compiler"];
+}

@@ -1,0 +1,609 @@
+#+TITLE: Debugging GNU Guile
+#+DATE: [2025-10-11 Sat]
+
+* Introduction to GNU Guile internals
+
+This article is meant to introduce the reader to the compilation internals of GNU Guile. If that is not your cup of tea, you may be interested in reading the section on [[CPS transformations][CPS transformations]] if you've heard of CPS but never got the point of it.
+
+I wrote these notes during the course of my investigations of certain segfaults of GNU Guile, in particular [[https://lists.gnu.org/archive/html/bug-guile/2025-09/msg00010.html][bug#79483]] and [[https://lists.gnu.org/archive/html/bug-guile/2025-09/msg00009.html][bug#79479]]. In this entire article I work with guile 3.0.10.
+
+** Compilation phases
+
+The following schematic shows the compilation phases in GNU Guile:
+
+#+CAPTION: The compilation phases in GNU Guile.
+[[file:../img/guile-compilation-phases.svg]]
+
+One can compile from any host language to any target language using the [[https://www.gnu.org/software/guile/manual/html_node/Compilation.html#index-compile-1][~compile~]] procedure: For example we may compile Scheme to the CPS intermediate language:
+
+#+begin_src scheme
+(compile '(car (list 1 2 3)) #:from 'scheme #:to 'cps)
+#+end_src
+
+#+RESULTS:
+: #<intmap 0-4>
+
+The compile procedure will use the associated reader procedure for the source language specified. The result, an /intmap/, will be explained later in the [[#cps][CPS section]].
+
+* The Scheme reader
+
+The ~read~ procedure reads Scheme source code into a Scheme value. For example,
+
+#+begin_src scheme :results output
+(define expr (with-input-from-string "(let ((x 1)) (+ x 41))" read))
+(format #t "expr is a list: ~A. \
+Its first element is '~A' and is a symbol: ~A.~%"
+        (pair? expr)
+        (car expr)
+        (symbol? (car expr)))
+#+end_src
+
+#+RESULTS:
+: expr is a list: #t. Its first element is 'let' and is a symbol: #t.
+
+The ~read~ procedure strips all source metadata from the s-expression it reads. In order to keep that metadata, one must use ~read-syntax~ instead. When ~read-syntax~ reads from files, it associates file name, line number, and so on with the (sub)expressions it reads. (No source metadata is retained when reading from the REPL or string ports.) The ~compile~ procedure will retain this information in the subsequent compilation targets.
+
+#+CAPTION: Compiling /foo.scm/ into Tree-IL using ~read-syntax~ with ~compile~.
+#+begin_src scheme
+(compile (with-input-from-file "foo.scm" read-syntax) #:to 'tree-il)
+#+end_src
+
+If you evaluate this expression in your REPL you will not see any source metadata, because it is stripped when printing the Tree-IL object. Nevertheless, it is there and it is accessible via pattern-matching on the Tree-IL records (more on that later). Another way to retain the source metadata is to use ~read-and-compile~:
+
+#+CAPTION: Compiling /foo.scm/ into Tree-IL using ~read-and-compile~.
+#+begin_src scheme
+(use-modules (system base compile))
+(call-with-input-file "foo.scm"
+  (lambda (port) (read-and-compile port #:to 'tree-il)))
+#+end_src
+
+If you use guild, say with ~guild compile --to=tree-il foo.scm~, you will not see this source metadata as guild strips it. The only target that retains this source metadata with guild is the VM ~bytecode~.
+
+The transformation of Scheme into Tree-IL within ~compile~ is implemented by ~macroexpand~, which (you may have noticed) does not yield Scheme but Tree-IL expessions:
+
+#+begin_src scheme
+(macroexpand '(+ 1 x))
+#+end_src
+
+#+RESULTS:
+: #<tree-il (call (toplevel +) (const 1) (toplevel x))>
+
+* Desugaring Scheme into Tree-IL
+:PROPERTIES:
+:CUSTOM_ID: tree-il
+:END:
+
+Tree-IL is a representation of /desugared/ Scheme.
+
+#+begin_src scheme
+(define t (compile '(let ((x 1)) (+ x 3)) #:to 'tree-il))
+t
+#+end_src
+
+#+RESULTS:
+: #<tree-il (let (x) (x-c36b7faaba690f9-1)
+:               ((const 1))
+:             (call (toplevel +)
+:                   (lexical x x-c36b7faaba690f9-1)
+:                   (const 3)))>
+
+Do not be fooled by the output; there is no ~#<tree-il>~ record type. The output merely pretty-prints all Tree-IL related records, such as ~<let>~ and so on, in this manner. In fact, ~t~ is an instance of the ~<let>~ record. It might be confusing, but all the procecure calls above correspond to records, i.e. ~let~ corresponds to ~<let>~, ~call~ to ~<call>~ and so on, although some have altered names for brevity, such as ~toplevel~ above which corresonds to ~<toplevel-ref>~. Nevertheless there is some utility with this external representation: it can be directly passed to ~parse-tree-il~ to produce actual Tree-IL objects; thus the pretty-print output is a serialization of Tree-IL.
+
+In the output we see ~<let>~ performing lexical binding of ~x~ to ~1~, with a generated symbol name ~x-c36b7faaba690f9-1~ that uniquely identifies this lexical binding. Then ~<call>~ invokes the procedure named ~+~ in ~<toplevel-ref>~, i.e. what is visible as ~+~ in the current module, with two arguments: ~x~ and ~3~.
+
+** Tree-IL records
+
+Here is the list of Tree-IL records (documented in the Guile manual's section on [[https://www.gnu.org/software/guile/manual/html_node/CPS-in-Guile.html][/CPS in Guile/]]). The first field of every record is always for the source metadata and is not shown, with the exception of ~<lambda-case>~, ~<prompt>~, and ~<abort>~ which do not have such a field, and ~<letrec>~ which has it as the second field.
+
+#+CAPTION: The records of Tree-IL.
+|                             | Fields                                       |
+|-----------------------------+----------------------------------------------|
+| *Primitives*                  |                                              |
+| ~<primitive-ref>~             | ~name~                                         |
+| ~<primcall>~                  | ~name args~                                    |
+| *Lexical getters and setters* |                                              |
+| ~<lexical-ref>~               | ~name gensym~                                  |
+| ~<lexical-set>~               | ~name gensym exp~                              |
+| ~<module-ref>~                | ~mod name public?~                             |
+| ~<module-set>~                | ~mod name public? exp~                         |
+| ~<toplevel-ref>~              | ~name~                                         |
+| ~<toplevel-set>~              | ~name exp~                                     |
+| ~<toplevel-define>~           | ~name exp~                                     |
+| *Constant values*             |                                              |
+| ~<void>~                      |                                              |
+| ~<const>~                     | ~exp~                                          |
+| *Lambda abstraction*          |                                              |
+| ~<lambda>~                    | ~meta body~                                    |
+| ~<lambda-case>~               | ~req opt rest kw inits gensyms body alternate~ |
+| *Lexical binding*             |                                              |
+| ~<let>~                       | ~names gensyms vals exp~                       |
+| ~<letrec>~                    | ~in-order? src names gensyms vals exp~         |
+| ~<let-values>~                | ~names gensyms exp body~                       |
+| ~<fix>~                       | ~names gensyms vals body~                      |
+| *Control flow*                |                                              |
+| ~<conditional>~               | ~test then else~                               |
+| ~<call>~                      | ~prog args~                                    |
+| ~<seq>~                       | ~head tail~                                    |
+| ~<prompt>~                    | ~escape-only? tag body handler~                |
+| ~<abort>~                     | ~tag args tail~                                |
+
+As you can see, the Tree-IL language is small.[fn:minimal] A lot of functionality is performed by ~<primcall>~, which refers to primitive procedures that are provided by Guile. Once the Tree-IL has been generated and optimized, it is converted into CPS by the [[https://codeberg.org/guile/guile/src/branch/main/module/language/tree-il/compile-cps.scm][~(language tree-il compile-cps)~]] module.
+
+[fn:minimal] ...but not minimal; a minimal language would be less efficient.
+
+* Brainfuck into Tree-IL
+
+Guile is transformed into /Tree-IL/ and then into /CPS language/. After these transformations, it is finally bytecode compiled.
+
+This mechanism is plug-and-play; for example it is possible to translate Brainfuck into Tree-IL, and then the lower compilation targets will automatically be available. See the source files under [[https://codeberg.org/guile/guile/src/branch/main/module/language/brainfuck][~module/language/brainfuck~]], which serve as a good example of how this is done.
+
+#+begin_src scheme
+(use-modules (language brainfuck parse))
+(define bf-program ",+.")
+(define bf-IL (call-with-input-string bf-program read-brainfuck))
+(define tree-IL (compile bf-IL #:from 'brainfuck #:to 'tree-il))
+#+end_src
+
+If we inspect ~tree-IL~ we find that the Tree-IL representation of ~bf-program~ is:
+
+#+begin_src scheme
+(let (pointer tape) (pointer tape)
+     ;; Set pointer to 0 and tape to a make-vector of 30KB of zeros.
+     ((const 0) (call (primitive make-vector) (const 30000) (const 0)))
+     ;; A sequence of computations.
+     (seq (seq
+           ;; (1) Read a character and store into the cell pointed to
+           ;; by pointer.
+           (call (primitive vector-set!)
+                 (lexical tape tape)
+                 (lexical pointer pointer)
+                 (call (primitive char->integer)
+                       (call (primitive read-char))))
+           ;; (2) Increase the value of the cell pointed to by pointer
+           ;; by 1.
+           (call (primitive vector-set!)
+                 (lexical tape tape)
+                 (lexical pointer pointer)
+                 (call (primitive +)
+                       (call (primitive vector-ref)
+                             (lexical tape tape)
+                             (lexical pointer pointer))
+                       (const 1))))
+           ;; (3) Write the character in the cell.
+           (call (primitive write-char)
+                 (call (primitive integer->char)
+                       (call (primitive vector-ref)
+                             (lexical tape tape)
+                             (lexical pointer pointer))))))
+#+end_src
+
+** Creating Tree-IL terms
+
+At this point one may reasonably ask how Tree-IL terms are created (remember how we mentioned serialization earlier?) You'd need to know this information to write your own compiler targeting Tree-IL. Guile offers ~parse-tree-il~ from [[https://codeberg.org/guile/guile/src/branch/main/module/language/tree-il.scm][~(language tree-il)~]] for this purpose:
+
+#+begin_src scheme
+(use-modules (language tree-il))
+(let ((x 2))
+  (parse-tree-il `(call (toplevel +) (const 1) (const ,x))))
+#+end_src
+
+#+RESULTS:
+: #<tree-il (call (toplevel +) (const 1) (const 2))>
+
+Thus one builds a symbolic s-expression and converts it to Tree-IL with ~parse-tree-il~.
+
+* CPS transformations
+:PROPERTIES:
+:CUSTOM_ID: cps
+:END:
+
+** What is CPS?
+
+What is CPS? This quote gives a good hint:
+
+#+begin_quote
+A programmer can discover continuation-passing style by themselves if subjected to one constraint:
+
+*No procedure is allowed to return to its caller—ever.*
+
+One hint makes programming in this style possible:
+
+*Procedures can take a callback to invoke upon their return value.* ---Matt Might, [[https://matt.might.net/articles/by-example-continuation-passing-style/][By example: Continuation-passing style in JavaScript]]
+#+end_quote
+
+In short, every procedure takes an extra argument, which it uses to /return/ its computed value. Here's an example in Python of what this style would look like:
+
+#+begin_src python
+def func(x, y, z, ret):
+  ret(x + y*z)
+#+end_src
+
+The above is a only a hint as to what CPS is. There are two aspects to CPS:
+
+1. The ~call/cc~ facility (e.g. what Scheme offers) as a programming technique.
+2. The formal language, as a compiler technique.
+
+I have spent some time studying the first point and I came to the conclusion that I did not need ~call/cc~; it seemed like a smart ~goto~ facility that I could not come up with uses for. It took me many years to realize that there is a /deeper/ aspect to CPS, which is what the second point expresses. Not only it is deeper, but it felt much more interesting to study: theoretically, I was on much firmer ground as CPS is a variation of lambda calculus, a very familiar topic, and practically, the CPS language manifests as an intermediate language in the compiler tower of GNU Guile.[fn:cps]
+
+[fn:cps] There is a connection between the two points: it is natural to provide ~call/cc~ in languages whose compilers use the CPS compilation phase.
+
+** Compiling lambda calculus into CPS
+
+This content is taken from [[https://matt.might.net/articles/cps-conversion/][How to compile with continuations]].
+
+Consider the grammar of lambda calculus:
+
+#+begin_src
+<expr> ⩴ (λ (<var>) <expr>)
+       │ <var>
+       │ (<expr> <expr>)
+#+end_src
+
+(Note that we write terms in lisp syntax, i.e. we write ~(λ (x) f)~ instead of ~λx.f~.) The lambda calculus language is transformed into the CPS language (similarly written in lisp syntax):
+
+#+begin_src
+<aexp> ⩴ (λ (<var>*) <cexp>)
+       │ <var>
+<cexp> ⩴ (<aexp>+)
+#+end_src
+
+Observe that these are almost the same, barring that ~<cexp>~ (complex expressions) can have a variable number of ~<aexp>~ (atomic expressions) unlike lambda application, and atomic expessions can have any number of variables, unlike lambda functions. However it is exactly this property of functions having multiple variables and being applied multiple values that allows us to define CPS-style, as we will use one additional argument for the /continuation/!
+
+*** Plotkin's transformation
+
+We describe a transformation given by Plotkin [cite:@plotkin-1975]. It is a simple transformation of lambda calculus terms into CPS terms. The transformed terms are not optimal in their form; in practice more complex transformations are used.
+
+We have two transformations, ~M~ and ~T~. They both use each other, but the terms reduce eventually.
+
+First we have the ~M~ transformation for lambda functions and variables.
+
+#+begin_src
+① (M v:<var>) ≔ v
+② (M (λ (v:<var>) e:<expr>)) ≔ (λ (v k) (T e k))
+#+end_src
+
+We assume that ~k~ is a fresh symbol that we can use; it denotes the continuation. Now we define the ~T~ transformation:
+
+#+begin_src
+① (T e:(λ (v:<var>) e₁:<expr>) k) ≔ (k (M e))
+② (T v:<var> k) ≔ (k (M v))
+③ (T (e₀:<expr> e₁:<expr>) k) ≔ (T e₀
+                                    (λ (v₀) (T e₁
+                                               (λ (v₁) (v₀ v₁ k)))))
+#+end_src
+
+The interpretation of ~(T e k)~ is that it will transform ~e~ into a CPS procedure (or evaluate it, if it's a variable) and pass it to ~k~. Altogether we can say that ~e~ is transformed into a CPS term and then passed to ~k~. Thus in particular the way ~(T (e₀ e₁))~ is evaluated is that first ~e₀~ is transformed into a CPS term and assigned to ~v₀~, and then ~e₁~ is transformed into a CPS term and assigned to ~v₁~, and finally ~(v₀ v₁ k)~ is evaluated.
+
+*** Example CPS reduction
+
+Consider the lambda term (a function application) ~((λ (x) (x x)) v)~, where ~v~ is a variable. We cannot apply the ~M~ transformation here, but the ~T~ transformation (third definition) applies:
+
+#+begin_src
+╭────────────────────────────────────────────────────────╮
+│       (T ((λ (x) (x x)) v))                            │
+├────────────────────────────────────────────────────────┤
+│(T3)⟶ (T (λ (x) (x x))                                 │
+│          (λ (v₀) (T v                                  │
+│                     (λ (v₁) (v₀ v₁ k₀)))))             │
+├────────────────────────────────────────────────────────┤
+│(T1)⟶ ((λ (v₀) (T v                                    │
+│                   (λ (v₁) (v₀ v₁ k₀))))                │
+│        (M (λ (x) (x x))))                              │
+├────────────────────────────────────────────────────────┤
+│(M2)⟶ ((λ (v₀) (T v                                    │
+│                   (λ (v₁) (v₀ v₁ k₀))))                │
+│        (λ (x k₁) (T (x x) k₁)))                        │
+├────────────────────────────────────────────────────────┤
+│(T2)⟶ ((λ (v₀) ((λ (v₁) (v₀ v₁ k₀)) (M v)))            │
+│        (λ (x k₁) (T (x x) k₁)))                        │
+├────────────────────────────────────────────────────────┤
+│(M1)⟶ ((λ (v₀) ((λ (v₁) (v₀ v₁ k₀)) v))                │
+│        (λ (x k₁) (T (x x) k₁)))                        │
+├────────────────────────────────────────────────────────┤
+│(T3)⟶ ((λ (v₀) ((λ (v₁) (v₀ v₁ k₀)) v))                │
+│        (λ (x k₁) (T x                                  │
+│                     (λ (v₂) (T x                       │
+│                                (λ (v₃) (v₂ v₃ k₁)))))))│
+├────────────────────────────────────────────────────────┤
+│(T2)⟶ ((λ (v₀) ((λ (v₁) (v₀ v₁ k₀)) v))                │
+│        (λ (x k₁) ((λ (v₂) (T x                         │
+│                              (λ (v₃) (v₂ v₃ k₁))))     │
+│                   (M x))))                             │
+├────────────────────────────────────────────────────────┤
+│(M1)⟶ ((λ (v₀) ((λ (v₁) (v₀ v₁ k₀)) v))                │
+│        (λ (x k₁) ((λ (v₂) (T x                         │
+│                              (λ (v₃) (v₂ v₃ k₁))))     │
+│                   x)))                                 │
+├────────────────────────────────────────────────────────┤
+│(T2)⟶ ((λ (v₀) ((λ (v₁) (v₀ v₁ k₀)) v))                │
+│        (λ (x k₁) ((λ (v₂) ((λ (v₃) (v₂ v₃ k₁))         │
+│                            (M x)))                     │
+│                   x)))                                 │
+├────────────────────────────────────────────────────────┤
+│(M1)⟶ ((λ (v₀) ((λ (v₁) (v₀ v₁ k₀)) v))                │
+│        (λ (x k₁) ((λ (v₂) ((λ (v₃) (v₂ v₃ k₁))         │
+│                            x))                         │
+│                   x)))                                 │
+╰────────────────────────────────────────────────────────╯
+#+end_src
+
+At this point the lambda term is completely reduced into a CPS term. We could further reduce some of the lambda terms that do not involve continuations, just to make clearer what the involvement of continuations is:
+
+#+begin_src
+╭────────────────────────────────────────────────────────╮
+│    ((λ (v₀) ((λ (v₁) (v₀ v₁ k₀)) v))                   │
+│     (λ (x k₁) ((λ (v₂) ((λ (v₃) (v₂ v₃ k₁))            │
+│                         x))                            │
+│                x)))                                    │
+├────────────────────────────────────────────────────────┤
+│⟶* ((λ (x k₁) (x x k₁)) v k₀)                          │
+╰────────────────────────────────────────────────────────╯
+#+end_src
+
+Here we can view the two continuations ~k₀~ and ~k₁~ as labels into what the computation of the original expression ~((λ (x) (x x)) v)~ entails: We must evaluate ~v~, which is passed to ~k₀~, i.e. that step is labeled by ~k₀~, and we must evaluate ~(v v)~, which is labeled by ~k₁~.
+
+A complete reduction of lambda terms reduces to ~(v v k)~. In the original lambda expression, it would reduce to ~(v v)~. How can there be a difference? This is because the ~(v v)~ term is a lambda term. In our lambda calculus, it can only make sense when ~v~ reduces to a function. The ~(v v k)~ term is a CPS term. It too also only makes sense if ~v~ reduces to a CPS function, but CPS functions are ~<aexp>~ terms that /additionally/ accept a continuation parameter. Thus there is an equivalence between the ~(v v)~ term of the lambda calculus and the ~(v v k)~ term of the CPS language.
+
+** CPS in Guile
+
+Now let's take a look at CPS in Guile. Let's compile some simple source code:
+
+#+NAME: intmap-def
+#+begin_src scheme
+(define im (compile '(let ((x 36)) (+ x 6)) #:to 'cps))
+im
+#+end_src
+
+#+RESULTS: intmap-def
+: #<intmap 0-4>
+
+As a result we get an ~intmap~, a record defined in [[https://codeberg.org/guile/guile/src/branch/main/module/language/cps/intmap.scm][~(language cps intmap)~]]. Intmaps are hashmaps with integer keys. We can convert the intmap into an assoc list if we'd like:
+
+#+begin_src scheme :results output
+<<intmap-def>>
+(use-modules (language cps intmap)
+             (ice-9 pretty-print))
+(define al (intmap-fold-right acons im '()))
+(pretty-print al)
+#+end_src
+
+#+RESULTS:
+: ((0 . #<cps (kfun () 0 1 4)>)
+:  (1 . #<cps (ktail)>)
+:  (2 . #<cps (kargs (val) (1) (continue 1 (values 1)))>)
+:  (3 . #<cps (kargs () () (continue 2 (const 42)))>)
+:  (4 . #<cps (kclause (() () #f () #f) 3)>))
+
+Don't be fooled by the ~#<cps>~ type! It's not a real type, it's just how the different CPS records from the [[https://codeberg.org/guile/guile/src/branch/main/module/language/cps.scm][~(language cps)~]] module, such as ~$kfun~, ~$ktail~, ~$kargs~ and ~$kclause~, are printed (see the manual's [[https://www.gnu.org/software/guile/manual/html_node/CPS-in-Guile.html][CPS in Guile]] section for all the records). It is worthwhile familiarizing yourself with how this printer works, because it does not simply list all the record fields; you may also write your own examination facilities if you'd like.
+
+The output above is not to be read from top to bottom like a regular program. Instead, starting at ~0~, we must follow the continuation labels every time we wish to discover the next operation to be performed.
+
+It is important to understand that there are two sets of indices: continuation labels (the keys of the intmap) and variable labels (also integers). It is possible to have a continuation and a variable share the same numeric label; they are kept distinct by context.
+
+The zeroth record is the entry, so let us start examining from there. (Note that the ~#<cps>~ printer, like the ~#<tree-il>~ printer, does not print the ~src~ parameter.)
+
+1. The self label is ~0~, the tail label is ~1~ and the clause label is ~4~. The tail label is where this ~$kfun~ finishes; the entry in ~1~ is a ~$ktail~, which designates termination. The clause label is points to the invocation of a procedure; it points to ~4~.
+2. The entry indexed by ~4~ is a ~$kclause~ which is the invocation of a procedure, here called as a thunk.
+3. The procedure called is indexed by ~3~. The ~$kargs~ binds names to values, but here there's nothing, and then passes to the next continuation the value ~42~ (here the constants ~36~ and ~6~ have been folded into ~42~ and the addition operation has been eliminated).
+4. The procedure indexed by ~2~ has been assigned to its ~val~ variable the value ~42~. The ~val~ variable is indexed by ~1~. In its body, it returns the value of the variable indexed by ~1~, i.e. ~val~, to the continuation indexed by ~1~.
+5. That continuation indexed by ~1~ is the return of the ~kfun~ entry, and thus the compiled program returns the value ~42~.
+
+*** List of CPS terms
+
+#+CAPTION: The records of CPS in GNU Guile.
+|              | Arguments                         |
+|--------------+-----------------------------------|
+| *Continuation* |                                   |
+| ~$kargs~       | ~names vars term:Term~              |
+| ~$kreceive~    | ~arity k~                           |
+| ~$kfun~        | ~src meta self tail clause~         |
+| ~$ktail~       |                                   |
+| ~$kclause~     | ~arity cont alternate~              |
+| *Term*         |                                   |
+| ~$continue~    | ~k src exp:Expression~              |
+| ~$branch~      | ~kf kt src op param args~           |
+| ~$switch~      | ~kf kt* src arg~                    |
+| ~$throw~       | ~src op param args~                 |
+| ~$prompt~      | ~k kh src escape? tag~              |
+| *Expression*   |                                   |
+| ~$const~       | ~val~                               |
+| ~$prim~        | ~name~                              |
+| ~$call~        | ~proc args~                         |
+| ~$calli~       | not documented.                   |
+| ~$primcall~    | ~name param args~                   |
+| ~$values~      | ~args~                              |
+| ~$fun~         | ~body~                              |
+| ~$rec~         | ~names vars funs~                   |
+| ~$const-fun~   | ~label~                             |
+| ~$code~        | ~label~                             |
+| ~$callk~       | ~label proc args~                   |
+| *Data*         |                                   |
+| ~$arity~       | ~req opt rest kw allow-other-keys?~ |
+
+Noteworthy:
+- ~$prompt~ appears both as term and expression.
+- ~src~ appears in the ~$kfun~ continuation and all the terms and nowhere else.
+- What is a ~$primcall~ here? It may correspond to actual VM instructions, or it might be optimized out by a source transformation into something else.
+
+*** Example compilation into CPS
+
+Let's compile ~bar.scm~ into CPS using ~guild compile --to=cps bar.scm -o bar.cps~:
+
+#+CAPTION: The contents of /bar.scm/.
+#+begin_src scheme
+(define-module (bar))
+(define (f x) (string-ref x 0))
+#+end_src
+
+There are 54 lines of output. A lot of it is cache and module bookkeeping, which we skip, and crop only to the relevant parts:
+
+#+begin_src scheme
+⁞
+(44 (kargs (arg0 arg1 arg2 arg3 arg4 arg5) (36 37 38 39 40 41) (branch 42 43 heap-object? #f 36)))
+(45 (kfun ((name . define-module*@@guile)) #f 37 44))
+(46 (kargs (cache) (45) (continue 36 (callk 45 #f 45 31 32 33 34 35))))
+(47 (kargs (arg) (35) (continue 46 (primcall cache-ref ((guile) define-module* #f)))))
+(48 (kargs (arg) (34) (continue 47 (const #t))))
+(49 (kargs (arg) (33) (continue 48 (const #:declarative?))))
+(50 (kargs (arg) (32) (continue 49 (const "bar.scm"))))
+(51 (kargs (arg) (31) (continue 50 (const #:filename))))
+(52 (kargs () () (continue 51 (const (bar)))))
+#+end_src
+
+Reading from bottom to top, we bind ~((bar) #:filename "bar.scm" #:declarative? #t)~ to the variables ~(31 32 33 34 35)~ (remember, variables are indexed by integers) and then call ~cache-ref~ for ~define-module*~ from ~(guile)~. Finally, we pass all these variables, together with the cache result, as arguments to ~define-module*~. It is interesting to note that the first ~45~ in ~(continue 36 (callk 45 #f 45 31 32 33 34 35))~ is a continuation label while the second ~45~ is the cache variable, and we know this because of how ~$callk~ is defined: it expects a continuation label (and a proc which here is ~#f~), and then the rest are variables.
+
+The final line in ~kargs~ re-binds those variables to the new variable indices ~(36 37 38 39 40 41)~, and then contains some branching if/else logic.
+
+What follows after that (not shown above) is that the current module is set to ~(foo)~ and then the ~define!~ primcall is called to define ~f~:
+
+#+begin_src scheme
+⁞
+(22 (kargs (arg) (22) (continue 21 (primcall define! #f 1 22))))
+(23 (kargs (vals) (23) (continue 22 (const f))))
+⁞
+#+end_src
+
+There are more details of course. If you use ~-O3~ some primcalls will be optimized. In fact, the definition of ~f~ will be pruned because it is not exported (dead code elimination). At any rate, CPS output is messy because there's no clear indication of where a procedure definition starts and ends, and so on. It's one giant intertwined list of CPS instructions, which the manual refers to as a /"soup"/.
+
+*** Resources
+
+- See <https://matt.might.net/articles/cps-conversion/> and the resources therein. In that article lambda calculus is compiled into CPS.
+- Appel's /Compiling with Continuations/ [cite:@appel-2009].
+
+* The VM bytecode
+
+Bytecode can be produced with ~(compile ... #:to 'bytecode)~. The bytevector produced can be found as-is inside a section of the corresponding compiled ELF file (produced by ~guild compile~).
+
+Typically to examine bytecode one uses ~,x proc~ in the REPL or the ~disassemble-program~ procedure from ~(system vm disassembler)~; it is also possible to examine a raw bytevector using ~disassemble-image~.
+
+* Examples
+
+You will notice that every disassembled procedure has a /prologue/ and an /epilogue/.
+
+The instructions are in the form ~(instruction arg0 arg1 ... argN)~. Their C definitions can be found in ~libguile/vm-engine.c~. The byte representation is in 32-bit chunks and takes the form:
+
+#+begin_src
+instruction (8 bits)
+vvvvvvvv
+01234567890123456789012345678901 01234567890123456789012345678901 ...
+        ^^^^^^^^^^^^^^^^^^^^^^^^               arg1
+        arg0
+#+end_src
+
+Thus the first argument is limited to 24 bits. If it is absolutely necessary to use 32 bits for it, then those 24 bits are ignored, and the first argument takes the place of arg1:
+
+#+begin_src
+instruction (8 bits)
+vvvvvvvv
+01234567890123456789012345678901 01234567890123456789012345678901 ...
+        ^^^^^^^^^^^^^^^^^^^^^^^^               arg0
+        ignored
+#+end_src
+
+In some instances, multiple arguments can fit inside those remainder 24 bits: for example ~assert-nargs-ee/locals~ has two 12 bit arguments that fit there, so the above schematic is not always precise:
+
+#+begin_src
+assert-nargs-ee/locals
+vvvvvvvv
+01234567890123456789012345678901
+        ^^^^^^^^^^^^||||||||||||
+        arg0        arg1
+#+end_src
+
+In the disassembly output, the leftmost column records the current byte offset. If it seems that an instruction is too small, it's because its arguments are packed, i.e. they have small bit size, like in the case of ~assert-nargs-ee/locals~.
+
+The VM instructions can call out to /intrinsics/, which are C functions defined in ~libguile/intrinsics.c~. Intrinsics are referred to by their indices, which correspond to their order of appearance in ~libguile/intrinsics.h~.
+
+** Arithmetic
+
+Consider the function
+
+#+begin_src scheme
+(define (add-simple x) (+ x 42))
+#+end_src
+
+The disassembly[fn:disasm] yields:
+
+#+begin_src
+Disassembly of #<procedure add-simple (x)> at #x55eabd867298:
+
+   0    (instrument-entry 76)                                 at (unknown file):12:0
+   2    (assert-nargs-ee/locals 2 0)    ;; 2 slots (1 arg)
+   3    (call-scm<-scm-uimm 1 0 42 1)   ;; add/immediate      at (unknown file):12:14
+   5    (reset-frame 1)                 ;; 1 slot
+   6    (handle-interrupts)
+   7    (return-values)
+#+end_src
+
+[fn:disasm] Disassembly can be obtained in the REPL using ~,x add-simple~ or by using the ~disassemble-program~ procedure from ~(system vm disassembler)~.
+
+*** Procedure prologue
+
+The ~instrument-entry~ instruction bumps the procedure's execution counter. When the execution counter reaches a certain threshold, the procedure gets machine compiled by the JIT compiler. ~instrument-entry~ bumps by 30 and ~instrument-loop~ bumps by ~2~. The argument (here ~76~) is an index in the counter table that corresponds to this procedure.
+
+The ~assert-nargs-ee/locals~ instruction is stating that there's 2 arguments exactly and ensures there's stack space for 0 local variables. The arguments include the procedure ~add-simple~ itself, hence why there are two. This instruction is equivalent to an ~assert-nargs-ee~ together with an ~alloc-frame~.
+
+*** Procedure body
+
+#+begin_src
+             rv := add/immediate(sp[0], 42)         +-------+
+                      v v                           |local 0| <-- sp[1]
+(call-scm<-scm-uimm 1 0 42 1)                       +-------+
+                    |      |                        |local 1| <-- sp[0]
+          sp[1] := rv      add/immediate            +-------+
+#+end_src
+
+The ~call-scm<-scm-uimm~ instruction calls an intrinsic that returns an ~SCM~. The intrinsic is indexed by the final ~1~, and in the comments it is identified as ~add/immediate~. It is passed two arguments, the local ~1~ (second argument, i.e. ~sp[0]~) and ~42~. The resulting ~SCM~ is placed in local ~0~ (first argument, i.e. ~sp[1]~).
+
+In the name of the instruction, ~call~ means that an intrinsic is called; the ~scm<-scm-uimm~ part means that the intrinsic returns an ~SCM~ and that it expects an ~SCM~ and a ~uint8_t~ as arguments.
+
+*** Procedure epilogue
+
+Corresponds to ~alloc-frame~. The one extra argument slot allocated previously with ~assert-nartg-ee/locals~ is reset.
+
+The ~handle-interrupts~ instruction handles pending asynchronous interrupts.
+
+The ~return-values~ instruction returns a number of values from the call frame. The return values have been put in a contiguous array starting at slot 0.
+
+** string-ref
+
+Consider the procedure:
+
+#+begin_src scheme
+(define (string-ref-0 s) (string-ref s 0))
+#+end_src
+
+Let's examine it under the three different compilation options, ~-Ocps~, ~-Oresolve-primitives~, and when they're specified together.
+
+*** -Ocps
+
+#+begin_src
+Disassembly of #<procedure string-ref-0 (s)> at #x7fc65129a24c:
+
+   0    (instrument-entry 16371)                              at bug.scm:2:0
+   2    (assert-nargs-ee/locals 2 1)    ;; 3 slots (1 arg)
+   3    (static-ref 2 16356)            ;; #f                 at bug.scm:2:33
+   5    (immediate-tag=? 2 7 0)         ;; heap-object?
+   7    (je 9)                          ;; -> L1
+   8    (static-ref 2 16279)            ;; #<directory (bug) 7fc656f14640>
+  10    (static-ref 0 16359)            ;; string-ref
+  12    (call-scm<-scm-scm 2 2 0 111)   ;; lookup-bound
+  14    (static-set! 2 16345)           ;; #f
+L1:
+  16    (scm-ref/immediate 2 2 1)
+  17    (make-immediate 0 2)            ;; 0                  at bug.scm:2:46
+  18    (handle-interrupts)                                   at bug.scm:2:32
+  19    (tail-call)
+#+end_src
+
+**** Procedure prologue
+
+As before, ~instrument-entry~ keeps a cache for JIT to kick in. Three slots are allocated, one of them being the procedure ~string-ref-0~ itself, and another being its argument.
+
+~static-ref~ loads ~ip[16356]~ into ~sp[2]~.
+
+~immediate-tag=?~ Performs ~sp[2] & 7 == 0~ which is equivalent to ~(heap-object? sp[2])~. The result is stored in the /comparison result/, which is then utilized by the next jump instruction.
+
+In ~(call-scm<-scm-scm 2 2 0 111)   ;; lookup-bound~, the ~lookup-bound~ intrinsic looks up the name ~sp[0]~ in the module ~sp[2]~ and places the result in ~sp[2]~. Will throw error if the variable is undefined (~SCM_UNDEFINED~).
+
+In ~(make-immediate 0 2)~, we store ~s[0] := 2~.
