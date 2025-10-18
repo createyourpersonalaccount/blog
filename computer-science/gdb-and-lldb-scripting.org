@@ -100,7 +100,7 @@ template <typename T> struct Node {
       return std::vector<T>{value};
     } else {
       std::vector<T> acc;
-      for(auto child : children) {
+      for (auto child : children) {
         auto v = child.collect_leaves();
         acc.insert(acc.end(), v.begin(), v.end());
       }
@@ -117,14 +117,12 @@ int main(void) {
          |
          5
    */
-  Node<int> n1, n2, n3, n4, n5;
-  // this nonsense is done because I hit a Liquid formatter bug on GH pages
-  n1.value = 1; n2.value = n2; n3.value = n3; n4.value = n4; n5.value = n5;
-  n1.children.push_back(n2);
-  n1.children.push_back(n3);
-  n1.children.push_back(n4);
-  n1.children[1].children.push_back(n5);
-  for (auto b : n1.collect_leaves()) {
+  Node<int> mytree{{}, 1};
+  mytree.children.push_back({{}, 2});
+  mytree.children.push_back({{}, 3});
+  mytree.children.push_back({{}, 4});
+  mytree.children[1].children.push_back({{}, 5});
+  for (auto b : mytree.collect_leaves()) {
     std::cout << b << std::endl;
   }
   return 0;
