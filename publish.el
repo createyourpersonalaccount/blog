@@ -82,7 +82,14 @@
                :components ("blog-pages" "blog-assets")))
 
 ;;; Prevent org-export from evaluating babel blocks.
-(setq org-export-use-babel nil)
+; (setq org-export-use-babel nil)
+
+;;; Strip noweb references and do not evaluate source blocks on export.
+(setq org-babel-default-header-args
+      '((:session . "none") (:results . "replace")
+        (:exports . "both") (:eval . "never-export")
+        (:cache . "no") (:noweb . "strip-export")
+        (:hlines . "no") (:tangle . "no")))
 
 ;;; The configuration of the portion consisting of the Org pages
 (add-to-list 'org-publish-project-alist
