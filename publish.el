@@ -63,13 +63,6 @@
 ;;; Show the checkboxes as unicode.
 (setq org-html-checkbox-type 'unicode)
 
-;;; Always include babel src-block output in HTML export, if it exists.
-(let ((pair (assoc :exports org-babel-default-header-args)))
-  (if pair
-      (setcdr pair "both")
-    (add-to-list 'org-babel-default-header-args
-                 '(:exports . "both"))))
-
 ;;; Set blog configuration options for org-publish.
 (add-to-list 'org-publish-project-alist
              '("blog"
@@ -82,7 +75,7 @@
                :components ("blog-pages" "blog-assets")))
 
 ;;; Prevent org-export from evaluating babel blocks.
-; (setq org-export-use-babel nil)
+(setq org-export-use-babel nil)
 
 ;;; Strip noweb references and do not evaluate source blocks on export.
 (setq org-babel-default-header-args
