@@ -1,0 +1,346 @@
+#+TITLE: GDB and LLDB scripting
+#+DATE: [2024-01-24 Wed]
+
+* Introduction
+
+This post is about scripting the [[https://www.sourceware.org/gdb/][GDB]] and [[https://lldb.llvm.org/][LLDB]] debuggers.
+
+The example code we will write scripts for is a simple recursive
+[[https://en.wikipedia.org/wiki/Depth-first_search][depth-first]] tree
+traversal function.
+
+For debugging C++ applications on x86_64, I recommend LLDB for
+scripting, because it has more features. One issue I had with GDB 13 is
+that it does not support calling method functions. On the other hand,
+GDB has wider coverage of architectures and is more ergonomic and
+productive to use (apart from scripting.)
+
+** GDB Scripting
+
+If you're thinking of using Guile instead of Python, /don't/. Guile is a
+great language, but don't use it for gdb scripting, the gdb community
+doesn't use it. If you're thinking of using gdbscript, /don't/. It's
+powerless. With that out of the way, let's begin:
+
+Site-wide, gdb uses /data-directory/ for its Python scripts, which can
+be examined from within gdb with:
+
+#+begin_src
+show data-directory
+#+end_src
+
+Under the =data-directory/python= directory you will find Python scripts
+that e.g. pretty-print C++ strings, and that gdb makes use of
+automatically when debugging C++.
+
+Normally you don't have to touch this site-wide directory, and instead
+you use the =source= command, which you can either put in your project's
+gdbinit files and run as:
+
+#+begin_src sh
+gdb -x my_gdbinit_project_file
+#+end_src
+
+or use interactively:
+
+#+begin_src sh
+source my_command.py
+#+end_src
+
+Side note: There is good advice online about builting custom CLI scripts
+that load various configurations for your specific project, and this may
+be a good idea for debugging too. See the external resource
+[[https://interrupt.memfault.com/blog/building-a-cli-for-firmware-projects][Building
+a CLI for Firmware Projects using Invoke]]. This way you can launch a
+particular debugging configuration very easily.
+
+We can python interactively with the =python-interactive= command (the
+=gdb= module is already imported):
+
+#+begin_src
+# ... get gdb to some state where there's a backtrace ...
+my_frame = gdb.newest_frame()
+my_val_object = my_frame.read_val("var_name")
+str(my_val) # obtain the string representing the value of `var_name`
+#+end_src
+
+We can define our own gdb functions, in this case =my_function()=, with
+this:
+
+#+begin_src python
+import gdb
+
+class MyClass (gdb.Command):
+    def __init__(self):
+        # the name of the function is here
+        super(MyClass, self).__init__("my_function", gdb.COMMAND_DATA)
+
+    def invoke(self, arg, from_tty):
+        # code goes here
+        print("Hello world")
+
+MyClass()
+#+end_src
+
+Time to explore the above in a project. Let's write a recursive tree
+walker function, and our task is to unwind the frames to print all the
+paths the function went through to reach a leaf.
+
+#+begin_src cpp
+#include <iostream>
+#include <list>
+#include <numeric>
+#include <vector>
+
+template <typename T> struct Node {
+  std::vector<Node<T>> children;
+  T value;
+  std::vector<T> collect_leaves() const {
+    if (children.empty()) {
+      return std::vector<T>{value};
+    } else {
+      std::vector<T> acc;
+      for(auto child : children) {
+        auto v = child.collect_leaves();
+        acc.insert(acc.end(), v.begin(), v.end());
+      }
+      return acc;
+    }
+  }
+};
+
+int main(void) {
+  /* The tree looks like this:
+         1
+      /  |  \
+     2   3   4
+         |
+         5
+   */
+  Node<int> n1, n2, n3, n4, n5;
+  // this nonsense is done because I hit a Liquid formatter bug on GH pages
+  n1.value = 1; n2.value = n2; n3.value = n3; n4.value = n4; n5.value = n5;
+  n1.children.push_back(n2);
+  n1.children.push_back(n3);
+  n1.children.push_back(n4);
+  n1.children[1].children.push_back(n5);
+  for (auto b : n1.collect_leaves()) {
+    std::cout << b << std::endl;
+  }
+  return 0;
+}
+#+end_src
+
+We use the following python gdb script:
+
+#+begin_src python
+import gdb
+
+class RecursiveParameters (gdb.Command):
+    def __init__(self):
+        super(RecursiveParameters, self).__init__("recursive_parameters", gdb.COMMAND_DATA)
+
+    def invoke(self, arg, from_tty):
+        del arg, from_tty
+        frame = gdb.newest_frame()
+        parameters = []
+        while(frame):
+            try:
+                x = frame.read_var("this").dereference()
+                value = str(x['value'])
+                parameters = [value] + parameters
+            except ValueError:
+                pass
+            frame = frame.older()
+        print(parameters)
+
+RecursiveParameters()
+#+end_src
+
+and we compile with =-ggdb g3=. Behold the following gdb session:
+
+#+begin_src
+$ gdb walk_tree
+Reading symbols from walk_tree...
+(gdb) source recursive_parameters.py
+(gdb) b 11
+Breakpoint 1 at 0x189d: file walk_tree.cpp, line 11.
+(gdb) commands
+Type commands for breakpoint(s) 1, one per line.
+End with a line saying just "end".
+>silent
+>recursive_parameters()
+>continue
+>end
+(gdb) r
+Starting program: walk_tree
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+['1', '2']
+['1', '3', '5']
+['1', '4']
+2
+5
+4
+[Inferior 1 (process 233230) exited normally]
+#+end_src
+
+We put a breakpoint just before =collect_leaves()= returns from a leaf,
+and using =commands= we entered a small script that calls our python
+function to unwind the stack and show the three paths taken, =[1, 2]=,
+=[1, 3, 5]=, and =[1, 4]=.
+
+*** Some useful projects
+
+There are quite a few projects that script and enhance gdb. You may
+enjoy:
+
+- [[https://github.com/PlasmaHH/vdb][vdb]]
+- [[https://github.com/hugsy/gef][gef]]
+- [[https://github.com/pwndbg/pwndbg][pwndbg]]
+- [[https://github.com/cyrus-and/gdb-dashboard][gdb-dashboard]]
+
+For example, you can git-clone gef and then write a bash alias:
+
+#+begin_src sh
+alias gef="gdb --nh -q -iex 'source /path/to/gef/gef.py'"
+#+end_src
+
+so that =gef hello= will launch the gef-enabled version of gdb on the
+=hello= binary.
+
+** LLDB Scripting
+
+The LLDB debugger API is a shared library that can be used by any
+application.
+
+We start a session and set a breakpoint on line 11 as before
+
+#+begin_src
+lldb walk_tree
+(lldb) breakpoint set -l 11
+(lldb) process launch
+#+end_src
+
+Once we hit the breakpoint, we can enter the interactive python debugger
+with =script=
+
+#+begin_src
+(lldb) script
+#+end_src
+
+From within =script=, there are some variables defined for us, such as
+=lldb.frame= (see more at
+[[https://lldb.llvm.org/use/python-reference.html#embedded-python-interpreter][Embedded
+Python Interpreter]] in lldb docs.) However, outside of =script=, in our
+python scripts, the API is different; we are passed the relevant
+information in arguments instead.
+
+Let's illustrate both, first assuming we've hit the breakpoint on
+=collect_leaves()= and we are inside =script=:
+
+#+begin_src
+>>> lldb.frame.name
+'Node<int>::collect_leaves() const'
+>>> this = lldb.frame.FindVariable("this").
+>>> print(this.deref)
+(const Node<int>) *this = {
+  children = size=0 {
+    std::_Vector_base<Node<int>, std::allocator<Node<int> > > = {
+      _M_impl = {
+        std::_Vector_base<Node<int>, std::allocator<Node<int> > >::_Vector_impl_data = {
+          _M_start = nullptr
+          _M_finish = nullptr
+          _M_end_of_storage = nullptr
+        }
+      }
+    }
+  }
+  value = 2
+}
+>>> print(next(var for var in this.children if var.name == "value"))
+(int) value = 2
+#+end_src
+
+in the last invocation, we print =this->value=.
+
+However, we can now go /one step further/ than GDB, and print
+=this->children.size()= thanks to =EvaluateExpression()=:
+
+#+begin_src
+>>> print(lldb.frame.EvaluateExpression("this->children.size()"))
+(size_type) $6 = 0
+#+end_src
+
+Finally, we define our own LLDB command using Python:
+
+#+begin_src python
+#!/usr/bin/env python
+
+import lldb
+
+def recursive_parameters(debugger, command, exe_ctx, result, internal_dict):
+    """Walk the Node tree backwards and collect values"""
+    del debugger, command, internal_dict
+    parameters = []
+    frame = exe_ctx.frame
+    try:
+        while(frame):
+            this = frame.FindVariable("this")
+            value = next(var for var in this.children if var.name == "value")
+            parameters = [value.value] + parameters
+            frame = frame.parent
+    except:
+        pass
+    result.AppendMessage(f"{parameters}")
+#+end_src
+
+We load and run this command as follows:
+
+#+begin_src
+$ lldb walk_tree
+(lldb) target create "walk_tree"
+Current executable set to 'walk_tree' (x86_64).
+(lldb) command script import my_command.py
+(lldb) command script add -f my_command.recursive_parameters recursive_parameters
+(lldb) breakpoint set -l 11
+Breakpoint 1: where = walk_tree`Node<int>::collect_leaves() const + 72 at walk_tree.cpp:11:29, address = 0x0000000000001678
+(lldb) breakpoint command add 1
+Enter your debugger command(s).  Type 'DONE' to end.
+> recursive_parameters
+> process continue
+(lldb) r
+Process 16028 launched: 'walk_tree' (x86_64)
+(lldb)  recursive_parameters
+['1', '2']
+(lldb)  process continue
+Process 16028 resuming
+Command #2 'process continue' continued the target.
+(lldb)  recursive_parameters
+['1', '3', '5']
+(lldb)  process continue
+Process 16028 resuming
+Command #2 'process continue' continued the target.
+(lldb)  recursive_parameters
+['1', '4']
+(lldb)  process continue
+Process 16028 resuming
+Command #2 'process continue' continued the target.
+2
+5
+4
+Process 16028 exited with status = 0 (0x00000000)
+#+end_src
+
+In fact LLDB has more specific Python abilities for just running Python
+commands on breakpoints (which is a bit simpler than defining a
+command); see
+[[https://lldb.llvm.org/use/python-reference.html#running-a-python-script-when-a-breakpoint-gets-hit][Running
+a python script when a breakpoint gets hit]], but here we explore the
+general case of defining an LLDB command, not just scripting a
+breakpoint.
+
+We can add an =.lldbinit= in the project directory that has the above
+=command script ...= commands and invoke =lldb= with
+=lldb --local-lldbinit= to load it and make our function available
+project-wide.
