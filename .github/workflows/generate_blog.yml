@@ -40,10 +40,10 @@ jobs:
           sudo snap install emacs --classic
       - name: obtain ox-blorg sources
         run: |
-          git clone "https://github.com/createyourpersonalaccount/ox-blorg"
+          git clone "https://github.com/createyourpersonalaccount/ox-blorg" ../ox-blorg
       - name: Run blog makefile
         run: |
-          BLORG_SERVE=1 BLORG_LOAD_PATH=ox-blorg make
+          BLORG_SERVE=1 BLORG_LOAD_PATH=../ox-blorg make
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
