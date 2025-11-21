@@ -1,0 +1,175 @@
+#+TITLE: Connections in Fiber Bundles
+#+DATE: [2025-11-07 Fri]
+
+* An example introducing the main concepts
+
+Connections in geometry are a difficult subject to grasp. We work through the concepts with a simple example.
+
+** Horizontal subbundle
+
+Let us consider consider the fiber bundle \(\pi : Y \to X\) where \(X\) is a line and \(Y\) is a plane. We draw \(X\) curved so that the tangent lines become more apparent:
+
+#+ATTR_HTML: :width 40% :height 40%
+#+CAPTION: The fiber bundle \(Y \to X\), and some tangent spaces of \(Y\) and \(X\).
+#+NAME: fig:connections-1
+[[../img/connections-1.svg]]
+
+In the figure above, the fibers \(Y_x\) of \(Y\) are in grey; the tangent space \(T_yY\) is drawn with the canonical vertical subspace \(V_yY\) visible, and the dotted horizontal line is the missing horizontal space.
+
+This is the important part: while there is a well-defined vertical subbundle \(VY \coloneqq \ker T\pi\) inside \(TY\), there is no horizontal subbundle. The reason is that in the holonomic coordinates \((\dot{x}, \dot{y})\) of the fiber coordinates[fn:holonomic-coordinates] \((x, y)\) the equation \(\dot{x} = 0\) is well-defined (preserved under change of fiber coordinates) but the equation \(\dot{y} = 0\) is not, as I explain [[#well-defined-bundles][later]].
+
+Suppose we had such a horizontal subbundle \(HY\), what could we do with it? If we had a vector field \(\tau\) on \(X\), we could lift it to a vector field \(\Gamma\tau\) on \(Y\):
+
+#+ATTR_HTML: :width 40% :height 40%
+#+CAPTION: Lifting the vector field \(\tau\) of \(X\) onto \(Y\).
+#+NAME: fig:connections-2
+[[../img/connections-2.svg]]
+
+It is not obvious from the figure[fn:integral-curves] above but the lift is performed such that it projects back down to \(\tau\) via \(T\pi\). Since \(T\pi : (\dot{x}, \dot{y}) \mapsto \dot{x}\), the form the vector field must take on \(Y\) is
+
+\begin{align}
+\Gamma : \partial_x & \mapsto \partial_x + C \partial_y, & C \in \mathbb{R}.
+\end{align}
+
+This is all there is to the definition of a connection (from the perspective of horizontal bundles) with two minor details:
+
+1. There should be a transformation law for \(\Gamma\) so that \(C\) stays invariant between different fiber coordinates.
+2. Typical fiber bundles have larger dimensions with coordinates \((x^\lambda, y^i)\) and thus instead of the term \(C\partial_y\) we have \(\Gamma^i_\lambda \partial_i\) involved.[fn:einstein-notation]
+
+[fn:holonomic-coordinates] Fiber coordinates in this example are the coordinates of the \(Y\)-plane and holonomic coordinates are those of its tangent planes. See [cite:@mangiarotti-2000], Ch. 1 for their definitions.
+
+[fn:integral-curves] Something else nonobvious: we have drawn the horizontal subbundle as a foliation. This is only true for flat connections. Furthermore, fiber bundles over the line are special: the line is contractible, connections are flat and represented by vector fields of the total space, and so on.
+
+[fn:einstein-notation] Here we employ Einstein's summation notation.
+
+** Covariant derivative
+
+Connections are typically introduced as a means to differentiate vector fields. If \(s : X \to Y\) is a section and \(\tau : X \to TX\) a vector field, how do we form \(\nabla_\tau s\)? The formula is:
+
+\begin{align}
+\nabla_\tau s & = (\partial_\lambda s^i - \Gamma^i_\lambda)\tau^\lambda \partial_i,
+\end{align}
+
+where \(\Gamma^i_\lambda\) is evaluated at \(s(x)\) (the minus sign is a convention and you may encounter it in either direction.) The result lies in the vertical subbundle \(VY\). When \(Y\) is a vector bundle, there is a canonical identification of \(VY\) with those of \(Y\), and the result can be said to be a section \(\nabla_\tau s : X \to Y\). The term \(\partial_\lambda s^i\) is the only term with first derivatives; other term is a zero-order correction without which the expression would not be coordinate-invariant: if a frame \(e_i\) is given for a vector bundle and a path is given by \(y(t) \coloneqq y^i(t) e_i(t)\), then the derivative \(y'(t)\) contains zero-order terms of the form \(y^i(t)e'_i(t) = y^i(t)\omega_i^j(t)e_j(t)\) which are going to be different for different coordinates; hence the zero-order correction is required.
+
+** Parallel transport
+
+Using the covariant derivative we can introduce parallel transport as the path of \(Y\) solving the equation \(\nabla_{\frac{d\gamma}{dt}} s = 0\) where \(s(0) = s_0 \in T_{y_0}Y\) and \(\gamma(t)\) is a path on \(X\) with \(\gamma(0) = \pi(y_0)\).
+
+We can also view parallel transport from the perspective of horizontal bundles; \(\frac{d\gamma}{dt}\)  lifts to a path \(\Gamma\frac{d\gamma}{dt}\) on \(TY\). The solution \(s(t)\) to the equation \(\frac{ds}{dt} = \Gamma\frac{d\gamma}{dt}\) is the parallel transport of \(s_0\) along \(\gamma\).
+
+With this example we can arrive at a line bundle: if \(Y \to X\) is our fiber bundle and \(\gamma : I \hookrightarrow X\) is our path, then there is a new fiber bundle \(\gamma^*Y \to I\) with connection \(\gamma^*\Gamma\) given by \((\gamma^*\Gamma)\partial_t = \Gamma\frac{d\gamma}{dt}\), or in coordinates \(\partial_t \mapsto \partial_t + \Gamma^i_\lambda\frac{d\gamma^\lambda}{dt}\partial_i\). A common notation for the covariant derivative \(\nabla_{\frac{d\gamma}{dt}}\) of \(\gamma^*\Gamma\) is \(\frac{D}{dt}\).
+
+** Why is the vertical bundle well-defined but the horizontal bundle is not?
+:PROPERTIES:
+:CUSTOM_ID: well-defined-bundles
+:END:
+
+Before demonstrating the answer, let me explain the reason, which is invariance. What does invariance mean? All objects in Mathematics eventually become numbers, (to which I also offer the following quote):
+
+#+begin_quote
+The older I get, the more I believe that at the bottom of most deep mathematical problems there is a combinatorial problem.
+---Israel M. Gelfand, Lecture to Courant Institute (1990)
+#+end_quote
+
+How does this apply for the theory of manifolds? For example, vectors are a set of coordinates, with each coordinate being a number at every point of a coordinate chart. Invariance then becomes the pointwise agreement of these numbers for different charts. This is what the following transition function formula states:
+
+\begin{align}
+\label{eq:holonomic-transition}
+\dot{z}'^\lambda & = \frac{\partial z'^\lambda}{\partial z^\mu}\dot{z}^\mu.
+\end{align}
+
+Invariance can take other more global forms (i.e. not pointwise) such as for example the minimal number of critical points of any function \(f\in C^\infty(M)\) for a given manifold \(M\), or the de Rham cohomology class of some differential form. Those too are just numbers when all abstraction is eliminated, but the process by which they are obtained is different than evaluating functions at a coordinate chart point.
+
+The formula in \eqref{eq:holonomic-transition} is the transition function formula for the holonomic coordinates of \(TZ\) for a manifold \(Z\) (see [cite:@mangiarotti-2000] Ch. 1.) Applied to \(TY\) for a fiber bundle \(Y \to X\) we obtain:
+
+\begin{equation}
+\label{eq:vert-bundle-coords}
+\begin{aligned}
+\dot{x}'^\lambda & = \frac{\partial x'^\lambda}{\partial x^\mu}\dot{x}^\mu + \cancel{\frac{\partial x'^\lambda}{\partial y^i}}\dot{y}^i, \\
+\dot{y}'^i & = \frac{\partial y'^i}{\partial x^\mu}\dot{x}^\mu + \frac{\partial y'^i}{\partial y^j}\dot{y}^j.
+\end{aligned}
+\end{equation}
+
+Note that the cancelled term is because the \(x\)-coordinates are independent of changes in the fibers in tangent bundles. The definition of the vertical bundle \(VY\) is given by \(\dot{x}^\lambda = 0\) locally. To prove that this is an invariant definition, we must prove that if \(\dot{x}^\lambda = 0\) holds in one chart, then \(\dot{x}'^\lambda = 0\) holds in another (the pointwise equality of numbers I alluded to above). Plugging in \(\dot{x}^\lambda = 0\) in \eqref{eq:vert-bundle-coords}, we obtain the following system:
+
+\begin{equation}
+\begin{aligned}
+\dot{x}'^\lambda & = 0, \\
+\dot{y}'^i & = \frac{\partial y'^i}{\partial y^j}\dot{y}^j.
+\end{aligned}
+\end{equation}
+
+The important point here is that the equality \(\dot{x}'^\lambda = 0\) holds in the new chart. On the other hand, setting for example \(\dot{y}^i = 0\), which would be a guess for the a definition of the horizontal bundle, the following equations are obtained instead:
+
+\begin{equation}
+\begin{aligned}
+\dot{x}'^\lambda & = \frac{\partial x'^\lambda}{\partial x^\mu}\dot{x}^\mu, \\
+\dot{y}'^i & = \frac{\partial y'^i}{\partial x^\mu}\dot{x}^\mu.
+\end{aligned}
+\end{equation}
+
+In these new coordinates, the equality \(\dot{y}'^i = 0\) is not preserved, and this is exactly the reason why a definition of the horizontal bundle by \(\dot{y}^i = 0\) is not well-defined.
+
+* Levi-Civita connections in extrinsic geometry
+
+In extrinsic geometry we consider the features of \(N\subset M\) where both \(N, M\) are manifolds; \(M\) is the /ambient space/ and \(N\) is embededed manifold whose geometry we are interested in.
+
+If we have two vector fields \(\overline{u}, \overline{v} : \mathbb{R}^n \to \mathbb{R}^n\) there is a simple method to differentiate \(\overline{v}\) in the direction of \(\overline{u}\) at \(x\in\mathbb{R}^n\):
+
+\begin{align}
+(\overline{\nabla}_{\overline{u}} \overline{v})(x) = \overline{u}^i(x) \frac{\partial \overline{v}}{\partial x_i}(x).
+\end{align}
+
+(Note that as is customary, the connection of the ambient space is given an overline above it.)
+
+Now let us consider a hypersurface \(S\subset \mathbb{R}^n\), with two tangent vector fields \(u, v : S \to \mathbb{R}^n\). (For concreteness, consider the unit sphere \(S^2\) of \(\mathbb{R}^3\).) What should the notion of differentiating \(v\) in the direction of \(u\) be? We cannot compute \(\overline{\nabla}_u v\) as before because \(v\) is not specified on an open subset of \(\mathbb{R}^n\) and thus the differentiation operators \(\frac{\partial}{\partial x_i}\) do not apply. To solve this problem we can extend the domain of \(v\). Obviously, the values that the extension takes far away from \(S\) do not matter. We may assume that we have an extension \(\overline{v}\) of \(v\) that is defined on an open subset containing \(S\) and such that \(\overline{v}(x) = v(x)\) for \(x\in S\).
+
+Now we can compute \(u^i(x) \frac{\partial \overline{v}}{\partial x_i}(x)\) on \(x\in S\), but the result will depend on the extension \(\overline{v}\), so that different extensions yield different results. As it turns out, the difference of that quantity in two different extensions lies in the normal bundle \(NS\), that is, normal to the tangent spaces of \(S\). Since that quantity agrees in the tangent directions it makes sense to project the result to \(TS\). Let \(p : T \mathbb{R}^n \to TS\) be the projection and define \(\nabla\) for \(TS\) as follows:
+
+\begin{align}
+(\nabla_u v)(x) & \coloneqq p\left(u^i(x) \frac{\partial \overline{v}}{\partial x_i}(x)\right), & x \in S.
+\end{align}
+
+The two characteristic properties of the Levi-Civita connection are satisfied by \(\nabla\), and thus it is the Levi-Civita connection of \(S\) with the induced metric \(g\) from the embedding into \(\mathbb{R}^n\), where we equip \(\mathbb{R}^n\) with the standard Euclidean metric.
+
+* Intuitive understanding of Christoffel symbols
+
+Very late into my quest to understand these concepts it occurred to me that it would be beneficial to look at the simplest possible example, e.g. polar coordinates in two dimensions. This case is very nicely explained in a YouTube video by user 'Dialect'.[cite:@dialect-2023] We will summarize the crux of it here.
+
+Suppose that we start with the Riemannian manifold of the plane in Cartesian coordinates equipped with the standard metric; then we consider polar coordinates on this manifold. The metric on those coordinates takes the following form:
+
+\begin{align}
+g = \begin{pmatrix}
+1 & 0 \\
+0 & r^2
+\end{pmatrix}.
+\end{align}
+
+The fact that the metric is diagonal means that the basis \(\{\partial_r, \partial_\theta\}\) is transported into Cartesian coordinates again as an orthogonal basis. The diagonal entries of the metric tell us that the \(\partial_r\) vector has unit length while \(\partial_\theta\) has length \(r\).
+
+The metric then captures lengths and angles of the basis, but it does not capture how the basis itself rotates. In fact, the basis rotates counterclockwise at an angle of \(d\theta\). To reiterate the point, since metric components are given by \(g_{ij} = g(\partial_i, \partial_j)\), the metric can only capture the changes of the basis vectors relative to one another, and not the rotation that happens to the basis as a whole.
+
+This rotation is instead captured by the Levi-Civita connection (these equations give all the Christoffel symbols):
+
+\begin{align}
+\nabla_r \partial_r & = 0, \\
+\nabla_r \partial_\theta & = \frac 1r \partial_\theta, \\
+\nabla_\theta \partial_r & = \frac 1r \partial_\theta, \\
+\nabla_\theta \partial_\theta & = -r\partial_r.
+\end{align}
+
+To obtain the above formulas one only has to sketch the basis \(\{\partial_r, \partial_\theta\}\) in the three points \((r, \theta)\), \((r + dr, \theta)\), and \((r, \theta + d\theta)\) on the Cartesian plane.
+
+* Flat connections and holonomy
+
+Now let us consider two different (line) bundles over \(S^1\), the cylinder and the Möbius band. The cylinder may be identified with \(TS^1\) while the Möbius band is obviously a distinct vector bundle due to its twist. Both may be given a vanishing connection. We can see this from the identifications:
+
+\begin{align}
+TS^1 & \cong \mathbb{R}^2 / {\sim_\phi}, &\quad \phi(x,y) & = (x + 1, y), \\
+\text{M\"obius} & \cong \mathbb{R}^2 / {\sim_\psi}, &\quad \psi(x,y) & = (x + 1, -y).
+\end{align}
+
+Although for both \(\nabla = 0\), their holonomy groups \(\Hol(\nabla)\) differ; for the cylinder it is trivial and for the Möbius band it is \(\mathbb{Z}_2\). Hence, \(\nabla\) itself does not capture the twisting of the bundle, i.e. it does not by itself tell the full story.
+
+It is also interesting to note that a trivial holonomy \(\Hol(\nabla) = 1\) for any vector bundle implies that the bundle is trivial. The reason is that any given frame \(e_i\) at a point can be parallel-transported to its entire path-connected component, trivializing it.
