@@ -14,4 +14,7 @@ $\DeclareMathOperator{\lcm}{lcm}$
 $\DeclareMathOperator{\seq}{seq}$
 $\DeclareMathOperator{\var}{var}$
 $\DeclareMathOperator{\Hol}{Hol}$
+$\DeclareMathOperator{\SL}{SL}$
+$\DeclareMathOperator{\Spin}{Spin}$
+$\DeclareMathOperator{\Sp}{Sp}$
 #+HTML: </div>

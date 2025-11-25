@@ -1,0 +1,67 @@
+#+TITLE: Connections in Physics
+#+DATE: [2025-11-22 Sat]
+
+* Notes
+
+** Special relativity
+
+The Minkowski spacetime is a \(4\)-dimensional real affine space \(\mathcal{M}\). An affine coordinate chart on \(\mathcal{M}\) is a choice of basis \(e_0, \dots, e_3\) of \(\mathbb{R}^4\) and an origin point \(O\in \mathcal{M}\), uniquely determining \(x^\lambda(P)\) for any \(P\in \mathcal{M}\); we further set \(x^0 = ct, x^1 = x, x^2 = y, x^3 = z\) where \(c>0\), and equip \(\mathcal{M}\) with the /Minkowski inner product/ \(2\)-form \(ds^2 = -c^2dt^2 + dx^2 + dy^2 + dz^2 = \eta_{\lambda\mu}dx^\lambda dx^\mu\).
+
+The transformations of \(\mathbb{R}^4\) which preserve the form of \(\eta\) compose the /Poincare group/.
+
+* TODO To read
+
+** TODO [#A] Principal G-bundles
+
+*** TODO Mangiarotti [cite:@mangiarotti-2000]
+
+The entire chapter 6 contains all the relevant information.
+
+I need to read it carefully because it is new material and confusing. For example:
+
+- [ ] why is there both a left Lie algebra \(\mathfrak{g}_l\) and a right Lie algebra \(\mathfrak{g}_r\)?
+- [ ] What is a reduction of a principal G-bundle?
+  See Remark 6.5.2 in p. 183. In particular Theorem 6.5.1 says that the structure group \(G\) reduces to \(H\) if and only if \(P\) has an atlas with \(H\)-valued transition functions.
+- [ ] Why is the Mauer-Cartan formula \(d\phi(\epsilon_1, \epsilon_2) = -\frac{1}{2}\phi([\epsilon_1, \epsilon_2])\) holding true? In this vein, I might be aided by Chern [cite:@bams/1183527777] chapter 3. Ah; Mangiarotti has written the formula wrong by a factor of \(\frac{1}{2}\).
+
+** TODO Special relativity
+
+*** TODO Wald [cite:@wald-2022]
+
+Chapter 8 for special relativity and electromagnetism and chapter 9 for electromagnetism as a connection in special and general relativity as well as electromagnetism as a \(U(1)\) theory.
+
+*** TODO Carroll [cite:@carroll-2003]
+
+Chapter 1 details special relativity. Chapter 4 for general relativity.
+
+*** TODO Hughston, Tod [cite:@hughston-tod-1991]
+
+Chapter 3 on special relativity contains a lot of pictures.
+
+- p. 9 motivates the stress tensor from the ideal fluid example; derives Euler's equations of motion and conservation equations of energy. Furthermore, explains that the tensor requires faith/imagination when generalized in general relativity. The three-body problem in GR becomes a two-body problem: the third body is /gravitational radiation/!
+- Continue from 3.2.
+
+*** TODO Frè [cite:@fre-2012]
+
+Chapter 1 introduces special relativity rigorously. Spinors in Appendix A.
+
+** TODO Naber [cite:@naber-2011]
+
+Chapter 3 for spinors. Rewrites Maxwell's equations into
+
+\begin{align}
+\nabla^{A\dot{X}}\phi_{AB} & = 0, & A = 0,1, \quad \dot{X} = \dot{1}, \dot{0}.
+\end{align}
+
+Generalizations of the above equations such as the /Weyl neutrino equation/:
+
+\begin{align}
+\nabla^{A\dot{X}}\phi_A & = 0, & \dot{X} = \dot{1}, \dot{0}.
+\end{align}
+
+Requires understanding the /spin map/ \(\Spin : \SL(2, \mathbb{C}) \to \mathcal{L}\), where \(\mathcal{L}\) is the Lorentz group.
+
+** TODO Naber [cite:@naber-2010]
+
+Chapter 6 talks about connections on principal G-bundles. Interesting in p. 344 the equivalence between connections is discussed, called the /moduli space of connections/ on a bundle. Yang-Mills functional in 6.3. Note that there is a lot of discussion around the quarternionic Hopf bundle and \(\SL(2, \mathbb{H})\). The Atiyah-Hitchin-Singer theorem in §6.5 has the moduli space of connections for that bundle computed as \(\SL(2, \mathbb{H})/{\Sp(2)}\).
+
