@@ -13,4 +13,5 @@ $\DeclareMathOperator{\supp}{supp}$
 $\DeclareMathOperator{\lcm}{lcm}$
 $\DeclareMathOperator{\seq}{seq}$
 $\DeclareMathOperator{\var}{var}$
+$\DeclareMathOperator{\Hol}{Hol}$
 #+HTML: </div>
