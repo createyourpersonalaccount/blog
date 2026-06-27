@@ -1,0 +1,24 @@
+#+TITLE: Note on bicharacteristics
+#+DATE: [2026-01-16 Fri]
+
+* Bicharacteristics
+
+Let \(H \colon T^*M \to \mathbb{R}\) be a Hamiltonian function and consider the differential equation
+
+\begin{align}
+H(d\psi) & = 1.
+\end{align}
+
+The equation \(H = 1\) defines a hypersurface \(\Sigma\) and the graph of the solution \(\psi\) defines a Lagrangian submanifold \(L \subset T^*M\). The differential equation is equivalent to \(L \subset \Sigma\).
+
+Now consider the Hamiltonian vector field \(X\) defined using the canonical symplectic form of the cotangent bundle. The hypersurface \(\Sigma\) is foliated by the integral curves, which are called /bicharacteristics/. When restricting \(X\) to \(L\), the bicharacteristics also foliate \(L\): note that for any tangent vector \(\xi \in TL\), we have \(\omega(X, \xi) = dH(\xi) = 0\), since \(H\) is constant on \(\Sigma\); by definition of Lagrangian submanifolds, this implies that \(X \in TL\).
+
+Now let \((x^\lambda, p_i)\) be an integral curve of \(X\) contained in \(L\), which means that \(p(t) = d\psi(x(t))\) for all \(t\). We have:
+
+\begin{align}
+\frac{d}{dt}\psi(x(t)) = \langle p(t), \dot{x}(t)\rangle.
+\end{align}
+
+Thus we may integrate the right hand side to obtain \(\psi\) on \(x(t)\).
+
+For a concrete example using Maxwell's equations see Guillemin and Sternberg, Geometric Asymptotics, Chapter III.

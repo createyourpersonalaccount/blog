@@ -56,6 +56,71 @@
                  (ox-blorg-ensure-suffix "/" (or (locate-dominating-file "." "index.org") ""))
                  ox-blorg-publishing-directory)))))
 
+;;; MathJax tex.macros
+
+(defun mathops-to-mathjax (file)
+  "Convert \\DeclareMathOperator lines in FILE into a MathJax tex.macros string.
+
+Note that there should only be one \\DeclareMathOperator per line, does
+not work with operator arguments."
+  (with-temp-buffer
+    (insert-file-contents file)
+    (let ((macros '()))
+      (goto-char (point-min))
+      (while (re-search-forward
+              "\\\\DeclareMathOperator{\\\\\\([^}]+\\)}{\\(.*\\)}"
+              nil t)
+        ;; Escape backlashes for JS strings
+        (let ((name (match-string 1))
+              (body (string-replace "\\" "\\\\" (match-string 2))))
+          (push (format "%s: \"\\\\operatorname{%s}\""
+                        name body)
+                macros)))
+      (string-join (nreverse macros) ",\n        "))))
+
+(setq org-html-mathjax-template
+      (concat
+       ;; #1
+       "<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '%MULTLINEWIDTH'
+      },
+      tags: '%TAGS',
+      tagSide: '%TAGSIDE',
+      tagIndent: '%TAGINDENT',
+      macros: {
+        "
+       ;; #2
+       (mathops-to-mathjax "latex/mymathops.sty")
+       ;; #3
+       "
+      }
+    },
+    chtml: {
+      scale: %SCALE,
+      displayAlign: '%ALIGN',
+      displayIndent: '%INDENT'
+    },
+    svg: {
+      scale: %SCALE,
+      displayAlign: '%ALIGN',
+      displayIndent: '%INDENT'
+    },
+    output: {
+      font: '%FONT',
+      displayOverflow: '%OVERFLOW'
+    }
+  };
+</script>
+
+<script
+  id=\"MathJax-script\"
+  async
+  src=\"%PATH\">
+</script>"))
+
 ;;; Bibliographic files.
 (setq org-cite-global-bibliography `(,(expand-file-name "bibliography.bib")))
 (setq org-cite-export-processors `((t . (csl ,(expand-file-name "elsevier-with-titles.csl")))))

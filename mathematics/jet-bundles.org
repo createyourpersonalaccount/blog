@@ -1,0 +1,54 @@
+#+TITLE: Jet bundles
+#+DATE: [2025-11-29 Sat]
+
+* Introduction
+
+The point of this article is to serve as an easy introduction to jet bundles.
+
+Jet bundles are useful for those studying connections (see my article [[file:connections-in-fiber-bundles.org][connections in fiber bundles]] for an introduction to connections). They have other uses too, but this was my motivating factor to study them. In short, jet bundles record Taylor expansion coefficients. Indeed, for instance \(j^1_x s\) is the tuple \((x, s(x), \partial_\lambda s(x))\) for all indices \(\lambda\). As a very simple example, we can consider the bundle \(\mathbb{R}^2\to \mathbb{R}\) with first jet bundle diffeomorphic to \(\mathbb{R}^3\) as a manifold. However, this diffeomorphism misses the point: jet bundles come with a special coordinate atlas, where more interesting computations can be made, similar to how a tangent bundle has holonomic coordinates that transform via \(\dot{x}'^\lambda = \frac{\partial x'^\lambda}{\partial x^\mu} \dot{x}^\mu\) (a priori in a general manifold such atlas cannot be assumed!) What really matters then is to specify what the transition functions are for a pair of coordinate charts.
+
+There is one more way in which the jet bundles are distinguished from general bundles; a lifting property. For instance, we may lift a section \(s : X \to Y\) to a section of \(J^1Y \to X\) via \(x \mapsto j^1_x s\).
+
+** Transition functions
+
+Given a fiber bundle \(\pi : Y \to X\) with local coordinates \((x^\lambda, y^i)\), we define the following. For sections \(s,r : X \to Y\), we have an equivalence at \(x\in X\) with equivalence class \(j^1_x s\) given by \(s \sim r\) iff \(s(x) = r(x)\) and \(\partial_\lambda s(x) = \partial_\lambda r(x)\) for all \(\lambda\). This is well-defined, as the chain rule demonstrates; we will show this momentarily. The collection of equivalence classes as \(x\) and \(s\) range over their domains constitutes of the /first-order jet bundle/ \(J^1Y\), which comes with adapted coordinates \((x^\lambda, y^i, y^i_\lambda)\) that map \(j^1_x s\) to \((x^\lambda, s^i(x), \partial_\lambda s^i(x))\). We have from the chain rule:
+
+\begin{align}
+y'^i_\lambda = \frac{\partial x^\mu}{\partial x'^\lambda}(\partial_\mu + y^j_\mu \partial_j)y'^i.
+\end{align}
+
+(In particular if \(\partial_\mu s^j = \partial_\mu r^j\)  at \(x\) for all indices then \(\partial'_\lambda s^i = \partial'_\lambda r^i\) at \(x\) for all indices.)
+
+** Points are splittings
+
+A point \((x^\lambda, y^i, y^i_\lambda) \in J^1Y\) over \(y = (x^\lambda, y^i)\) defines a right splitting of the linear spaces
+
+\begin{align}
+0 \xrightarrow{} V_yY \xrightarrow[Y]{} T_yY \xrightarrow[Y]{} T_yX \xrightarrow{} 0,
+\end{align}
+
+via the map
+
+\begin{align}
+\partial_\lambda \mapsto \partial_\lambda + y^i_\lambda \partial_i.
+\end{align}
+
+This explains why connections may be viewed as 
+
+This property illustrates why the first jet bundle is related to connections, which may be viewed as a splitting of the corresponding bundle sequence.
+
+** A tricky but simple computation with the total derivative
+
+The total derivative, denoted by \(d_\lambda\) or \(\frac{d}{dx^\lambda}\), is defined on \(J^1Y\) as
+
+\begin{align}
+d_\lambda \coloneqq \partial_\lambda + y^i_\lambda \partial_i.
+\end{align}
+
+Here's a little trick:
+
+\begin{align}
+d_\lambda y^i = y^i_\lambda.
+\end{align}
+
+You may think this comes from \(\partial_\lambda y^i\), but that term is zero; it instead comes from \(\frac{\partial y^i}{\partial y^i} = 1\).

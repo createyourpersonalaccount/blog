@@ -1,0 +1,231 @@
+#+TITLE: Electromagnetism as a gauge theory
+#+DATE: [2025-12-15 Mon]
+
+* Introduction
+
+Maxwell's equations specify the div \(\nabla\cdot\) and the curl \(\nabla\times\) of \(\boldsymbol{E}\) and \(\boldsymbol{B}\). The equations involving the cross product also have a term of a time derivative \(\partial_t\) of the other field.
+
+Both div and curl can be written as exact differential forms and Stokes' theorem may be applied in the integral form of these equations to obtain a macroscopic interpretation on surfaces (in the case of div) and loops (in the case of curl). These experiments are [[https://en.wikipedia.org/wiki/Gauss%27s_law][Gauss's flux theorem]], [[https://en.wikipedia.org/wiki/Faraday%27s_law_of_induction][Faraday's law of induction]], and [[https://en.wikipedia.org/wiki/Amp%C3%A8re%27s_circuital_law][Ampère's circuital law]].
+
+The equations contain a positive constant \(c\) which they predict to be the /speed of light/, i.e. the speed with which the wavefronts of electromagnetic radiation travel. This becomes an issue: these equations are written in a specific coordinate system \(\boldsymbol{x}\). With a different coordinate system \(\boldsymbol{x'}\) whose axes are parallel but whose center is at \(\boldsymbol{v}t\), there is a contradiction that \(c = c + v\). In other words, they seem to require a preferred origin with which to measure velocities. We have no preferred point of origin in nature, and this led others to look for a formulation of the equations in some affine space; Minkowski spacetime is the answer.
+
+There is yet another quantity, aside from the wavefront velocity, that arises in the solutions of these equations: the /phase/ of the waves, a unit complex number \(e^{i\theta}\). These numbers with multiplication form the group \(U(1)\).  The number \(\theta\) varies with time, but yet again we have discovered a preferred origin since \(\theta\) is an element of the vector space \(\mathbb{R}\). In nature we can only meaningfully measure the difference \(\Delta\theta\) between two measurements of \(\theta\), and there is no distinguished \(0\) phase. Principal \(G\)-bundles are spaces with a group action where the identity element of the group is "forgotten"[fn:forgotten]; this is the exact geometric concept required.
+
+The electromagnetic field, or more correctly its potential, then becomes a principal connection of the principal \(U(1)\)-bundle. However, this formalism is only required if we decide to couple electromagnetism to a matter field: after all, to measure phases we must use matter interactions.
+
+[fn:forgotten] In general, a principal \(G\)-bundle does not have a global (group) unit section: those that do are trivial bundles. Thus for non-trivial bundles the fibers do not have a distinguished identity element.
+
+* TODO Electromagnetism as a gauge theory
+
+We will quickly show how the theory is formulated as a gauge theory, and in the next sections we will attempt to explain all of the mathematics that we introduced.
+
+Lying in the background of the solution \(\boldsymbol{E}\) and \(\boldsymbol{B}\) are the electric potential \(\phi\) and the magnetic potential \(\boldsymbol{A}\). These potentials may be used to obtain \(\boldsymbol{E}\) and \(\boldsymbol{B}\) by differentiation, but they are not unique. They have experimental significance, as they can be measured, e.g. in the [[https://en.wikipedia.org/wiki/Aharonov%E2%80%93Bohm_effect][Aharonov–Bohm effect]], and therefore should be considered central to the theory of electromagnetism. Given a principal connection \(A_\mu\) (also called a /gauge/) of the principal \(U(1)\)-bundle \(P = \coloneqq \mathcal{M}\times U(1)\), where \(\mathcal{M}\) is Minskowski spacetime, we may form the curvature \(F_{\mu\nu} = \partial_\mu A_\nu - \partial_\nu A_\mu\) (also called the /field strength/). The Yang-Mills \(L^2\) energy \(\int \|F\|_2~dV\) (this expression makes use of the metric) is minimized for curvatures with \(\partial^\mu F_{\mu\nu} = 0\). This equation together with the Bianchi identity for \(F_{\mu\nu}\) consist of Maxwell's equations. A solution is then a principal connection \(A_\mu\) satisfying these equations. Given any section \(s\) of \(P \to \mathcal{M}\) we may take the pullback \(s^*A\), and recall that for a trivialization \(\psi : \pi^{-1}(U) \to U \times G\) we have a local unit section \(s(x) = \psi^{-1}(x,1)\) of \(P \to \mathcal{M}\), which is the section we will use to pull back the connection on \(U\), which is what physicists call /gauge fixing/. The effect of the section \(s\) is to choose an origin for each copy of \(U(1)\) over \(\mathcal{M}\), and thus, together with coordinates \(x^\mu\), we can think of these choices as a coordinate chart for \(P\), on which we write down Maxwell's equations.
+
+** TODO Fix the notation \(A_\mu\) since the gauge depends not only on the four spacetime coordinates \(x^\mu\) but also the gauge coordinate too
+
+* Principal \(G\)-bundles
+
+A Lie group \(G\) comes with the maps
+
+\begin{align}
+L_g, R_g, C_g : G \to G
+\end{align}
+
+for left and right multiplication, and conjugation, by \(g\in G\). Trivially, the left and right multiplication commute with one another, which is useful for proofs of other properties. Taking the tangent map, we obtain
+
+\begin{align}
+TL_g, TR_g, TC_g : TG \to TG,
+\end{align}
+
+and in particular
+
+\begin{align}
+TL_g, TR_g : T_1G & \to T_gG, \\
+C_g : T_1G & \to T_1G.
+\end{align}
+
+1. We can use left and right multiplication to lift any vector in \(T_1G\) into a vector field. In particular, for any \(\varepsilon \in T_1G\) define the vector field \(\xi_g \coloneqq TL_g\varepsilon\). It is a left-invariant vector field in the sense that \(TL_g\xi = \xi\) for any \(g\in G\). The collection makes up the Lie algebra of left-invariant vector fields \(\mathfrak{g}_l\), and similarly by using \(TR_g\varepsilon\) we have \(\mathfrak{g}_r\), the right-invariant vector fields. We may denote this lift by \(\varepsilon^{\#}\) for \(\varepsilon \in T_1G\) with the left or right action inferred by context.
+   1. The tangent bundle \(TG\) is trivial: choose a basis \(\varepsilon_p\) of \(T_1G\) and lift it to global left-invariant sections \(\varepsilon^{\#}_p\) of \(TG\) that form a basis of its tangent spaces, thus \(TG \underset{G}{\cong} G\times\mathfrak{g}_l\).
+2. \(G\) is realized as a subgroup of \(\Aut(\mathfrak{g}_r)\):
+
+   \begin{equation}
+   \label{eq:Ad}
+   \begin{aligned}
+   \Ad : G & \to \Aut(\mathfrak{g}_r) \\
+   \Ad g : \xi & \mapsto TL_g\xi.
+   \end{aligned}
+   \end{equation}
+
+   This representation is called the /adjoint representation/. Similarly there is an representation on \(\mathfrak{g}_l\) by \(\xi \mapsto TR_{g^{-1}}~\xi\).
+   1. Note that right-invariantly lifting \((TL_g \varepsilon^{\#})(1) = TC_g\varepsilon\) results back in \(TL_g \varepsilon^{\#}\) again.
+      Thus \(\Ad g\) may also be viewed as a map \(T_1G \to T_1G\) given by \(TC_g \varepsilon\).
+   2. Taking the tangent map of \eqref{eq:Ad} at the identity results in
+
+      \begin{align}
+      \ad : T_1G \to \End(\mathfrak{g}_r).
+      \end{align}
+      This is the /adjoint representation/ of \(\mathfrak{g}_r\) in itself (by identifying \(T_1G\) with \(\mathfrak{g}_r\)).
+3. The flow of a given invariant vector field \(\varepsilon^{\#}\) yields paths \(\Psi^g_t\in G\) about each specified \(g\in G\). The flow at \(g = 1\) is denoted by \(t \mapsto \exp(t\varepsilon^{\#})\). For right-invariant vector fields we have \(\Psi^g_t = \exp(t\epsilon^{\#})g\) and for left-invariant vector fields we have \(\Psi^g_t = g\exp(t\epsilon^{\#})\). The inverse of \(\exp(\varepsilon^{\#})\) around a neighborhood of \(0\) of \(T_1G\) is \(\log g\). Note that the logarithm cannot be defined on components other than the identity component of \(G\); and it may be multi-valued far away from the identity element of \(G\), consider e.g. \(z = e^{i\theta} \in U(1)\) with any \(\theta + 2\pi \mathbb{Z}\) mapping exponentially to the given \(z\).
+   1. The flow induces an invariant vector field via
+
+      \begin{align}
+      \xi_g \coloneqq \left.\frac{d}{dt}\right|_{t=0} \Psi^g_t.
+      \end{align}
+   2. The flow induces a flow to any manifold \(Z\) acted upon by \(G\) (say on the right) via \(z(t) \coloneqq z_0\Psi^g_t\). Consequently the invariant vector fields of \(G\) lift to \(Z\). A chosen basis \(\varepsilon_p\) of \(T_1G\) corresponds to the /fundamental vector fields/ of \(Z\).
+   3. We may equivalently lift invariant vector fields without using the flow as follows: the right action \(R_z : G \to Z\) defined by \(R_z(g) \coloneqq zg\) yields, taking the tangent map, the map \(TR_z : T_1G \to T_zZ\). Thus \(\varepsilon \in T_1G\) maps to the vector field \(z \mapsto TR_z\varepsilon\).
+    
+** TODO Compare 2.3.2 to 6.1.20
+
+For example, in electromagnetism, why are the fiber derivative terms zero? In non-abelian gauges, why are they not zero? ChatGPT seems to think that the fiber derivatives are related to the structure constants somehow.
+
+** TODO do we have \(\ad (\varepsilon)(\xi) = \ad (\varepsilon^{\#}_g)(\xi)\) for all \(g\in G\) and \(\varepsilon \in T_1G\)? If not, what do we have?
+
+Is perhaps \(\Ad\) involved? I'm thinking:
+
+\begin{align}
+\left.\frac{d}{dt}\right|_{t=0} (\Ad \Psi^1_t)(\xi) = \left.\frac{d}{dt}\right|_{t=0} (\Ad \Psi^g_t)(\xi)
+\end{align}
+
+and using \(\Psi^g_t = \Psi^1_tg\).
+
+* Spinors
+
+A review of Lawson and Michelsohn [cite:@lawson-1990].
+
+Let \(V\) a vector space over the field \(k\) (for ease of analysis we assume \(k = \mathbb{R}\) or \(k = \mathbb{C}\) and the reader is advised to read [cite:@lawson-1990] for general fields), and \(q : V \to k\) a quadratic form[fn:quadratic-form], viz. \(q(\lambda v) = \lambda^2 q(v)\) for \(v\in V\) and \(\lambda\in k\). It is associated with a symmetric form, called the /polarization form/, \(q(v,w) \coloneqq \frac 12 (q(v + w) - q(v) - q(w))\). On the whole this forms a category with \(f : (V,q) \to (V', q')\) when \(f : V \to V'\) and \(f^*q' = q\).
+
+The Clifford algebra \(\Cl(V,q)\) is defined as
+
+\begin{align}
+\Cl(V,q) \coloneqq \underbrace{\otimes^*V/(v\otimes v + q(v)1 : v \in V)}_{{\mathscr{T}(V)}/{\mathscr{I}_q(V)}}.
+\end{align}
+
+Aside from determining the squares of vectors, this construction determines the anticommutator of vectors:
+
+\begin{align}
+\label{eq:anticommutator}
+vw + wv = -2q(v,w)1.
+\end{align}
+
+The Clifford algebra is a functorial construction with \(f : (V, q) \to (V', q')\) inducing \(\Cl(f) : \Cl(V, q) \to \Cl(V', q')\). The orthogonal group \(O(V,q) \coloneqq \{f \in \GL(V) : f^*q = q\}\) hence has a representation on \(\Cl(V,q)\) via \(f \mapsto \Cl(f)\).
+
+** Structural comparison to \(\Lambda^*V\)
+
+The tensor order filtration of \(\mathscr{T}(V)\) transfers to \(\Cl(V,q)\) and summing its successive quotients we obtain the /associated graded algebra/ \(\mathscr{G}^*\). It's easy to show that the projection \(\mathscr{T}(V) \to \mathscr{G}^*\) is zero on \(\Sym^*(V)\) via the anticommutator property \eqref{eq:anticommutator}, thus the map reduces to \(\Lambda^*V \to \mathscr{G}^*\), which may be shown to be an isomorphism of graded algebras. For example, \(v\wedge v = 0\) in \(\Lambda^*V\) and similarly in \(\mathscr{G}^*\) we have \(v^2 = -q(v)1 \equiv 0\) in \(\mathscr{G}^1\). Yet, \(v^2 \not = 0\) in \(\Cl(V,q)\) as long as \(q\not = 0\) and this is why the Clifford algebra may be considered an enhancement of \(\Lambda^*V\), and loosely stated, its multiplication agrees "in top order" with it. Another example: \(uvw = -vuw - 2q(u,v)w\) in the Clifford algebra, which agrees in top order with \(u\wedge v \wedge w = -v\wedge u \wedge w\).
+
+** The adjoint map
+
+We will pursue an algebraic inquiry that will lead to geometric results. The motivational question here is to understand the adjoint
+
+\begin{align}
+\Ad_\varphi(x) & \coloneqq \varphi x\varphi^{-1}.
+\end{align}
+
+By its definition it requires that \(\varphi\) is invertible. We are thus led to our first definition, the Lie[fn:warn] group \(\Cl^\times(V,q)\) of invertible elements of the Clifford algebra. It is easy to see that we have the /adjoint representation/ of \(\Cl^\times(V,q)\) on \(\Cl(V,q)\) via \(\Ad\).
+
+For \(v\in V\) with \(q(v) \not = 0\), we have \(\Ad_v \circ \Ad_v = \Ad_{v^2} = \operatorname{Id}\) since \(v^2 = -q(v) \in k^\times\), and in particular \(\Ad_v\) bijective on \(\Cl(V,q)\).
+
+There is a very useful formula[fn:reflection] that arises for elements \(v,w\in V\) with \(q(v) \not = 0\):
+
+\begin{align}
+\label{eq:reflection}
+-\Ad_v(w) = w - \frac{2q(v,w)}{q(v)}v.
+\end{align}
+
+We note that \(-\Ad_v(v) = -v\) and for the hyperplane \(v^q \coloneqq \{w\in V : q(v,w) = 0\}\) we note that \(\Ad_v(v^q) = v^q\). Since \(V\) splits as \(v^q \oplus kv\) we have that \(-\Ad_v\) is a reflection across \(v^q\). Furthermore, this formula shows \(\Ad_v(w) \in V\) and together with its bijectivity we obtain that \(\Ad_v\) is an automorphism of \(V\); it is easy to show \(q(\Ad_v(w)) = q(w)\), thus:
+
+\begin{align}
+\label{eq:representation}
+\left.\Ad_v\right|_{V} \in \Aut(V,q).
+\end{align}
+
+This is an important property, because it means that \(\Ad_v = \Cl(\left.\Ad_v\right|_V)\); furthermore we are now in geometric territory as another name for \(\Aut(V,q)\) is the orthogonal group \(O(V,q)\), and we will switch to this notation now. We are now led to consider the subgroup of all \(\varphi\in\Cl^\times(V,q)\) for which we have the equivalent of \eqref{eq:representation}:
+
+\begin{align}
+\boldsymbol{P}(V,q) \coloneqq \{\varphi \in \Cl^\times(V,q) : \left.\Ad_\varphi\right|_V\in O(V,q)\}.
+\end{align}
+
+In general it is difficult[fn:invertibility] to compute \(\boldsymbol{P}(V,q)\). Inside it lies the subgroup generated by \(v\in V\) with \(q(v)\not = 0\) which is easily computable:
+
+\begin{align}
+P(V,q) \coloneqq \langle v \in V : q(v) \not = 0\rangle.
+\end{align}
+
+Indeed if \(\varphi = v_1 \cdots v_k \in P(V,q)\) then \(\Ad_\varphi = \Ad_{v_1}\circ \cdots\circ \Ad_{v_k}\) is in \(O(V,q)\) when its domain is restricted to \(V\).
+
+Now we wish to understand how these groups map to \(O(V,q)\) by the adjoint: whether the maps are surjective, and if we can obtain a good description of the fibers of the maps. Ultimately this will lead us to useful geometric results when \(V\) is finite dimensional.
+
+** On finite dimensional Clifford algebras
+
+Now assume that \(V\) is of finite dimension \(n\) over the field \(k\) and that the form \(q\) is nondegenerate, and let \(e_1, \dots, e_n\) be a \(q\)-orthogonal basis of \(V\) that we will use for computations. We define the /twisted adjoint/ by
+
+\begin{align}
+\Ad'_\varphi(x) &= \alpha(\varphi)x\varphi^{-1}.
+\end{align}
+
+(Here the involution \(\alpha(v) \coloneqq -v, v \in V\) is extended on \(\Cl(V,q)\) via the \(\Cl\) functor and \(Cl^0(V,q)\) is the set of elements that are fixed by \(\Cl(\alpha)\).)
+
+We have the following results of interest:
+
+1. We have \(\Ad' : \boldsymbol{P}(V,q) \to O(V,q)\), i.e. \(\Ad'\) preserves \(q\).
+2. The kernel of \(\Ad'\) on \(\boldsymbol{P}(V,q)\) is \(k^\times\).
+3. The map \(\Ad' : P(V,q) \to O(V,q)\) is surjective (and consequently from \(\boldsymbol{P}(V,q)\) as well.)
+
+The first result requires the notion of a norm, so let us first take care of the other two. Let us calculate the kernel of the twisted adjoint.[fn:adjoint-kernel] For \(v = e_{i_1}\cdots e_{i_m} \in P(V,q)\)  we have \(\Ad'_v(e_{i_1}) = e_{i_1}\) iff \(q(e_{i_1})e_{i_2}\cdots e_{i_m} = -q(e_{i_1})e_{i_2}\cdots e_{i_m}\) which is a contradiction; thus if we set \(k_0^\times \coloneqq q(V)\) we have \(\ker \Ad' = k_0^\times\) in \(P(V,q)\) and also \(\ker\Ad' = k^\times\) in \(\boldsymbol{P}(V,q)\) with similar computations.
+
+Reflections as in \eqref{eq:reflection}, by the [[https://en.wikipedia.org/wiki/Cartan%E2%80%93Dieudonn%C3%A9_theorem][Cartan-Dieudonné theorem]], compose into \(O(V,q)\), and thus we have that \(\Ad' : P(V,q) \to O(V,q)\) is surjective. By defining \(SP(V,q) \coloneqq P(V,q)\cap\Cl^0(V,q)\) we also have that \(\Ad' : SP(V,q) \to SO(V,q)\) is surjective.
+
+The norm[fn:norm] is defined by
+
+\begin{align}
+\operatorname{N}(\varphi) & \coloneqq \varphi\alpha(\varphi)^t.
+\end{align}
+
+This definition yields \(\operatorname{N}(v) = q(v)\) for vectors \(v\in V\) and is multiplicative so that \(\operatorname{N}(\varphi\psi) = \operatorname{N}(\varphi)\operatorname{N}(\psi)\). It is a homomorphism \(\operatorname{N} : \boldsymbol{P}(V,q) \to k^\times\), which can be seen by starting from the observation that we may apply the transpose to \(\Ad'_\varphi v \in V\) for \(\varphi\in\Cl^\times(V,q)\) and \(v\in V\) which yields after a small calculation that \(\alpha(\varphi^t)\varphi \in \ker\Ad' \cap \boldsymbol{P}(V,q)\), from which the result follows. Another quick calculation yields \(q(\Ad'_\varphi(v)) = \operatorname{N}(\Ad'_\varphi(v)) = q(v)\) and so \(\Ad'_\varphi \in O(V,q)\).
+
+The result on the kernel of the twisted adjoint on \(P(V,q)\) yields \(\boldsymbol{P}(V,q) / P(V,q) \cong 0\) (mixed signature of \(q\) in the real field) or \(\{-1, 1\}\) (positive or negative definite \(q\) in real field). Furthermore we have the short exact sequence of multiplicative groups:
+
+\begin{align}
+1 & \longrightarrow k^\times \longrightarrow \boldsymbol{P}(V,q) \longrightarrow O(V,q) \longrightarrow 1.
+\end{align}
+
+We don't always get sequences for \(P(V,q)\) and \(SP(V,q)\) because if \(1 \not\in k_0^\times\) (i.e. \(q\) is negative definite) then \(k_0^\times\) is not a group. We can trim the fibers of the twisted adjoint by making use of the following lean subgroups:
+
+\begin{align}
+\Pin(V,q) & \coloneqq \langle v \in V : q(v) = \pm 1 \rangle, \\
+\Spin(V,q) & \coloneqq \Pin(V,q) \cap \Cl^0(V,q).
+\end{align}
+
+If any element \(v = v_1\dots v_m\) from the above subgroups is in the kernel of the twisted adjoint it follows that \(v^2 = N(v) = \pm 1\). Thus the kernel is \(\{-1, 1\}\) when \(k = \mathbb{R}\) and \(\{\pm 1, \pm i\}\) when \(k = \mathbb{C}\) for both groups. Thus we have, for \(F\) defined appropriately, the following short exact sequences of groups:
+
+\begin{align}
+& 1 \longrightarrow F \longrightarrow \Pin(V,q) \xrightarrow{\Ad'} O(V,q) \longrightarrow 1, \\
+& 1 \longrightarrow F \longrightarrow \Spin(V,q) \xrightarrow{\Ad'} SO(V,q) \longrightarrow 1.
+\end{align}
+
+In the case where the real signature of \(q\) is not \((1,1)\), we have that the twisted adjoint is a non-trivial two-sheeted covering: choose two q-orthogonal vectors \(v,w\) with \(q(v) = q(w) = \pm 1\) and note that the path \(t\mapsto (v\cos t + w\sin t)(v\cos t - w\sin t)\) connects \(1\) to \(-1\). In particular for the mixed signature \((r,s)\) of \(q\), because \(SO_{r,s}\) has two topological components, this argument also shows that we can restrict both \(\Spin_{r,s}\) and \(SO_{r,s}\) to their identity components and that of course is the universal covering homomorphism of \(SO^0_{r,s}\).
+
+[fn:quadratic-form] A word of warning: the theory of quadratic forms on infinite dimensional vector spaces is difficult. Likewise complications arise over a general field. Several theorems and concepts here may be of interest regarding quadratic forms on vector spaces: [[https://en.wikipedia.org/wiki/Sylvester%27s_law_of_inertia][Sylvester's law of inertia]], the [[https://en.wikipedia.org/wiki/Cartan%E2%80%93Dieudonn%C3%A9_theorem][Cartan-Dieudonné theorem]], [[https://en.wikipedia.org/wiki/Witt%27s_theorem][Witt's theorem]] and the [[https://en.wikipedia.org/wiki/Witt_group][Witt group]]. Note that (pseudo-)Riemannian metrics are quadratic forms on the tangent fibers; we use this later to define Clifford bundles.
+
+[fn:warn] Note to self: what if \(V\) is infinite dimensional?
+
+[fn:reflection] This formula is called the [[https://en.wikipedia.org/wiki/Householder_transformation][Householder transformation]].
+
+[fn:invertibility] For example, computing \(\varphi^{-1}\) is hard and rife with open questions.
+
+[fn:adjoint-kernel] The kernel of the twisted adjoint is easy to calculate, while all other mapping properties are preserved same as the adjoint, which is why we utilize it.
+
+[fn:norm] It is nice to have this norm, because the form \(q\) can only be applied to vectors \(v\in V\).
+
+* Dirac operators
+
+* TODO Plan for study [0/5]
+
+- [-] Study Chapter 2 from Lawson
+  - [X] Study covering spaces from Hatcher, to understand Lemma 1.1 on \(\operatorname{Cov}_2(X) \cong H^1(X; \mathbb{Z}_2)\).
+  - [ ] Read rest of chapter.
+- [ ] Study Principal G-bundle appendix from Lawson, Appendix A
+- [ ] Classifying spaces and Characteristic Classes from Lawson, Appendix B
+- [ ] Orientation Classes and Thom Isomorphisms in K-Theory from Lawson, Appendix C
+- [ ] \(\text{Spin}^c\)-manifolds from Lawson, Appendix D
+  

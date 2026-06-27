@@ -1,0 +1,56 @@
+#+TITLE: Notes on Lean4 with Emacs
+#+DATE: [2026-03-26 Thu]
+
+* Introduction
+
+I had to install ~elan~ with
+
+#+begin_src sh
+git clone https://github.com/leanprover/elan
+cd elan
+cargo build --release
+target/release/elan-init
+#+end_src
+
+This set up everything for me; because I chose not to modify ~$PATH~ I had to set up my ~.profile~:
+
+#+begin_src sh
+[ -f "$HOME/.elan/env" ] && source "$HOME/.elan/env"
+#+end_src
+
+I git-cloned the [[https://github.com/leanprover-community/lean4-mode][lean4-mode]] package in =~/code/git/lean4-mode= and configured Emacs with:
+
+#+begin_src elisp
+;; This mode is tightly integrated with LSP.
+(use-package lean4-mode
+  :load-path "~/code/git/lean4-mode"
+  :ensure nil)
+
+;; This mode uses Eglot instead.
+(use-package nael)
+
+;; Suppress workspace/inlayHint/refresh requests from Lean/lake LSP
+;; server, see <https://github.com/leanprover/lean4/issues/7488#issuecomment-3559786608>.
+(defun my/suppress-lsp-inlayhint-warnings (orig-fun type message &rest args)
+  "Suppress LSP inlayHint/refresh warnings."
+  (unless (and (eq type 'lsp-mode)
+               (string-match-p "workspace/inlayHint/refresh" message))
+    (apply orig-fun type message args)))
+
+(advice-add 'display-warning :around #'my/suppress-lsp-inlayhint-warnings)
+#+end_src
+
+I also customized ~lsp-file-watch-ignored-directories~ to include ~"[/\\\\]\\.lake\\'"~.
+
+** Keybindings
+
+- View/close goals with ~C-c TAB~.
+- View errors and warnings with flycheck with ~C-c ! l~.
+
+** Search
+
+Search can be performed with [[https://loogle.lean-lang.org/][Loogle]], either online or locally using ~lake exe loogle~. As the [[https://github.com/nomeata/loogle][Loogle repository README]] advises, ~lake build LoogleMathlibCache~ will build precompute an index for large libraries like Mathlib to make searching faster.
+
+** Tactics documentation
+
+Tactics are detailed in the [[https://lean-lang.org/doc/reference/latest/Tactic-Proofs/Tactic-Reference/][Tactics-Reference]] section of the Lean 4 docs.

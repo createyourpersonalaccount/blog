@@ -1,0 +1,52 @@
+#+TITLE: All about Fourier integral operators
+#+DATE: [2026-05-05 Tue]
+
+* Introduction
+
+In these notes we will explain the theory of Fourier integral operators using Duistermaat's book [cite:@duistermaat-2011] as a roadmap, a theory so dense that it requires intimate familiarity with applications to be properly understood, and for that purpose we will use the lecture notes of Lafitte [cite:@lafitte-2024].
+
+* Duistermaat - Fourier Integral Operators
+
+- [ ] Study introduction and understand how it applies compared to Lafitte & Evans.
+
+* On applications
+
+** Lafitte's lecture notes
+
+*** TODO Chapter 1 §1.2
+
+In general, for the wave equation \(\Delta u - \frac{1}{c^2}\partial^2_t u = 0\) we may use the ansatz \(u = \psi(x)e^{-i\omega t}\) to obtain the Helmholtz equation \(\Delta\psi + k^2\psi = 0\), where \(\omega = ck\). A general solution for the wave equation is \(u = \int \psi_\omega(x) e^{-i\omega t}d\omega\), which means that the Helmholtz equation picks out a single-frequency solution for the wave equation.
+
+Let's now assume the knowledge that the outgoing solutions of the 2-dimensional wave equation for a fixed frequency \(\omega\) are given, in polar coordinates, by
+
+\begin{align}
+u(x) = \sum_{n=0}^\infty a_n e^{in\theta - i\omega t}H^1_n(kr),
+\end{align}
+
+where \(a_n\in\ell^2(\mathbb{N})\) and \(H^1_n(x)\) is the Hankel function of first kind. This is an orthogonal \(\ell^2\) sum, and then the author examines a single term to find the asymptotic for \(k \gg 1\):
+
+\begin{align}
+k^{\frac{1}{2}}H^1_n(kr) = \sqrt{\frac{2}{\pi r}} e^{ikr - n\pi/2 - \pi/4}\sum_{m=0}^\infty c_m(r)k^{-m} + O(k^nr^ne^{-2kr}).
+\end{align}
+
+He defines \(H^M_n(kr)\) as the formal truncated sum above at \(m \leq M\), and sets \(u_M(x) \coloneq k^{\frac{1}{2}}H^M_n(kr)e^{in\theta - i\omega t}\) which has the property that \(\square u_M = O(k^{-M-1})\) and \(u_M \to u\), and the author asks then under what conditions can this situation be generalized.
+
+*** Chapter 1 §2
+
+The definition of an /asymptotic expansion/ is given:
+
+\begin{align}
+b(y,\varepsilon) \simeq \sum b_j(y)\varepsilon^j.
+\end{align}
+
+*** Chapter 1 §4
+
+The Helmholtz equation is examined again in the high frequency limit resulting in the eikonal and transport equations.
+
+** TODO Evans - Partial Differential Equations
+
+He motivates the high-frequency approximation slightly different (by replacing Lafitte's large \(k\) with a large \(1/\varepsilon\) and seems to obtain a different Eikonal equation?)
+
+See pages 206-217.
+
+

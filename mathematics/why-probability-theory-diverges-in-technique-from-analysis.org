@@ -1,0 +1,12 @@
+#+TITLE: Why probability theory diverges in technique from analysis
+#+DATE: [2026-03-02 Mon]
+
+* A number of differences
+
+It is a commonly held but mistaken belief that probability theory is a subset of measure theory. This leads the student to not adopt the techniques of probability, translating them instead into measure-theoretic integrals, and so on. The belief is based on the fact that the probability measure is a nonnegative regular measure of total mass 1, and random variables are measurable functions. Here is however how the subjects diverge:
+
+1. In probability theory, the probability space \((\Omega, \Sigma, \mathbb{P})\) is not (always) uniquely determined. A lot of probability problems are described in plain language, and yet point to a well-defined mathematical problem. For example: flip a fair coin, what is the chance of heads? The measurable space \(\Omega \coloneqq \{0,1\}, \Sigma = \{\{0,1\},\{0\},\{1\},\emptyset\}\) is just as good as \(\Omega \coloneqq \{1,2,3\}\) with \(\Sigma = \{\{1,2,3\},\{1\},\{2,3\},\emptyset\}\). We may think of such probability spaces as /models/ of the problem. In probability theory we typically ignore the particular model used in practice.[fn:model] In theorems of existence of certain notions, such as the existence of Brownian motion, one has to construct the probability space.
+
+2. In classical analysis, it is rarely the case that multiple \(\sigma\)-algebras are considered, and yet this is extremely commonplace in probability theory. These \(\sigma\)-algebras are handled with novel arguments and novel notation. Of course everything can (and should) be expressed also in classical analytic terminology, but it is not the salient point to understand to begin working with them. Instead, the student should familiarize themselves with those novel arguments, which largely involve algebraic manipulations of the expectation operator \(\mathbb{E}(\cdot)\).
+
+[fn:model] With exceptions; for example the strong solution to a stochastic differential equation depends on the underlying probability space. Generally, a foundational issue arises: does a model exist? Otherwise a particular problem would be vacuous (or, say, contradictory). This issue has been resolved TODO. Another foundational issue is, what foundations should we use for our models? In the section "Variants of the standard foundations" of his [[https://terrytao.wordpress.com/2015/09/29/275a-notes-0-foundations-of-probability-theory/][275A notes]], Terry Tao explains other approaches and related theorems.

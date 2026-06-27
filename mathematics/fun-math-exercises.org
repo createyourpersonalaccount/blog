@@ -1,0 +1,10 @@
+#+TITLE: Fun math exercises
+#+DATE: [2026-03-14 Sat]
+
+* Cocycle condition in manifold definition
+
+Let \(M\) be a connected \(n\)-dimensional manifold with charts \((\varphi_i, U_i)\) such that the transition functions \(\varphi_i\circ\varphi_j^{-1}\) are constant \(n\times n\)-matrices \(A(i,j)\). Prove that \(M\) is diffeomorphic to \(\mathbb{R}^n\).
+
+** Solution
+
+Let \((\varphi_0, U_0)\) be one of the charts. The cocycle condition yields \(A(i,j) = A(i,0) A(0,j)\). The new charts \(\psi_i \coloneqq A(0,i)\circ\varphi_i\) then yield \(\psi_i\circ\psi_j^{-1} = \operatorname{Id}\), hence \(\psi_i = \psi_j\) on \(U_i\cap U_j\), and so there is a global \(\psi : M \to \mathbb{R}^n\) defined by these charts.
