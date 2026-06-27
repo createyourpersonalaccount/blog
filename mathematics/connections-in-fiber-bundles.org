@@ -25,10 +25,10 @@ Suppose we had such a horizontal subbundle \(HY\), what could we do with it? If 
 #+NAME: fig:connections-2
 [[../img/connections-2.svg]]
 
-It is not obvious from the figure[fn:integral-curves] above but the lift is performed such that it projects back down to \(\tau\) via \(T\pi\). Since \(T\pi : (\dot{x}, \dot{y}) \mapsto \dot{x}\), the form the vector field must take on \(Y\) is
+It is not obvious from the figure[fn:integral-curves] above but the lift is performed such that it projects back down to \(\tau\) via \(T\pi\). Since \(T\pi \colon (\dot{x}, \dot{y}) \mapsto \dot{x}\), the form the vector field must take on \(Y\) is
 
 \begin{align}
-\Gamma : \partial_x & \mapsto \partial_x + C \partial_y, & C \in \mathbb{R}.
+\Gamma \colon \partial_x & \mapsto \partial_x + C \partial_y, & C \in \mathbb{R}.
 \end{align}
 
 This is all there is to the definition of a connection (from the perspective of horizontal bundles) with two minor details:
@@ -44,13 +44,13 @@ This is all there is to the definition of a connection (from the perspective of 
 
 ** Covariant derivative
 
-Connections are typically introduced as a means to differentiate vector fields. If \(s : X \to Y\) is a section and \(\tau : X \to TX\) a vector field, how do we form \(\nabla_\tau s\)? The formula is:
+Connections are typically introduced as a means to differentiate vector fields. If \(s \colon X \to Y\) is a section and \(\tau \colon X \to TX\) a vector field, how do we form \(\nabla_\tau s\)? The formula is:
 
 \begin{align}
 \nabla_\tau s & = (\partial_\lambda s^i - \Gamma^i_\lambda)\tau^\lambda \partial_i,
 \end{align}
 
-where \(\Gamma^i_\lambda\) is evaluated at \(s(x)\) (the minus sign is a convention and you may encounter it in either direction.) The result lies in the vertical subbundle \(VY\). When \(Y\) is a vector bundle, there is a canonical identification of \(VY\) with those of \(Y\), and the result can be said to be a section \(\nabla_\tau s : X \to Y\). The term \(\partial_\lambda s^i\) is the only term with first derivatives; other term is a zero-order correction without which the expression would not be coordinate-invariant: if a frame \(e_i\) is given for a vector bundle and a path is given by \(y(t) \coloneqq y^i(t) e_i(t)\), then the derivative \(y'(t)\) contains zero-order terms of the form \(y^i(t)e'_i(t) = y^i(t)\omega_i^j(t)e_j(t)\) which are going to be different for different coordinates; hence the zero-order correction is required.
+where \(\Gamma^i_\lambda\) is evaluated at \(s(x)\) (the minus sign is a convention and you may encounter it in either direction.) The result lies in the vertical subbundle \(VY\). When \(Y\) is a vector bundle, there is a canonical identification of \(VY\) with those of \(Y\), and the result can be said to be a section \(\nabla_\tau s \colon X \to Y\). The term \(\partial_\lambda s^i\) is the only term with first derivatives; other term is a zero-order correction without which the expression would not be coordinate-invariant: if a frame \(e_i\) is given for a vector bundle and a path is given by \(y(t) \coloneqq y^i(t) e_i(t)\), then the derivative \(y'(t)\) contains zero-order terms of the form \(y^i(t)e'_i(t) = y^i(t)\omega_i^j(t)e_j(t)\) which are going to be different for different coordinates; hence the zero-order correction is required.
 
 ** Parallel transport
 
@@ -58,7 +58,7 @@ Using the covariant derivative we can introduce parallel transport as the path o
 
 We can also view parallel transport from the perspective of horizontal bundles; \(\frac{d\gamma}{dt}\)  lifts to a path \(\Gamma\frac{d\gamma}{dt}\) on \(TY\). The solution \(s(t)\) to the equation \(\frac{ds}{dt} = \Gamma\frac{d\gamma}{dt}\) is the parallel transport of \(s_0\) along \(\gamma\).
 
-With this example we can arrive at a line bundle: if \(Y \to X\) is our fiber bundle and \(\gamma : I \hookrightarrow X\) is our path, then there is a new fiber bundle \(\gamma^*Y \to I\) with connection \(\gamma^*\Gamma\) given by \((\gamma^*\Gamma)\partial_t = \Gamma\frac{d\gamma}{dt}\), or in coordinates \(\partial_t \mapsto \partial_t + \Gamma^i_\lambda\frac{d\gamma^\lambda}{dt}\partial_i\). A common notation for the covariant derivative \(\nabla_{\frac{d\gamma}{dt}}\) of \(\gamma^*\Gamma\) is \(\frac{D}{dt}\).
+With this example we can arrive at a line bundle: if \(Y \to X\) is our fiber bundle and \(\gamma \colon I \hookrightarrow X\) is our path, then there is a new fiber bundle \(\gamma^*Y \to I\) with connection \(\gamma^*\Gamma\) given by \((\gamma^*\Gamma)\partial_t = \Gamma\frac{d\gamma}{dt}\), or in coordinates \(\partial_t \mapsto \partial_t + \Gamma^i_\lambda\frac{d\gamma^\lambda}{dt}\partial_i\). A common notation for the covariant derivative \(\nabla_{\frac{d\gamma}{dt}}\) of \(\gamma^*\Gamma\) is \(\frac{D}{dt}\).
 
 ** Why is the vertical bundle well-defined but the horizontal bundle is not?
 :PROPERTIES:
@@ -115,7 +115,7 @@ In these new coordinates, the equality \(\dot{y}'^i = 0\) is not preserved, and 
 
 In extrinsic geometry we consider the features of \(N\subset M\) where both \(N, M\) are manifolds; \(M\) is the /ambient space/ and \(N\) is embededed manifold whose geometry we are interested in.
 
-If we have two vector fields \(\overline{u}, \overline{v} : \mathbb{R}^n \to \mathbb{R}^n\) there is a simple method to differentiate \(\overline{v}\) in the direction of \(\overline{u}\) at \(x\in\mathbb{R}^n\):
+If we have two vector fields \(\overline{u}, \overline{v} \colon \mathbb{R}^n \to \mathbb{R}^n\) there is a simple method to differentiate \(\overline{v}\) in the direction of \(\overline{u}\) at \(x\in\mathbb{R}^n\):
 
 \begin{align}
 (\overline{\nabla}_{\overline{u}} \overline{v})(x) = \overline{u}^i(x) \frac{\partial \overline{v}}{\partial x_i}(x).
@@ -123,7 +123,7 @@ If we have two vector fields \(\overline{u}, \overline{v} : \mathbb{R}^n \to \ma
 
 (Note that as is customary, the connection of the ambient space is given an overline above it.)
 
-Now let us consider a hypersurface \(S\subset \mathbb{R}^n\), with two tangent vector fields \(u, v : S \to \mathbb{R}^n\). (For concreteness, consider the unit sphere \(S^2\) of \(\mathbb{R}^3\).) What should the notion of differentiating \(v\) in the direction of \(u\) be? We cannot compute \(\overline{\nabla}_u v\) as before because \(v\) is not specified on an open subset of \(\mathbb{R}^n\) and thus the differentiation operators \(\frac{\partial}{\partial x_i}\) do not apply. To solve this problem we can extend the domain of \(v\). Obviously, the values that the extension takes far away from \(S\) do not matter. We may assume that we have an extension \(\overline{v}\) of \(v\) that is defined on an open subset containing \(S\) and such that \(\overline{v}(x) = v(x)\) for \(x\in S\).
+Now let us consider a hypersurface \(S\subset \mathbb{R}^n\), with two tangent vector fields \(u, v \colon S \to \mathbb{R}^n\). (For concreteness, consider the unit sphere \(S^2\) of \(\mathbb{R}^3\).) What should the notion of differentiating \(v\) in the direction of \(u\) be? We cannot compute \(\overline{\nabla}_u v\) as before because \(v\) is not specified on an open subset of \(\mathbb{R}^n\) and thus the differentiation operators \(\frac{\partial}{\partial x_i}\) do not apply. To solve this problem we can extend the domain of \(v\). Obviously, the values that the extension takes far away from \(S\) do not matter. We may assume that we have an extension \(\overline{v}\) of \(v\) that is defined on an open subset containing \(S\) and such that \(\overline{v}(x) = v(x)\) for \(x\in S\).
 
 Now we can compute \(u^i(x) \frac{\partial \overline{v}}{\partial x_i}(x)\) on \(x\in S\), but the result will depend on the extension \(\overline{v}\), so that different extensions yield different results. As it turns out, the difference of that quantity in two different extensions lies in the normal bundle \(NS\), that is, normal to the tangent spaces of \(S\). Since that quantity agrees in the tangent directions it makes sense to project the result to \(TS\). Let \(p : T \mathbb{R}^n \to TS\) be the projection and define \(\nabla\) for \(TS\) as follows:
 
@@ -173,3 +173,22 @@ TS^1 & \cong \mathbb{R}^2 / {\sim_\phi}, &\quad \phi(x,y) & = (x + 1, y), \\
 Although for both \(\nabla = 0\), their holonomy groups \(\Hol(\nabla)\) differ; for the cylinder it is trivial and for the Möbius band it is \(\mathbb{Z}_2\). Hence, \(\nabla\) itself does not capture the twisting of the bundle, i.e. it does not by itself tell the full story.
 
 It is also interesting to note that a trivial holonomy \(\Hol(\nabla) = 1\) for any vector bundle implies that the bundle is trivial. The reason is that any given frame \(e_i\) at a point can be parallel-transported to its entire path-connected component, trivializing it.
+
+* Connections as infinitesimal holonomy
+
+This is the Ambrose-Singer theorem, first stated in [cite:@ambrose-singer-1953]; exposition in [cite:@kobayashi-nomizu-1996] Chapter 2 §7.8 for principal G-bundles, and an extension on fiber bundles in [cite:@michor-1991] §12.4.
+
+* Connections as global sections of jet bundle
+
+The connections of a fiber bundle \(\pi\colon Y \to X\) are in bijection with the global sections of the first jet bundle \(J^1Y \to Y\): the components have the same transformation laws and hence one can be used to define the other. On the other hand, \(J^1Y \to Y\) is an affine bundle modelled over the vector bundle \(T^*X \underset{Y}{\otimes} VY \to Y\).[fn:jet-affine-bundle] A global section \(\Gamma \colon Y \to J^1Y\) provides an isomorphism of these two bundles:
+
+\begin{equation}
+\begin{aligned}
+D_\Gamma \colon J^1Y &\xrightarrow[Y]{\cong} T^*X \underset{Y}{\otimes} VY, \\
+y^i_\lambda & \mapsto (y^i_\lambda - \Gamma^i_\lambda)dx^\lambda\otimes \partial_i.
+\end{aligned}
+\end{equation}
+
+The isomorphism above merely chooses an origin \(\Gamma^i_\lambda(y)\) for the affine space \(J^1_{y}Y\) for each \(y\in Y\). What is interesting is that \(D_\Gamma\) is the /covariant differential/! In fact the covariant derivative is recovered immediately as \(\nabla^\Gamma s = D_\Gamma \circ j^1s\) for a section \(s \colon X \to Y\). Let us explain the prolongation \(j^1s\) here: the section \(s\) makes the \(y^i\) variables depend on \(x^\lambda\), i.e. \(y^i = s^i(x)\); all \(j^1s\) does is make \(y^i_\lambda\) also depend on \(x\), i.e. \(y^i_\lambda = \partial_\lambda s^i(x)\).
+
+[fn:jet-affine-bundle] More generally, we have that the affine bundle \(\pi_{k,k-1}\colon J^kY \to J^{k-1}Y\) is modelled over the vector bundle \(S^kT^*X \underset{J^{k-1}Y}{\otimes} VY \to J^{k-1}Y\), see Proposition 2.1.13 of [cite:@saunders-thesis].

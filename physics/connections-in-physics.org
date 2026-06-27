@@ -19,11 +19,22 @@ The entire chapter 6 contains all the relevant information.
 
 I need to read it carefully because it is new material and confusing. For example:
 
-- [ ] why is there both a left Lie algebra \(\mathfrak{g}_l\) and a right Lie algebra \(\mathfrak{g}_r\)?
-- [ ] What is a reduction of a principal G-bundle?
+- [X] why is there both a left Lie algebra \(\mathfrak{g}_l\) and a right Lie algebra \(\mathfrak{g}_r\)?
+  Answer: the bracket \([u, v]\) is defined for two vector fields of \(G\); if left or right invariant the answer differs by a minus. Thus the notation merely involves whether one speaks of the left or the right bracket.
+- [X] What is a reduction of a principal G-bundle?
   See Remark 6.5.2 in p. 183. In particular Theorem 6.5.1 says that the structure group \(G\) reduces to \(H\) if and only if \(P\) has an atlas with \(H\)-valued transition functions.
-- [ ] Why is the Mauer-Cartan formula \(d\phi(\epsilon_1, \epsilon_2) = -\frac{1}{2}\phi([\epsilon_1, \epsilon_2])\) holding true? In this vein, I might be aided by Chern [cite:@bams/1183527777] chapter 3. Ah; Mangiarotti has written the formula wrong by a factor of \(\frac{1}{2}\).
 
+  A reduction simplifies a principal G-bundle.
+- [X] Why is the Maurer-Cartan formula \(d\phi(\epsilon_1, \epsilon_2) = -\frac{1}{2}\phi([\epsilon_1, \epsilon_2])\) holding true? In this vein, I might be aided by Chern [cite:@bams/1183527777] chapter 3. Ah; Mangiarotti has written the formula wrong by a factor of \(\frac{1}{2}\) (actually, it's a convention).
+
+  There's a general formula for \(d\omega(\epsilon_1, \dots, \epsilon_n)\). Applied to a \(2\)-form it yields:
+
+  \begin{align}
+  d\phi(\epsilon_1, \epsilon_2) = \frac{1}{2}\epsilon_1\phi(\epsilon_2) - \frac{1}{2}\epsilon_2\phi(\epsilon_1) - \frac{1}{2}\phi([\epsilon_1, \epsilon_2]).
+  \end{align}
+
+  For left-invariant forms and left-invariant vector fields \(\epsilon_1, \epsilon_2 \in \mathfrak{g}_l\), the first two terms are zero.
+  
 ** TODO Special relativity
 
 *** TODO Wald [cite:@wald-2022]
@@ -65,3 +76,20 @@ Requires understanding the /spin map/ \(\Spin : \SL(2, \mathbb{C}) \to \mathcal{
 
 Chapter 6 talks about connections on principal G-bundles. Interesting in p. 344 the equivalence between connections is discussed, called the /moduli space of connections/ on a bundle. Yang-Mills functional in 6.3. Note that there is a lot of discussion around the quarternionic Hopf bundle and \(\SL(2, \mathbb{H})\). The Atiyah-Hitchin-Singer theorem in §6.5 has the moduli space of connections for that bundle computed as \(\SL(2, \mathbb{H})/{\Sp(2)}\).
 
+** TODO Terek [cite:@terek-2025]
+
+This article is interesting; it introduces magnetic geometry, and it might be a nice addition to my knowledge of classical electromagnetism.
+
+** TODO Woit [cite:@woit-2017] for groups related to physics
+
+This book contains a lot of analysis of groups that are related to physics.
+
+** TODO Nair [cite:@nair-2010] for an intro to QFT, QED, etc
+
+** TODO Guillemin, Sternberg [cite:@guillemin-2006] for some geometry on Kepler's problem
+
+There is *a lot* of geometry on this problem. It is quite impressive yet appears elementary, so perhaps a worthwhile read.
+
+*** TODO Weinstein [cite:@weinstein-1983] geometry of Poisson manifolds
+
+Guillemin mentions Poisson manifolds, there's interesting questions about them explored in this paper, in particular how they're foliated by symplectic manifolds of various dimensions, and how the structure constants of a Lie algebra can define a Poisson manifold.

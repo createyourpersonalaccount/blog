@@ -1,0 +1,173 @@
+#+TITLE: Examples in Mathematics
+#+DATE: [2026-03-09 Mon]
+
+* Lie groups
+
+** Matrix groups
+
+For matrix groups we have the following explicit formulas:
+
+If \(\dot{h} = X\) then \(\left.\frac{d}{dt}\right|_{t=0} ghg^{1} = g\dot{h}g^{-1}\). Thus,
+
+\begin{align}
+\Ad_g(X) = gXg^{-1}.
+\end{align}
+
+Furthermore, if \(\dot{g} = Y\) then \(\left.\frac{d}{dt}\right|_{t=0} gXg^{-1} = \dot{g}X - X\dot{g}\). Thus,
+
+\begin{align}
+\ad_Y(X) = [Y,X].
+\end{align}
+
+** Orthogonal group
+
+Given a quadratic form \(q\) on an \(n\)-dimensional vector space over \(\mathbb{k}\) we have the orthogonal group \(O(q, \mathbb{k})\) that preserves it. It is an algebraic group; however for the case where \(\mathbb{k} = \mathbb{R}, \mathbb{C}, \mathbb{Q}_p\), it is a Lie group. \(O(n, \mathbb{k})\) acts transitively on the sphere \(S^{n-1}_{\mathbb{k}}\) by the Cartan-Dieudonné theorem.
+
+* Manifolds
+
+** Spheres
+
+The \(n\)-dimensional sphere \(S^n\) may be viewed as an algebraic variety by the polynomial equation
+
+\begin{align}
+\label{eq:unit-sphere}
+x_1^2 + \cdots + x_n^2 = 1.
+\end{align}
+
+As a CW-complex, the sphere may be obtained as \(e^0\sqcup e^n/{\sim}\) gluing by \(\varphi : S^{n-1} \to e^0\).[fn:cw-complex] Differentially, it has spherical coordinates obtained by a simple inductive argument as \(\varphi_j \in [0,\pi]\) for \(j=1,\dots,n-1\) and \(\varphi_n \in [0,2\pi]\), where each \(\varphi_j\) measures the zenith angle from the \(j\)-th axis, and the final \(\varphi_n\) coordinate belongs to \(S^1\): fixing \(\varphi_1, \dots, \varphi_{j-1}\), we obtain a sphere dimension \(n-j+1\) and of radius \(\sin\varphi_1\cdots\sin\varphi_{j-1}\) on which we define the \(j\)-th zenith angle \(\varphi_j\).
+
+The Riemannian metric \(g\) inherited from \eqref{eq:unit-sphere} is given in spherical coordinates by the diagonal tensor (here \(\langle \cdot, \cdot\rangle\) denoting the standard metric of \(\mathbb{R}^{n+1}\)),
+
+\begin{align}
+g
+& = \langle \partial /\partial \varphi_i, \partial / \partial \varphi_k\rangle d\varphi^i\otimes d\varphi^k \\
+& = \sum_{j=1}^n (\sin\varphi_1\dots\sin\varphi_{j-1})^2d\varphi_j^2.
+\end{align}
+
+The non-zero Christoffel symbols are given by (modulo permutations of lower indices),
+
+\begin{align}
+\begin{cases}
+\Gamma^i_{jj} & = -\cot\varphi_i(\sin\varphi_i\cdots\sin\varphi_{j-1})^2, & i < j, \\
+\Gamma^j_{ij} & = \cot\varphi_i & i < j.
+\end{cases}
+\end{align}
+
+From this there's a few ways to compute the Riemann curvature tensor:
+
+1. Compute the sectional curvature (a constant) and recover using Theorem 6.5 (and subsequent results) of Chapter 6 of Kuhnel.
+2. Compute as in Petersen's Chapter 3.2 using formulas of ambient geometry (second fundamental form).
+3. View the sphere as a symmetric space and apply the formula \(R(X,Y)Z = -[[X, Y], Z]\).
+4. View the sphere as a wrapped product \(S^n \cong S^{n-1}\times_{\sin\theta_n} I\) and apply related formulas.
+5. Direct computation using the formula for \(R^i_{jkl}\) in terms of the Christoffel symbols.
+
+We proceed with a direct computation.[fn:four-zero-tensor] We list all the non-zero cases modulo permutations of the lower indices of \(\Gamma\):
+
+\begin{align}
+\begin{cases}
+\partial_i \Gamma^i_{jj} & = (2\sin^2\varphi_i - 1)(\sin\varphi_{i+1}\cdots\sin\varphi_{j-1})^2, & i < j, \\
+\partial_j \Gamma^i_{kk} & = -2\cot\varphi_i\cot\varphi_j (\sin\varphi_i\cdots\sin\varphi_{k-1})^2, & i < j < k, \\
+\partial_i \Gamma^j_{ij} & = -\csc^2\varphi_i, & i < j.
+\end{cases}
+\end{align}
+
+Furthermore,
+
+\begin{equation}
+\begin{aligned}
+\begin{cases}
+(\Gamma^i_{jj})(\Gamma^j_{kk}) & = \cot\varphi_i\cot\varphi_j (\sin\varphi_i\cdots\sin\varphi_{k-1})^2, & i < j < k \\
+(\Gamma^i_{kk})(\Gamma^k_{jk}) & = -\cot\varphi_i\cot\varphi_j (\sin\varphi_i\cdots\sin\varphi_{k-1})^2, & i, j < k \\
+(\Gamma^j_{ij})(\Gamma^j_{kk}) & = -\cot\varphi_i\cot\varphi_j (\sin\varphi_j\cdots\sin\varphi_{k-1})^2, & i < j < k \\
+(\Gamma^k_{ik})(\Gamma^k_{jk}) & = \cot\varphi_i\cot\varphi_j, & i, j < k.
+\end{cases}
+\end{aligned}
+\end{equation}
+
+We have from \eqref{eq:curvature-coefficients} that:
+
+[fn:cw-complex] See [cite:@hatcher-2001], Appendix.
+
+[fn:four-zero-tensor] We should note that it is more natural to work with \(R_{ijkl}\) instead because the symmetries are more apparent, e.g. \(R_{ijkl} = R_{klij}\) translates to \(R^i_{jkl} = R_{kl}\,{}^{i}\,{}_{j}\) if one decides to use the \((3,1)\)-tensor instead, so the identities cannot even be stated wholly in the \((3,1)\)-realm.
+
+** Projective spaces
+
+The \(n\)-dimensional real projective space \(\mathbb{PR}^n\) is the real Grassmannian of lines in \(\mathbb{R}^{n+1}\), i.e. \(\Gr_{\mathbb{R}}(n+1,1)\). Equivalently it's the quotient \(S^n/{\mathbb{Z}_2}\) of the antipodal action. As a CW complex, it is given as a quotient of \(e^0\sqcup e^1\sqcup \cdots \sqcup e^n\): the idea is that inductively \(\mathbb{PR}^n\) is obtained from \(\mathbb{PR}^{n-1}\) by attaching an \(n\)-cell \(e^n\) via the map
+
+** Real \(1\)-dimensional bundles over \(S^1\)
+
+There are only two such bundles, \(S^1\times \mathbb{R}\) and the Möbius strip: By the [[#classification-principal-g-bundles][classification theorem for bundles]], since the maximal compact subgroup of \(\GL(1, \mathbb{R})\) is \(O(1)\), we have that they are classified by \(H^1(S^1; \mathbb{Z}_2)\) which is simply \(\mathbb{Z}_2\), and hence there are only two such bundles. A distinguished element that disambiguates between the two is the first Stiefel-Whitney class.
+
+* Connections
+
+Let \(\pi : Y \to X\) be a fiber bundle. A connection in a fiber bundle chart \((U, \psi)\) with associated fibred coordinates \((x^\lambda, y^i)\) is given by arbitrarily picked functions \(\Gamma^i_\lambda \in C^\infty(U)\). We can give simple examples for \(T \mathbb{R}^n \to \mathbb{R}^n\) where the functions are chosen to be constants:
+
+1. \(\Gamma^i_{jk} = 0\) for all \(i,j,k\). This connection leads to the covariant derivative \(\nabla_V W = V^i\partial_iW^j\partial_j\). The geodesic equation \(\nabla_{\dot{x}}x = 0\) is given by \(\ddot{x} = 0\).
+2. \(\Gamma^i_{jk} = \varepsilon_{ijk}\), where \(\varepsilon_{ijk}\) is the [[https://en.wikipedia.org/wiki/Levi-Civita_symbol][Levi-Civita symbol]] in three indices. This connection has the same geodesic equation as the previous example, \(\ddot{x} = 0\), even though it behaves differently for general parallel translation because it has torsion. This example is worked out in more detail in section [[Torsion]].
+
+** Torsion
+
+Consider \(\mathbb{R}^3\) with Christoffel symbols defined by \(-\Gamma^z_{yx} = \Gamma^z_{xy} = 1\), \(-\Gamma^y_{zx} = \Gamma^y_{xz} = -1\), and \(-\Gamma^x_{zy} = \Gamma^x_{yz} = 1\), and all others set to zero. The geodesic equation is given by:
+
+\begin{align}
+\nabla_{\partial_t} \dot{\gamma} = 0 \implies \ddot{\gamma}^i - \Gamma^i_{jk}\dot{\gamma}^j\dot{\gamma}^k = 0.
+\end{align}
+
+Because of the antisymmetry in the lower indices, the geodesic equation ends up being \(\ddot{\gamma}^i = 0\), which is the same for the Levi-Civita connection of \(\mathbb{R}^3\). Now consider the parallel translation equation for a vector field \(V\) over \(\gamma\):
+
+\begin{align}
+\nabla_{\partial_t} V = 0 \implies \dot{\gamma}^j\partial_j V^i - \Gamma^i_{jk}\dot{\gamma}^jV^k = 0.
+\end{align}
+
+This equation may be rewritten as \(\dot{V} = MV\) where \(M\) is skew-symmetric; in particular, \(\dot{V} = \dot{\gamma}\times V\). The solution will preserve \(\|V\|\) as \(\frac{d}{dt}\|V\|^2 = 2V\cdot \dot{V} = 0\) and hence \(V(t) = R(t)V(0)\) for some \(R(t)\in SO(3)\) solving \(\dot{R} = MR\) with \(M\in\mathfrak{so}(3)\). Now if \(\gamma\) is not just any general loop but a geodesic, according to the previous observation, it will be an arclength parametrized straight line, so \(\dot{\gamma}\) is constant (and so is \(M\)), and therefore \(R = \exp(tM)\) and \(V(t)\) will rotate about \(\dot{\gamma}\) with angle \(t\).
+
+* Theorems and lemmas
+
+** Classification of principal \(G\)-bundles
+:PROPERTIES:
+:CUSTOM_ID: classification-principal-g-bundles
+:END:
+
+Let \(\operatorname{Prin}(X, G)\) be the isomorphic classes of principal \(G\)-bundles over a paracompact topological space \(X\).
+
+1. There exists a bijection with the first Čech cohomology group \(H^1(X; G)\).
+2. There exists a bijection[fn:homotopic-maps-into-bg] with the homotopy classes of maps \(X \to BG\) which [[#classification-principal-g-bundles-isawasa][often reduces further]]. This bijection works as follows, given any map \(f : X \to BG\), we may form the principal \(G\)-bundle \(P \coloneqq f^*(EG)\). The bundle \(EG \to BG\) is called the classifying space of principal \(G\)-bundles. Its construction as an infinite join \(G*G*\cdots\) is due to Milnor.[fn:milnor-universal]
+
+[fn:homotopic-maps-into-bg] See [cite:@lawson-1990] Appendix B, equation B.1.
+[fn:milnor-universal] See [cite:@milnor-1956-ii].
+
+*** Classification of vector bundles
+
+Any \(n\)-dimensional vector bundle \(E \to X\) over \(k\) can be canonically obtained as an associated bundle from the frame bundle \(F(E) \to X\) as \(F(E)\times_{\GL(n,k)} k^n\), where with this notation we quotient \(F(E)\times k^n\) by identifying elements \((p,v)\) and \((pg, g^{-1}v)\) for \(g\in\GL(n,k)\). Therefore the classification of vector bundles reduces to the classification of principal \(\GL(n,k)\)-bundles.
+
+*** Cartan decomposition
+:PROPERTIES:
+:CUSTOM_ID: classification-principal-g-bundles-isawasa
+:END:
+
+Given a connected real semisimple Lie group \(G\) with a maximal compact subgroup \(K\), we have a homotopy equivalence \(G \simeq K\) yielding \(BG \simeq BK\).[fn:maximal-compact-subgroup] This implies \(\operatorname{Prin}(X, G)\) is also in bijection with \([X, BK]\).
+
+[fn:maximal-compact-subgroup] See [cite:@helgason-2001] Chapter VI §1 Theorem 1.1 (iii) and §2 Theorem 2.2 (iii).
+
+* Calculations
+
+Certain expressions are hard to remember. In this section we provide a way to remember certain expressions and concepts.
+
+** Riemann curvature tensor
+
+The easiest calculation comes from
+
+\begin{align}
+[\nabla_k, \nabla_l],
+\end{align}
+
+where, in the above expression, only the terms \(\nabla \Gamma\) survive:
+
+\begin{equation}
+\label{eq:curvature-coefficients}
+\begin{aligned}
+R^i_{jkl}
+& = \nabla_l \Gamma^i_{jk} - \nabla_k \Gamma^i_{jl} \\
+& = \partial_l\Gamma^i_{jk} - \partial_k\Gamma^i_{jl} + \Gamma^i_{mk}\Gamma^m_{jl} - \Gamma^i_{ml}\Gamma^m_{jk}.
+\end{aligned}
+\end{equation}

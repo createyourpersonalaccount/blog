@@ -1,0 +1,57 @@
+#+TITLE: Statistical Mechanics
+#+DATE: [2026-02-21 Sat]
+
+* The partition function
+
+For a statistical system, the partition function is defined as
+
+\begin{align}
+Z \coloneqq \int e^{-H(X)}.
+\end{align}
+
+How does one arrive at this definition? Let us consider a sequence of energy levels \(E_i\) and a probability distribution \(p_i\). We may write down the entropy of this distribution as
+
+\begin{align}
+\label{eq:entropy}
+S \coloneqq -\sum_i p_i \ln p_i.
+\end{align}
+
+Suppose that we have decided upon the mean energy \(\langle E\rangle\) of the system. We seek to find a probability distribution \(p_i\) that maximizes the entropy[fn:maximize] given the constraints
+
+\begin{align}
+\label{eq:probability}
+\sum_i p_i & = 1, \\
+\sum_i p_i E_i & = \langle E \rangle.
+\end{align}
+
+Using Lagrange multipliers,
+
+\begin{align}
+\mathcal{L} \coloneqq S - \alpha(\sum_i p_i - 1) -\beta(\sum_i p_i E_i - \langle E \rangle)
+\end{align}
+
+we obtain on the condition \(\frac{\partial \mathcal{L}}{\partial p_i} = 0\) that
+
+\begin{align}
+p_i = e^{-1 -\alpha -\beta E_i}.
+\end{align}
+
+Using \(A \coloneqq \exp(-1 -\alpha)\) temporarily, \eqref{eq:probability} yields
+
+\begin{align}
+Z \coloneqq A^{-1} = \sum_i e^{-\beta E_i}.
+\end{align}
+
+This yields a family of probability distributions depending on the parameter \(\beta\) which we are free to select as we'd like. By setting \(\beta = (k_B T)^{-1}\) where \(T\) is temperature, we obtain the [[https://en.wikipedia.org/wiki/Boltzmann_distribution][Boltzmann distribution]].
+
+[fn:maximize] But why do we seek to maximize entropy? The reason is that we wish the system to be as fere and unconstrained as possible, other than the conditions we have already imposed. This is the [[https://en.wikipedia.org/wiki/Principle_of_maximum_entropy][principle of maximum entropy]].
+
+** Mean values
+
+Now we can take the mean value of an observable \(Q\) as:
+
+\begin{align}
+\langle Q\rangle
+& = \sum_i p_i Q_i \\
+& = Z^{-1}\sum_i e^{-\beta E_i}Q_i.
+\end{align}

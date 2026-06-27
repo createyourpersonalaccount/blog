@@ -1,0 +1,76 @@
+#+TITLE: Mechanics
+#+DATE: [2026-06-02 Tue]
+
+* Hamiltonian formalism
+
+To formulate Hamiltonian mechanics at a minimum we need a Poisson bracket on the smooth functions of a manifold. Poisson manifolds, as they are called (see [cite:@weinstein-1983]), come with a (skew-symmetric) bivector field \(\pi\); its rank as a map \(T^*X \to TX\) stratifies \(TX\) on the even dimensions \(0, 2, \dots, 2n\) (due to the bivector field being skew-symmetric.) Each stratum folliated by symplectic leaves. It is therefore natural (and simpler) to begin with symplectic manifolds when studying the Hamiltonian formalism.
+
+Each function \(H\in C^\infty(X)\) defines the evolution of every other smooth quantity, say \(f\in C^\infty(X)\), by the evolution equation
+
+\begin{align}
+\dot{f} & = \{H, f\}.
+\end{align}
+
+This equation means that \(H\) defines[fn:dot-notation] curves \((x(t), \dot{x}(t))\) with any given initial data such that \(\frac{d}{dt}f(x(t), \dot{x}(t)) = \{H, f\}(x(t), \dot{x}(t))\). These curves are defined by the same evolution equation, yielding /Hamilton's equations/:
+
+\begin{align}
+\frac{d x}{dt} = \frac{\partial H}{\partial \dot{x}}, \quad \frac{d \dot{x}}{dt} = -\frac{\partial H}{\partial x}.
+\end{align}
+
+The function \(H\) is the energy of the system. We can play the same "game" for any other function \(g\in C^\infty(X)\) even if it is not an energy function; having fixed \(H\) (and hence our system), if we then look at the \(g\)-evolution, we will (most likely) traverse through the states of different phase-space trajectories. This can be useful because the algebraic behavior of \(g\) with respect to the bracket can give us information on the geometric features of such a traverse path without solving any differential equations!
+
+If a function \(f\) satisfies \(\{f, H\} = 0\) it is said to be a /first integral/ of the Hamiltonian system. It is useful to find as many functions in involution with \(H\) as one can. In a complicated problem, such as the Kepler problem, one simply writes down the angular momentum vector \(\boldsymbol{L}\) and the (normalized) Runge-Lenz vector \(\boldsymbol{A}\) and it turns out that the brackets of their coordinate functions close over themselves, which has immediate implications for the geometry of the problem.
+
+[fn:dot-notation] The dot notation on \(x\), i.e. \(\dot{x}\), is used as a formal variable; local coordinates in \(TX\) are denoted by \(\dot{x}^\lambda\) and in \(T^*X\) by \(\dot{x}_\lambda\).
+
+** TODO add example here
+
+This example should show the \(\boldsymbol{L}\cdot\boldsymbol{\delta\omega}\), etc, examples from Maclay.
+
+** TODO remove dot-x notation
+
+Remove this notation because in a general symplectic manifold \((X, \omega)\) the notation is bad (gets conflated with \(TX\)) instead one should use \((z^1, \dots, z^{2n})\) as is customary.
+
+* Lagrangian formalism
+
+** Classical treatment
+
+Let \(X\) be an \(n\)-dimensional manifold and \(TX\) its tangent bundle with local coordinates \((x^\lambda, \dot{x}^\mu)\) and let \(L(t, x^\lambda, \dot{x}^\mu)\) be a (first order) /Lagrangian density/. The /action integral/ is given by \(S \coloneqq \int_{t_0}^{t_1} L dt\).
+
+Given a path \(x \colon I \to X\) for the interval \(I \coloneqq [t_0, t_1]\), lying inside the coordinate patch, we can form a variation of it as follows: consider any path \(\eta \colon (I, \{t_0, t_1\}) \to (\mathbb{R}^n, 0)\). There's a family of paths \(r \mapsto (x^\lambda)^{-1} \circ (x(t) + r\eta(t))\) which induces the Gateaux derivative at \(\left.\frac{d}{dr}\right|_{r=0}\) denoted by \(\delta x / \delta \eta \colon (I, \{t_0, t_1\}) \to (TX, 0)\). Due to the fact that we will consider every such \(\eta\), we may suppress it from notation and finally denote the /variation/ of \(x\) as \(\delta x\), which then denotes /any/ path \((I, \{t_0, t_1\}) \to (TX, 0)\). Since the action \(S\) is a function of the path \(x(t)\), it too has a variation \(\delta S\), which we may compute as:
+
+\begin{align}
+\delta S = \int_{t_0}^{t_1} (\partial_\lambda L \cdot \delta x^\lambda + \partial_\mu L \cdot \delta \dot{x}^\mu) dt.
+\end{align}
+
+We may use integration by parts on the second term to obtain:[fn:partial-notation]
+
+\begin{align}
+\delta S = \cancel{\left.\partial_\mu L\cdot \delta x^\mu\right|_{t_0}^{t_1}} + \int_{t_0}^{t_1} (\partial_\lambda L - \frac{d}{dt}\dot{\partial_\lambda} L) \delta x^{\lambda} dt.
+\end{align}
+
+Setting \(\delta S = 0\) for all variations \(\delta x\) yields exactly the Euler-Lagrange equation:
+
+\begin{align}
+\partial_\lambda L - \frac{d}{dt}\dot{\partial}_\lambda L = 0.
+\end{align}
+
+Note that \(\frac{d}{dt} \dot{\partial}_\lambda L = \partial_t \dot{\partial}_\lambda L + \dot{x}^\kappa \partial_\kappa \dot{\partial}_\lambda L + \ddot{x}^\mu \dot{\partial}_\mu \dot{\partial}_\lambda L\). We will use this expression later to define the total derivative when we discuss Lagrangians in the Jet bundle formalism.
+
+[fn:partial-notation] The notation \(\dot{\partial}_\lambda\) stands for \(\partial/\partial \dot{x}^\lambda\).
+
+** Jet bundle formalism
+
+In the above, the path \(\delta \dot{x}\) is a section of \(x^*(VTX)\). As we can see, we arrive at the second order jet bundle in this manner. Replacing the \(x\)-coordinate with a \(y\)-coordinate and generalizing the time coordinate to any base \(x\)-coordinate, we arrive at the formalism on \(J^1 Y \to X\), with a first-order Lagrangian density \(L(x^\lambda, y^i, y^i_\lambda)\omega\) for some top-level differential form \(\omega\) on \(X\).
+
+The Euler-Lagrange operator is obtained by the same means, that is via variations \(\delta y\) and setting \(\delta S = 0\), to be
+
+\begin{align}
+\mathcal{E}_i(L) \coloneqq \partial_i L  - d_\lambda \partial^\lambda_i L.
+\end{align}
+
+Continue with [[https://chatgpt.com/s/t_6a1fe38628048191976336730855b0f2][this chatgpt conversation]]. See also <https://chatgpt.com/s/t_6a1ff62723ec819195876a2ff66418a0>.
+
+* TODO Things to study
+
+- [ ] See also Ian Anderson's "The Variational Bicomplex" and his youtube series https://www.youtube.com/watch?v=oUagwAW3wUQ.
