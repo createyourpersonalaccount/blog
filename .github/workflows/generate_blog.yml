@@ -36,8 +36,7 @@ jobs:
         run: |
           sudo apt update
           sudo debconf-set-selections <<< "postfix postfix/main_mailer_type string 'No configuration'"
-          sudo apt install -y snapd graphviz jq make texlive texlive-pictures git
-          sudo snap install emacs --classic
+          sudo apt install -y graphviz jq make texlive texlive-pictures git emacs-nox
       - name: obtain ox-blorg sources
         run: |
           git clone "https://github.com/createyourpersonalaccount/ox-blorg" ../ox-blorg
