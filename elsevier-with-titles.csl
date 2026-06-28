@@ -85,6 +85,10 @@
     </sort>
     <layout prefix="[" suffix="]" delimiter=",">
       <text variable="citation-number"/>
+      <group prefix=", ">
+        <label variable="locator" form="short" suffix=" "/>
+        <text variable="locator"/>
+      </group>
     </layout>
   </citation>
   <bibliography entry-spacing="0" second-field-align="flush">
