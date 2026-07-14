@@ -3,6 +3,8 @@
 
 * Lie groups
 
+The adjoint representation is a group action \(\Ad : G \to \Aut(\mathfrak{g})\), and for each \(g\in G\), may be thought of as a vector field of \(\mathfrak{g}\), i.e. \(\mathfrak{g}\ni X \mapsto \Ad_g(X) \in \mathfrak{g}\). The infinitesimal adjoint representation is an algebra action \(\ad : \mathfrak{g} \to \End(\mathfrak{g})\), and for each \(X\in \mathfrak{g}\), may be thought of as a vector field of \(\mathfrak{g}\). The same comments apply for the coadjoint actions, where it is worth noting that it is \(\mathfrak{g}\) that acts on \(\mathfrak{g}^*\) for the infinitesimal coadjoint action (and not \(\mathfrak{g}^*\) itself). The adjoint orbit is \(\Ad_G(X) = \{\Ad_g(X) : g\in G\}\) and it is an immersed submanifold. For any \(Y\) on the orbit, the infinitesimal adjoint orbit \(\ad_{\mathfrak{g}}(Y) = \{\ad_Z(Y) : Z \in \mathfrak{g}\}\) is the tangent space of the orbit at \(Y\).
+
 ** Matrix groups
 
 For matrix groups we have the following explicit formulas:
@@ -21,7 +23,9 @@ Furthermore, if \(\dot{g} = Y\) then \(\left.\frac{d}{dt}\right|_{t=0} gXg^{-1} 
 
 ** Orthogonal group
 
-Given a quadratic form \(q\) on an \(n\)-dimensional vector space over \(\mathbb{k}\) we have the orthogonal group \(O(q, \mathbb{k})\) that preserves it. It is an algebraic group; however for the case where \(\mathbb{k} = \mathbb{R}, \mathbb{C}, \mathbb{Q}_p\), it is a Lie group. \(O(n, \mathbb{k})\) acts transitively on the sphere \(S^{n-1}_{\mathbb{k}}\) by the Cartan-Dieudonné theorem.
+Given a quadratic form \(q\) on an \(n\)-dimensional vector space over \(\mathbb{k}\) we have the orthogonal group \(\O(q, \mathbb{k})\) that preserves it. It is an algebraic group; however for the case where \(\mathbb{k} = \mathbb{R}, \mathbb{C}, \mathbb{Q}_p\), it is a Lie group. \(\O(n, \mathbb{k})\) acts transitively on the sphere \(S^{n-1}_{\mathbb{k}}\) by the Cartan-Dieudonné theorem.
+
+For \(\mathrm{SO}(3)\) there is a equivariant isomorphism \(\mathbb{R}^3 \cong \so(3)\) denoted by \(v \mapsto \widehat{v}\), i.e. for which \(\Ad_g(\widehat{v}) = \widehat{gv}\). (The equivariance is between the adjoint and left actions.) As a result the adjoint orbits are concentric spheres centered at the origin. We furthermore have \(\ad_{\widehat{v}}({\widehat{w}}) = \widehat{v\times w}\) and \(\widehat{v}w = v\times w\). The Killing form is given by \(B(X,Y) = \tr(XY)\) and the KKS symplectic form is given by \(\omega_{\widehat{u}}(\widehat{v},\widehat{w}) = u\cdot (v\times w)\).
 
 * Manifolds
 
