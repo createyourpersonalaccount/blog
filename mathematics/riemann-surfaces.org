@@ -1,0 +1,31 @@
+#+TITLE: Riemann surfaces
+#+DATE: [2026-07-14 Tue]
+
+* Introduction
+
+Inspired by a great book of Girondo and González-Diez [cite:@girondo-2012] I decided to write some notes on Riemann surfaces and Belyi maps.
+
+* Hyperelliptic curves
+
+Let \(a_1, \dots, a_k \in \mathbb{C}\) be distinct. Consider the subset \(\mathring{S}\) of \(\mathbb{C}^2\) for which
+
+\begin{align}
+\label{eq:hyperelliptic}
+y^2 & = (x - a_1) \cdots (x - a_k), & x,y\in \mathbb{C}.
+\end{align}
+
+(The circle above \(\mathring{S}\) notes the fact that we have not compactified the surface yet.) We want to show that this is a complex manifold of real dimension 2.
+
+The projection \(x\colon\mathring{S} \to \mathbb{C}\) is a local biholomorphic 2-cover away from \(x = a_j\) for  \(j = 1, \dots, k\). For example about a given \((x_0, y_0)\in\mathring{S}\) we can take \(y = \sqrt{(x - a_1)\cdots(x-a_k)}\).
+
+About a special point \(a_j\) the behavior is most easily understood by the following two examples:
+
+1. The equation \(y^2 = x\), for which the equations \(x = z^2\) and \(y = z\) define a chart about \(x = 0\) for \(z\in \mathbb{C}\) small.
+2. The equation \(y^2 = (x-a)(x-b)\) for which \(x = z^2 + a\) and \(y = z(z^2 + a - b)\) define a chart near about \(x = a\) for \(z\in \mathbb{C}\) small.
+
+Thus for those points it is \(y\colon \mathring{S} \to \mathbb{C}\) that is locally biholomorphic (say for \(j = 1\)) with an equation given by \(x = a_1 + y^2/(x - a_2)\cdots (x - a_k)\) although for practical purposes it is easier to use the chart given by the equations \(x = z^2 + a_1\) and \(y = z(z^2 + a_1 - a_2)\cdots (z^2 + a_1 - a_k)\) since it yields a much simpler form for \(x\).
+
+:NOTE:
+A note on the condition of distinctness for \(a_j\): the equation \(y^2 = (x - a)^2\) is the union of two complex lines \(y = \pm (x - a)\). Thus distinctness guarantees that the resulting algebraic variety is a complex manifold.
+:END:
+

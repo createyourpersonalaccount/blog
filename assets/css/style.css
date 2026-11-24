@@ -208,6 +208,23 @@ div#sidebar h2::before {
     font-style: italic;
 }
 
+.callout {
+    margin: 1.5em 0;
+    padding: 0.75em 1em;
+    border-left: 4px solid #4a90d9;
+    border-radius: 4px;
+    background: color-mix(in srgb, #4a90d9 8%, transparent);
+}
+.callout-title {
+    margin: 0 0 0.25em;
+    font-weight: bold;
+    font-variant: small-caps;
+}
+.callout-warning {
+    border-left-color: #d97706;
+    background: color-mix(in srgb, #d97706 8%, transparent);
+}
+
 #content { max-width: 60em; margin: auto; }
 .title  { text-align: center;
           margin-bottom: .2em; }
