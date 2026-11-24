@@ -283,7 +283,87 @@ See <https://tech.fpcomplete.com/blog/2017/06/readert-design-pattern/>.
 
 *** TODO Why mtl is bad and should use effectful instead
 
-See <https://github.com/haskell-effectful/effectful/blob/master/transformers.md>.
+See <https://github.com/haskell-effectful/effectful/blob/master/transformers.md> and the [[Effectful tutorial]] below.
+
+*** Effectful tutorial
+
+Effects are like intefaces. Consider a ~Button~ that you can ~press~ and a ~Wheel~ that you can ~turn~ (with a ~degree~ parameter). The button is a light switch, which is either on or off, and we implement as a boolean.
+
+Consider this idea implemented in the object-oriented paradigm: we would have an object that inherits from both the button and wheel classes. Something akin to:
+
+#+begin_src
+status = obj.press()
+obj.turn(0.25)
+#+end_src
+
+With effectful the above is decoupled, with the operations distinct from the implementation. A program is a sequence of operations:
+
+#+begin_src haskell
+program = do
+  status <- press
+  turn 0.25
+#+end_src
+
+There is no object, but instead there are handlers, which implement the operations.
+
+#+begin_src haskell
+data Button :: Effect where
+  Press :: Button m Bool
+
+data Wheel :: Effect where
+  Turn :: Float -> Wheel m ()
+
+type instance DispatchOf Button = Dynamic
+type instance DispatchOf Wheel  = Dynamic
+#+end_src
+
+Now ~Button~ and ~Wheel~ are effects; their constructors are effect operations. To register these operations into the effect system we use ~send~, which sends the operation to the handler responsible for the effect. Typically, we write some boilerplate constructors as follows:
+
+#+begin_src haskell
+press :: Button :> es => Eff es Bool
+press = send Press
+
+turn :: Wheel  :> es => Float -> Eff es ()
+turn = send . Turn
+#+end_src
+
+Now our programs can use ~press~ and ~turn~, but they only register operations. To turn these registered operations into actions, we must use effect handlers:
+
+#+begin_src haskell
+runButton :: Eff (Button : es) a -> Eff es a
+runButton action =
+  reinterpret (evalState False) handler action
+  where handler :: EffectHandler Button (State Bool : es)
+        handler _ = \case
+          Press -> do
+            modify not
+            get
+
+runWheel :: Eff (Wheel : es) a -> Eff es a
+runWheel action =
+  reinterpret (evalState (0.0 :: Float)) handler action
+  where handler :: EffectHandler Wheel (State Float : es)
+        handler _ = \case
+          Turn deg -> do
+            modify (+deg)
+#+end_src
+
+Both handlers have internal state; in the case of the button, whether it is on or off; and in the case of the wheel, to what degree it is currently turned. While the button handler communicates its state with the outside world, the wheel handler only allows us to turn it.
+
+The effectful library comes with some popular effects such as ~Console~, ~Environment~, ~Filesystem~, and so on, and re-exports effectful-core, which has more basic effects such as ~Error~, ~Input~, ~Output~, ~State~.
+
+**** TODO Interpose examples
+
+- Logging prior to IO
+  - Combination (stacking) of two distinct loggers
+- Caching prior to operation computation
+- Mention ~op -> passthrough env op~ with ~interpose \env -> \case ...~
+
+**** TODO Introducing effects
+
+- With ~reinterpret~, we can handle an effect while introducing additional effects into the effect stack, i.e. a ~State~ for record keeping.
+- With ~interpose~, the effect can be handled by additional handlers.
+- Show examples that introduce more than 1 effect at a time.
 
 ** Debugging
 
